@@ -193,7 +193,7 @@
                 return;
             }
 
-            const message = `Praça: ${praçaSelecionada.value}\nItens faltando: ${selectedItems.join(", ")}`;
+            const message = `*Praça:* ${praçaSelecionada.value}\n*Itens faltando:* ${selectedItems.join(", ")}`;
 
             const whatsappNumber = "+5581998814321";
             const url = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
@@ -202,4 +202,5 @@
     </script>
 </body>
 </html>
+
 
