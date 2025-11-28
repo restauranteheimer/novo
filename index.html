@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Falta de Mercadoria - Heimer Restaurante</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        .container {
+            width: 80%;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .section {
+            margin-bottom: 20px;
+        }
+        .section h2 {
+            color: #333;
+        }
+        .item-list {
+            margin-bottom: 10px;
+        }
+        .item-list input {
+            margin-right: 10px;
+        }
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background-color: #25d32e;
+            color: rgb(243, 235, 235);
+            text-align: center;
+            font-size: 18px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .btn:hover {
+            background-color: #128C7E;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Heimer Restaurante - Falta de Mercadoria</h1>
+        <form id="itemsForm">
+
+            <div class="section">
+                <h2>Escolha a Praça</h2>
+                <label><input type="radio" name="praça" value="Almoço" onclick="mostrarItens('almoco')" required> Praça de Almoço</label><br>
+                <label><input type="radio" name="praça" value="Sushi" onclick="mostrarItens('sushi')"> Praça de Sushi</label><br>
+                <label><input type="radio" name="praça" value="Hambúrguer" onclick="mostrarItens('hamburguer')"> Praça de Hambúrguer</label><br>
+                <label><input type="radio" name="praça" value="Pizza" onclick="mostrarItens('pizza')"> Praça da Pizza</label><br>
+                <label><input type="radio" name="praça" value="Yakisoba" onclick="mostrarItens('yakisoba')"> Praça de Yakisoba</label><br>
+            </div>
+
+            <!-- PRAÇA DE ALMOÇO -->
+            <div id="almoco" class="item-section" style="display:none;">
+                <h2>Itens da Praça de Almoço</h2>
+                <div class="item-list">
+                    <label><input type="checkbox" name="item" value="Frango"> Frango</label><br>
+                    <label><input type="checkbox" name="item" value="CoxaSobrecoxa"> CoxaSobrecoxa</label><br>
+                    <label><input type="checkbox" name="item" value="Bife"> Bife</label><br>
+                    <label><input type="checkbox" name="item" value="Macarrão talharim"> Macarrão talharim</label><br>
+                    <label><input type="checkbox" name="item" value="Macarrão fino"> Macarrão fino</label><br>
+                    <label><input type="checkbox" name="item" value="Macarrão de lasanha"> Macarrão de lasanha</label><br>
+                    <label><input type="checkbox" name="item" value="Arroz"> Arroz</label><br>
+                    <label><input type="checkbox" name="item" value="Feijão mulatinho"> Feijão mulatinho</label><br>
+                    <label><input type="checkbox" name="item" value="Feijão preto"> Feijão preto</label><br>
+                    <label><input type="checkbox" name="item" value="Sal"> Sal</label><br>
+                    <label><input type="checkbox" name="item" value="Açúcar"> Açúcar</label><br>
+                    <label><input type="checkbox" name="item" value="Óleo"> Óleo</label><br>
+                    <label><input type="checkbox" name="item" value="Maisena"> Maisena</label><br>
+                    <label><input type="checkbox" name="item" value="Molho de tomate"> Molho de tomate</label><br>
+                    <label><input type="checkbox" name="item" value="Creme de leite"> Creme de leite</label><br>
+                    <label><input type="checkbox" name="item" value="Leite de caixa"> Leite de caixa</label><br>
+                    <label><input type="checkbox" name="item" value="Farinha"> Farinha</label><br>
+                    <label><input type="checkbox" name="item" value="Margarina"> Margarina</label><br>
+                    <label><input type="checkbox" name="item" value="Tempero de galinha"> Tempero de galinha</label><br>
+                    <label><input type="checkbox" name="item" value="Temperos"> Temperos</label><br>
+                </div>
+            </div>
+
+            <!-- PRAÇA DE SUSHI -->
+            <div id="sushi" class="item-section" style="display:none;">
+                <h2>Itens da Praça de Sushi</h2>
+                <div class="item-list">
+                    <label><input type="checkbox" name="item" value="Salmão noite"> Salmão noite</label><br>
+                    <label><input type="checkbox" name="item" value="Salmão manhã"> Salmão manhã</label><br>
+                    <label><input type="checkbox" name="item" value="Camarão"> Camarão</label><br>
+                    <label><input type="checkbox" name="item" value="Cream Cheese"> Cream Cheese</label><br>
+                    <label><input type="checkbox" name="item" value="Papel toalha"> Papel toalha</label><br>
+                    <label><input type="checkbox" name="item" value="Pepino"> Pepino</label><br>
+                    <label><input type="checkbox" name="item" value="Kani"> Kani</label><br>
+                    <label><input type="checkbox" name="item" value="Cebolinho"> Cebolinho</label><br>
+                    <label><input type="checkbox" name="item" value="Kambu"> Kambu</label><br>
+                    <label><input type="checkbox" name="item" value="Vinagre de arroz"> Vinagre de arroz</label><br>
+                    <label><input type="checkbox" name="item" value="Arroz"> Arroz</label><br>
+                </div>
+            </div>
+
+            <!-- PRAÇA DE HAMBÚRGUER -->
+            <div id="hamburguer" class="item-section" style="display:none;">
+                <h2>Itens da Praça de Hambúrguer</h2>
+                <div class="item-list">
+                    <label><input type="checkbox" name="item" value="Carne cliente"> Carne cliente</label><br>
+                    <label><input type="checkbox" name="item" value="Carne Motoqueiro"> Carne Motoqueiro</label><br>
+                    <label><input type="checkbox" name="item" value="Pão de Hambúrguer"> Pão de Hambúrguer</label><br>
+                    <label><input type="checkbox" name="item" value="Pão de Baguete"> Pão de Baguete</label><br>
+                    <label><input type="checkbox" name="item" value="Alface"> Alface</label><br>
+                    <label><input type="checkbox" name="item" value="Tomate"> Tomate</label><br>
+                    <label><input type="checkbox" name="item" value="Óleo"> Óleo</label><br>
+                    <label><input type="checkbox" name="item" value="Ovo"> Ovo</label><br>
+                    <label><input type="checkbox" name="item" value="Maionese Especial"> Maionese Especial</label><br>
+                    <label><input type="checkbox" name="item" value="Bacon"> Bacon</label><br>
+                    <label><input type="checkbox" name="item" value="Cheddar do Hambúrguer"> Cheddar do Hambúrguer</label><br>
+                </div>
+            </div>
+
+            <!-- PRAÇA DA PIZZA -->
+            <div id="pizza" class="item-section" style="display:none;">
+                <h2>Itens da Praça da Pizza</h2>
+                <div class="item-list">
+                    <label><input type="checkbox" name="item" value="Base de pizza"> Base de pizza</label><br>
+                    <label><input type="checkbox" name="item" value="Presunto"> Presunto</label><br>
+                    <label><input type="checkbox" name="item" value="Frango"> Frango</label><br>
+                    <label><input type="checkbox" name="item" value="Cebola"> Cebola</label><br>
+                    <label><input type="checkbox" name="item" value="Tomate"> Tomate</label><br>
+                    <label><input type="checkbox" name="item" value="Calabresa"> Calabresa</label><br>
+                    <label><input type="checkbox" name="item" value="Molho de tomate"> Molho de tomate</label><br>
+                    <label><input type="checkbox" name="item" value="Cheddar"> Cheddar</label><br>
+                    <label><input type="checkbox" name="item" value="Catupiry"> Catupiry</label><br>
+                    <label><input type="checkbox" name="item" value="Cream Cheese"> Cream Cheese</label><br>
+                    <label><input type="checkbox" name="item" value="Mesinha de pizza"> Mesinha de pizza</label><br>
+                    <label><input type="checkbox" name="item" value="Orégano"> Orégano</label><br>
+                    <label><input type="checkbox" name="item" value="Ovo"> Ovo</label><br>
+                    <label><input type="checkbox" name="item" value="Azeitona"> Azeitona</label><br>
+                    <label><input type="checkbox" name="item" value="Camarão"> Camarão</label><br>
+                </div>
+            </div>
+
+            <!-- PRAÇA DE YAKISOBA -->
+            <div id="yakisoba" class="item-section" style="display:none;">
+                <h2>Itens da Praça de Yakisoba</h2>
+                <div class="item-list">
+                    <label><input type="checkbox" name="item" value="Cenoura"> Cenoura</label><br>
+                    <label><input type="checkbox" name="item" value="Acelga"> Acelga</label><br>
+                    <label><input type="checkbox" name="item" value="Carne Yakisoba"> Carne Yakisoba</label><br>
+                    <label><input type="checkbox" name="item" value="Camarão"> Camarão</label><br>
+                    <label><input type="checkbox" name="item" value="Frango"> Frango</label><br>
+                    <label><input type="checkbox" name="item" value="Shoyu 20 litros"> Shoyu 20 litros</label><br>
+                    <label><input type="checkbox" name="item" value="Abacaxi"> Abacaxi</label><br>
+                    <label><input type="checkbox" name="item" value="Corante vermelho"> Corante vermelho</label><br>
+                </div>
+            </div>
+
+            <button type="button" class="btn" onclick="enviarWhatsApp()">Enviar para WhatsApp</button>
+        </form>
+    </div>
+
+    <script>
+        function mostrarItens(praca) {
+            const sections = document.querySelectorAll('.item-section');
+            sections.forEach(section => section.style.display = 'none');
+            document.getElementById(praca).style.display = 'block';
+        }
+
+        function enviarWhatsApp() {
+            const praçaSelecionada = document.querySelector('input[name="praça"]:checked');
+            if (!praçaSelecionada) {
+                alert("Por favor, selecione a praça.");
+                return;
+            }
+
+            const selectedItems = [...document.querySelectorAll('input[name="item"]:checked')]
+                .map(i => i.value);
+
+            if (selectedItems.length === 0) {
+                alert("Por favor, selecione pelo menos um item.");
+                return;
+            }
+
+            const message = `Praça: ${praçaSelecionada.value}\nItens faltando: ${selectedItems.join(", ")}`;
+
+            const whatsappNumber = "+5581996473748";
+            const url = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
+            window.open(url, "_blank");
+        }
+    </script>
+</body>
+</html>
