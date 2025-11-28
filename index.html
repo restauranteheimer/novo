@@ -65,6 +65,8 @@
                 <label><input type="radio" name="praça" value="Hambúrguer" onclick="mostrarItens('hamburguer')"> Praça de Hambúrguer</label><br>
                 <label><input type="radio" name="praça" value="Pizza" onclick="mostrarItens('pizza')"> Praça da Pizza</label><br>
                 <label><input type="radio" name="praça" value="Yakisoba" onclick="mostrarItens('yakisoba')"> Praça de Yakisoba</label><br>
+                <label><input type="radio" name="praça" value="Salão" onclick="mostrarItens('salao')"> Praça de Salão</label><br>
+                
             </div>
 
             <!-- PRAÇA DE ALMOÇO -->
@@ -109,6 +111,32 @@
                     <label><input type="checkbox" name="item" value="Kambu"> Kambu</label><br>
                     <label><input type="checkbox" name="item" value="Vinagre de arroz"> Vinagre de arroz</label><br>
                     <label><input type="checkbox" name="item" value="Arroz"> Arroz</label><br>
+                </div>
+            </div>
+              <!-- PRAÇA DE SALÃO -->
+            <div id="salao" class="item-section" style="display:none;">
+                <h2>Itens da Praça de Salão</h2>
+                <div class="item-list">
+                    <label><input type="checkbox" name="item" value="Gelo para cliente"> Gelo para cliente</label><br>
+                    <label><input type="checkbox" name="item" value="Gelo para motoqueiro"> Gelo pro motoqueiro</label><br>
+                    <label><input type="checkbox" name="item" value="Suco"> Suco</label><br>
+                    <label><input type="checkbox" name="item" value="Sache de barbecue"> Sashe de barbecue</label><br>
+                    <label><input type="checkbox" name="item" value="Ketchup sashe"> Ketchup sashe</label><br>
+                    <label><input type="checkbox" name="item" value="Ketchup grande"> Ketchup grande</label><br>
+                    <label><input type="checkbox" name="item" value="Coca Cola lata"> Coca Cola lata</label><br>
+                    <label><input type="checkbox" name="item" value="Coca Cola 1 litro"> Coca Cola 1 litro</label><br>
+                    <label><input type="checkbox" name="item" value="Coca Cola lata ZERO"> Coca Cola lata ZERO</label><br>
+                    <label><input type="checkbox" name="item" value="Coca Cola 1 litro ZERO"> Coca Cola 1 litro ZERO</label><br>
+                    <label><input type="checkbox" name="item" value="Guaraná Antártica lata"> Guaraná Antártica lata</label><br>
+                    <label><input type="checkbox" name="item" value="Guaraná Antártica lata ZERO"> Guaraná Antártica lata ZERO</label><br>
+                    <label><input type="checkbox" name="item" value="Guaraná Antártica litro"> Guaraná Antártica litro</label><br>
+                    <label><input type="checkbox" name="item" value="Guaraná Antártica ZERO"> Guaraná Antártica ZERO</label><br>
+                    <label><input type="checkbox" name="item" value="Água mineral"> Água mineral</label><br>
+                    <label><input type="checkbox" name="item" value="Água com gás"> Água com gás</label><br>
+                    <label><input type="checkbox" name="item" value="Água pro restaurante"> Água pro restaurante</label><br>
+                    <label><input type="checkbox" name="item" value="Boniba"> Boniba</label><br>
+                    <label><input type="checkbox" name="item" value="Papel filme"> Papel filme</label><br>
+                    <label><input type="checkbox" name="item" value="Sache de shoyu"> Sache de shoyu</label><br>
                 </div>
             </div>
 
@@ -164,6 +192,7 @@
                     <label><input type="checkbox" name="item" value="Shoyu 20 litros"> Shoyu 20 litros</label><br>
                     <label><input type="checkbox" name="item" value="Abacaxi"> Abacaxi</label><br>
                     <label><input type="checkbox" name="item" value="Corante vermelho"> Corante vermelho</label><br>
+                    <label><input type="checkbox" name="item" value="Repolho"> Repolho</label><br>
                 </div>
             </div>
 
@@ -193,7 +222,7 @@
                 return;
             }
 
-            const message = `*Praça:* ${praçaSelecionada.value}\n*Itens faltando:* ${selectedItems.join(", ")}`;
+            const message = `*Praça:* ${praçaSelecionada.value}\n*Itens faltando*: ${selectedItems.join(", ")}`;
 
             const whatsappNumber = "+5581998814321";
             const url = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
@@ -202,5 +231,4 @@
     </script>
 </body>
 </html>
-
 
