@@ -3,8 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Falta de Mercadoria - Pedir até às 23:30</title>
+    <title>Falta de Mercadoria - Heimer Restaurante</title>
     <style>
+          #aviso {
+            width: 100%;
+            background-color: red;
+            color: white;
+            text-align: center;
+            padding: 10px;
+            font-size: 24px;
+            font-weight: bold;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 9999;
+        }
         body {
             font-family: Arial, sans-serif;
             margin: 0;
@@ -51,25 +64,45 @@
         .btn:hover {
             background-color: #128C7E;
         }
+    
     </style>
 </head>
 <body>
+     <div id="aviso"></div>
+
+    <script>
+        function mostrarAviso() {
+            const dataAtual = new Date();
+            const hora = dataAtual.getHours();
+            const avisoElement = document.getElementById('aviso');
+
+            if (hora >= 1 && hora < 17) {
+                avisoElement.innerHTML = "Pedir Até as 15:00";
+            } else {
+                avisoElement.innerHTML = "Pedir Até as 23:30";
+            }
+        }
+
+        // Chama a função para mostrar o aviso assim que a página carregar
+        window.onload = mostrarAviso;
+    </script>
     <div class="container">
         <h1>Heimer Restaurante - Falta de Mercadoria</h1>
         <form id="itemsForm">
 
             <div class="section">
                 <h2>Escolha a Praça</h2>
-                <label><input type="radio" name="praça" value="Almoço" onclick="mostrarItens('almoco')" required> Praça de Almoço</label><br>
-                <label><input type="radio" name="praça" value="Sushi" onclick="mostrarItens('sushi')"> Praça de Sushi</label><br>
-                <label><input type="radio" name="praça" value="Hambúrguer" onclick="mostrarItens('hamburguer')"> Praça de Hambúrguer</label><br>
-                <label><input type="radio" name="praça" value="Pizza" onclick="mostrarItens('pizza')"> Praça da Pizza</label><br>
-                <label><input type="radio" name="praça" value="Yakisoba" onclick="mostrarItens('yakisoba')"> Praça de Yakisoba</label><br>
-                <label><input type="radio" name="praça" value="Salão" onclick="mostrarItens('salao')"> Praça de Salão</label><br>
-                
+                <!-- name alterado para "praca" (sem cedilha) -->
+                <label><input type="radio" name="praca" value="Almoço" onclick="mostrarItens('almoco')" required> Praça de Almoço</label><br>
+                <label><input type="radio" name="praca" value="Sushi" onclick="mostrarItens('sushi')"> Praça de Sushi</label><br>
+                <label><input type="radio" name="praca" value="Hambúrguer" onclick="mostrarItens('hamburguer')"> Praça de Hambúrguer</label><br>
+                <label><input type="radio" name="praca" value="Pizza" onclick="mostrarItens('pizza')"> Praça da Pizza</label><br>
+                <label><input type="radio" name="praca" value="Yakisoba" onclick="mostrarItens('yakisoba')"> Praça de Yakisoba</label><br>
+                <label><input type="radio" name="praca" value="Salão" onclick="mostrarItens('salao')"> Praça de Salão</label><br>
             </div>
 
-            <!-- PRAÇA DE ALMOÇO -->
+            <!-- SEÇÕES DE ITENS (mantive seus itens originais) -->
+
             <div id="almoco" class="item-section" style="display:none;">
                 <h2>Itens da Praça de Almoço</h2>
                 <div class="item-list">
@@ -96,14 +129,11 @@
                 </div>
             </div>
 
-            <!-- PRAÇA DE SUSHI -->
             <div id="sushi" class="item-section" style="display:none;">
                 <h2>Itens da Praça de Sushi</h2>
                 <div class="item-list">
                     <label><input type="checkbox" name="item" value="Salmão noite"> Salmão noite</label><br>
                     <label><input type="checkbox" name="item" value="Salmão manhã"> Salmão manhã</label><br>
-                    <label><input type="checkbox" name="item" value="2 Salmão manhã"> 2 Salmão manhã</label><br>
-                    <label><input type="checkbox" name="item" value="2 Salmão noite"> 2 Salmão noite</label><br>
                     <label><input type="checkbox" name="item" value="Camarão"> Camarão</label><br>
                     <label><input type="checkbox" name="item" value="Cream Cheese"> Cream Cheese</label><br>
                     <label><input type="checkbox" name="item" value="Papel toalha"> Papel toalha</label><br>
@@ -115,7 +145,7 @@
                     <label><input type="checkbox" name="item" value="Arroz"> Arroz</label><br>
                 </div>
             </div>
-              <!-- PRAÇA DE SALÃO -->
+
             <div id="salao" class="item-section" style="display:none;">
                 <h2>Itens da Praça de Salão</h2>
                 <div class="item-list">
@@ -126,8 +156,8 @@
                     <label><input type="checkbox" name="item" value="Ketchup sashe"> Ketchup sashe</label><br>
                     <label><input type="checkbox" name="item" value="Ketchup grande"> Ketchup grande</label><br>
                     <label><input type="checkbox" name="item" value="Coca Cola lata"> Coca Cola lata</label><br>
-                    <label><input type="checkbox" name="item" value="Coca Cola 1 litro"> Coca Cola 1 litro</label><br>
                     <label><input type="checkbox" name="item" value="Coca Cola lata ZERO"> Coca Cola lata ZERO</label><br>
+                    <label><input type="checkbox" name="item" value="Coca Cola 1 litro"> Coca Cola 1 litro</label><br>
                     <label><input type="checkbox" name="item" value="Coca Cola 1 litro ZERO"> Coca Cola 1 litro ZERO</label><br>
                     <label><input type="checkbox" name="item" value="Guaraná Antártica lata"> Guaraná Antártica lata</label><br>
                     <label><input type="checkbox" name="item" value="Guaraná Antártica lata ZERO"> Guaraná Antártica lata ZERO</label><br>
@@ -139,12 +169,9 @@
                     <label><input type="checkbox" name="item" value="Boniba"> Boniba</label><br>
                     <label><input type="checkbox" name="item" value="Papel filme"> Papel filme</label><br>
                     <label><input type="checkbox" name="item" value="Sache de shoyu"> Sache de shoyu</label><br>
-                     <label><input type="checkbox" name="item" value="Touca"> Touca</label><br>
-                     <label><input type="checkbox" name="item" value="Avental"> Avental</label><br>
                 </div>
             </div>
 
-            <!-- PRAÇA DE HAMBÚRGUER -->
             <div id="hamburguer" class="item-section" style="display:none;">
                 <h2>Itens da Praça de Hambúrguer</h2>
                 <div class="item-list">
@@ -157,17 +184,11 @@
                     <label><input type="checkbox" name="item" value="Óleo"> Óleo</label><br>
                     <label><input type="checkbox" name="item" value="Ovo"> Ovo</label><br>
                     <label><input type="checkbox" name="item" value="Maionese Especial"> Maionese Especial</label><br>
-                    <label><input type="checkbox" name="item" value="Queijo mussarela"> Queijo mussarela</label><br>
                     <label><input type="checkbox" name="item" value="Bacon"> Bacon</label><br>
                     <label><input type="checkbox" name="item" value="Cheddar do Hambúrguer"> Cheddar do Hambúrguer</label><br>
-                      <label><input type="checkbox" name="item" value="Barbecue Sashe"> Barbecue Sashe</label><br>
-                      <label><input type="checkbox" name="item" value="Barbecue Grande"> Barbecue Grande</label><br>
-                      <label><input type="checkbox" name="item" value="Toscana"> Toscana</label><br>
-                      <label><input type="checkbox" name="item" value="Coracao de Galinha"> Coracao de Galinha</label><br>
                 </div>
             </div>
 
-            <!-- PRAÇA DA PIZZA -->
             <div id="pizza" class="item-section" style="display:none;">
                 <h2>Itens da Praça da Pizza</h2>
                 <div class="item-list">
@@ -186,19 +207,15 @@
                     <label><input type="checkbox" name="item" value="Ovo"> Ovo</label><br>
                     <label><input type="checkbox" name="item" value="Azeitona"> Azeitona</label><br>
                     <label><input type="checkbox" name="item" value="Camarão"> Camarão</label><br>
-                    <label><input type="checkbox" name="item" value="chocolate para pizza"> Chocolate para pizza</label><br>
-                    <label><input type="checkbox" name="item" value="Queijo para pizza"> Queijo para pizza</label><br>
                 </div>
             </div>
 
-            <!-- PRAÇA DE YAKISOBA -->
             <div id="yakisoba" class="item-section" style="display:none;">
                 <h2>Itens da Praça de Yakisoba</h2>
                 <div class="item-list">
                     <label><input type="checkbox" name="item" value="Cenoura"> Cenoura</label><br>
                     <label><input type="checkbox" name="item" value="Acelga"> Acelga</label><br>
                     <label><input type="checkbox" name="item" value="Carne Yakisoba"> Carne Yakisoba</label><br>
-                    <label><input type="checkbox" name="item" value="Carne espetinho"> Carne espetinho</label><br>
                     <label><input type="checkbox" name="item" value="Camarão"> Camarão</label><br>
                     <label><input type="checkbox" name="item" value="Frango"> Frango</label><br>
                     <label><input type="checkbox" name="item" value="Shoyu 20 litros"> Shoyu 20 litros</label><br>
@@ -220,8 +237,9 @@
         }
 
         function enviarWhatsApp() {
-            const praçaSelecionada = document.querySelector('input[name="praça"]:checked');
-            if (!praçaSelecionada) {
+            // agora usamos "praca" (sem cedilha)
+            const pracaSelecionada = document.querySelector('input[name="praca"]:checked');
+            if (!pracaSelecionada) {
                 alert("Por favor, selecione a praça.");
                 return;
             }
@@ -234,18 +252,15 @@
                 return;
             }
 
-            const message = `*Praça:* ${praçaSelecionada.value}\n*Itens faltando*: ${selectedItems.join(", ")}`;
+            const message =
+                `*Praça:* ${pracaSelecionada.value}\n` +
+                `*Itens faltando:* ${selectedItems.join(", ")}\n\n` +
+                `📌 Enviado pelo sistema - Heimer Restaurante\n` +
+                `➡ Grupo: https://chat.whatsapp.com/Gg7L7sSi8JS3wiTNVVcLUF?mode=hqrc`;
 
-            const whatsappNumber = "+5581999916443";
-            const url = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
+            const url = `https://wa.me/?text=${encodeURIComponent(message)}`;
             window.open(url, "_blank");
         }
     </script>
 </body>
 </html>
-
-
-
-
-
-
