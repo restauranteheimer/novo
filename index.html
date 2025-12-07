@@ -185,6 +185,9 @@
                     <label><input type="checkbox" name="item" value="Ovo"> Ovo</label><br>
                     <label><input type="checkbox" name="item" value="Maionese Especial"> Maionese Especial</label><br>
                     <label><input type="checkbox" name="item" value="Bacon"> Bacon</label><br>
+                    <label><input type="checkbox" name="item" value="Toscana"> Toscana</label><br>
+                    <label><input type="checkbox" name="item" value="Barbecue do grande"> Barbecue do grande</label><br>
+                    <label><input type="checkbox" name="item" value="Coração de galinha"> Coração de galinha</label><br>
                     <label><input type="checkbox" name="item" value="Cheddar do Hambúrguer"> Cheddar do Hambúrguer</label><br>
                 </div>
             </div>
@@ -255,8 +258,8 @@
             const message =
                 `*Praça:* ${pracaSelecionada.value}\n` +
                 `*Itens faltando:* ${selectedItems.join(", ")}\n\n` +
-                `📌 Enviado pelo sistema - Heimer Restaurante\n` +
-                `➡ Grupo: https://chat.whatsapp.com/Gg7L7sSi8JS3wiTNVVcLUF?mode=hqrc`;
+                `📌 Envie esta mensagem para o grupo Lista_pedidos, Link abaixo\n` +
+                `➡ Grupo:  https://chat.whatsapp.com/B72Wp4SAXZuD0Y3JUT455y?mode=hqrc`;
 
             const url = `https://wa.me/?text=${encodeURIComponent(message)}`;
             window.open(url, "_blank");
@@ -264,4 +267,3 @@
     </script>
 </body>
 </html>
-
