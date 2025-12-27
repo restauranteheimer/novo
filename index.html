@@ -232,39 +232,41 @@
         </form>
     </div>
 
-    <script>
-        function mostrarItens(praca) {
-            const sections = document.querySelectorAll('.item-section');
-            sections.forEach(section => section.style.display = 'none');
-            document.getElementById(praca).style.display = 'block';
+  <script>
+    function mostrarItens(praca) {
+        const sections = document.querySelectorAll('.item-section');
+        sections.forEach(section => section.style.display = 'none');
+        document.getElementById(praca).style.display = 'block';
+    }
+
+    function enviarWhatsApp() {
+        const pracaSelecionada = document.querySelector('input[name="praca"]:checked');
+        if (!pracaSelecionada) {
+            alert("Por favor, selecione a praça.");
+            return;
         }
 
-        function enviarWhatsApp() {
-            // agora usamos "praca" (sem cedilha)
-            const pracaSelecionada = document.querySelector('input[name="praca"]:checked');
-            if (!pracaSelecionada) {
-                alert("Por favor, selecione a praça.");
-                return;
-            }
+        const selectedItems = [...document.querySelectorAll('input[name="item"]:checked')]
+            .map(i => i.value);
 
-            const selectedItems = [...document.querySelectorAll('input[name="item"]:checked')]
-                .map(i => i.value);
-
-            if (selectedItems.length === 0) {
-                alert("Por favor, selecione pelo menos um item.");
-                return;
-            }
-
-            const message =
-                `*Praça:* ${pracaSelecionada.value}\n` +
-                `*Itens faltando:* ${selectedItems.join(", ")}\n\n` +
-                `📌 Envie esta mensagem para o grupo Lista_pedidos, Link abaixo\n` +
-                `➡ Grupo:  https://chat.whatsapp.com/B72Wp4SAXZuD0Y3JUT455y?mode=hqrc`;
-
-            const url = `https://wa.me/?text=${encodeURIComponent(message)}`;
-            window.open(url, "_blank");
+        if (selectedItems.length === 0) {
+            alert("Por favor, selecione pelo menos um item.");
+            return;
         }
-    </script>
+
+        const message =
+            `*Praça:* ${pracaSelecionada.value}\n` +
+            `*Itens faltando:* ${selectedItems.join(", ")}`;
+
+        // Número no padrão internacional (Brasil = 55)
+        const telefone = "5581999916443";
+
+        const url = `https://wa.me/${telefone}?text=${encodeURIComponent(message)}`;
+        window.open(url, "_blank");
+    }
+</script>
+
 </body>
 </html>
+
 
