@@ -8,8 +8,15 @@ let monthlyChart = null;
 let currentWeekStart = new Date();
 
 // ============ FUNÇÕES AUXILIARES ============
-function showLoading() { document.getElementById('loadingOverlay').style.display = 'flex'; }
-function hideLoading() { document.getElementById('loadingOverlay').style.display = 'none'; }
+function showLoading() { 
+    const overlay = document.getElementById('loadingOverlay');
+    if (overlay) overlay.style.display = 'flex'; 
+}
+
+function hideLoading() { 
+    const overlay = document.getElementById('loadingOverlay');
+    if (overlay) overlay.style.display = 'none'; 
+}
 
 function formatDateKey(date) {
     return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`;
@@ -44,30 +51,36 @@ async function loadUserData(uid) {
     if (!uid) return;
     showLoading();
     const statusDiv = document.getElementById('syncStatus');
-    statusDiv.textContent = '🔄 Carregando da nuvem...';
-    statusDiv.className = 'sync-status syncing';
+    if (statusDiv) {
+        statusDiv.textContent = '🔄 Carregando da nuvem...';
+        statusDiv.className = 'sync-status syncing';
+    }
     try {
         const snapshot = await db.ref(`users/${uid}/items`).once('value');
         if (snapshot.exists()) {
             items = snapshot.val() || [];
             if (!Array.isArray(items)) items = [];
-            statusDiv.textContent = `✅ ${items.length} itens carregados`;
+            if (statusDiv) statusDiv.textContent = `✅ ${items.length} itens carregados`;
         } else {
             items = [];
-            statusDiv.textContent = '✅ Pronto para salvar!';
+            if (statusDiv) statusDiv.textContent = '✅ Pronto para salvar!';
         }
-        statusDiv.className = 'sync-status synced';
+        if (statusDiv) statusDiv.className = 'sync-status synced';
         renderCalendar();
         updateCharts();
         updateDayItemsList();
-        updateMobileTotals();
-        renderMobileWeek();
-        updateUpcomingBills();
+        if (window.innerWidth <= 768) {
+            updateMobileTotals();
+            renderMobileWeek();
+            updateUpcomingBills();
+        }
         updateEconomyAndComparison();
     } catch (error) {
         console.error('Erro:', error);
-        statusDiv.textContent = '⚠️ Erro ao carregar: ' + error.message;
-        statusDiv.className = 'sync-status';
+        if (statusDiv) {
+            statusDiv.textContent = '⚠️ Erro ao carregar: ' + error.message;
+            statusDiv.className = 'sync-status';
+        }
     } finally {
         hideLoading();
     }
@@ -76,19 +89,25 @@ async function loadUserData(uid) {
 async function saveToCloud() {
     if (!currentUser) return;
     const statusDiv = document.getElementById('syncStatus');
-    statusDiv.textContent = '🔄 Salvando na nuvem...';
-    statusDiv.className = 'sync-status syncing';
+    if (statusDiv) {
+        statusDiv.textContent = '🔄 Salvando na nuvem...';
+        statusDiv.className = 'sync-status syncing';
+    }
     try {
         await db.ref(`users/${currentUser.uid}/items`).set(items);
-        statusDiv.textContent = '✅ Dados salvos na nuvem';
-        statusDiv.className = 'sync-status synced';
+        if (statusDiv) {
+            statusDiv.textContent = '✅ Dados salvos na nuvem';
+            statusDiv.className = 'sync-status synced';
+        }
         setTimeout(() => {
-            if (currentUser) statusDiv.textContent = '✅ Sincronizado';
+            if (currentUser && statusDiv) statusDiv.textContent = '✅ Sincronizado';
         }, 2000);
     } catch (error) {
         console.error('Erro:', error);
-        statusDiv.textContent = '⚠️ Erro ao salvar: ' + error.message;
-        statusDiv.className = 'sync-status';
+        if (statusDiv) {
+            statusDiv.textContent = '⚠️ Erro ao salvar: ' + error.message;
+            statusDiv.className = 'sync-status';
+        }
     }
 }
 
@@ -96,9 +115,11 @@ function saveData() {
     renderCalendar();
     updateCharts();
     updateDayItemsList();
-    updateMobileTotals();
-    renderMobileWeek();
-    updateUpcomingBills();
+    if (window.innerWidth <= 768) {
+        updateMobileTotals();
+        renderMobileWeek();
+        updateUpcomingBills();
+    }
     updateEconomyAndComparison();
     if (currentUser) saveToCloud();
 }
@@ -174,12 +195,8 @@ function getLast6MonthsBalances() {
 
 // ============ ECONOMIA E COMPARAÇÃO ============
 function updateEconomyAndComparison() {
-    const currentMonthBalance = getMonthBalance(new Date());
-    const lastMonthBalance = getMonthBalance(new Date(new Date().getFullYear(), new Date().getMonth() - 1, 1));
-    
-    // Economia (baseado em despesas planejadas vs reais)
-    const plannedExpenses = items.filter(i => i.type === 'expense' && i.status !== 'paid').reduce((s, i) => s + i.amount, 0);
     const actualExpenses = items.filter(i => i.type === 'expense' && i.status === 'paid').reduce((s, i) => s + i.amount, 0);
+    const plannedExpenses = items.filter(i => i.type === 'expense').reduce((s, i) => s + i.amount, 0);
     const economy = plannedExpenses - actualExpenses;
     
     const economyDiv = document.getElementById('economyValue');
@@ -189,8 +206,10 @@ function updateEconomyAndComparison() {
             `<div class="balance-negative">⚠️ R$ ${Math.abs(economy).toFixed(2)} acima do orçamento</div>`;
     }
     
-    // Comparação mês a mês
+    const currentMonthBalance = getMonthBalance(new Date());
+    const lastMonthBalance = getMonthBalance(new Date(new Date().getFullYear(), new Date().getMonth() - 1, 1));
     const comparison = currentMonthBalance - lastMonthBalance;
+    
     const comparisonDiv = document.getElementById('comparisonValue');
     if (comparisonDiv) {
         const percent = lastMonthBalance !== 0 ? (comparison / Math.abs(lastMonthBalance)) * 100 : comparison * 100;
@@ -200,7 +219,7 @@ function updateEconomyAndComparison() {
     }
 }
 
-// ============ CONTAS A VENCER ============
+// ============ CONTAS A VENCER (MOBILE) ============
 function updateUpcomingBills() {
     const today = new Date();
     const upcoming = [];
@@ -242,8 +261,8 @@ function updateUpcomingBills() {
 
 // ============ MOBILE: SALDO E TOTAIS ============
 function updateMobileTotals() {
-    const totalExpense = items.filter(i => i.type === 'expense' && i.status !== 'paid').reduce((s, i) => s + i.amount, 0);
-    const totalIncome = items.filter(i => i.type === 'income' && i.status !== 'paid').reduce((s, i) => s + i.amount, 0);
+    const totalExpense = items.filter(i => i.type === 'expense').reduce((s, i) => s + i.amount, 0);
+    const totalIncome = items.filter(i => i.type === 'income').reduce((s, i) => s + i.amount, 0);
     const currentBalance = totalIncome - totalExpense;
     const monthBalance = getMonthBalance(new Date());
     
@@ -381,7 +400,8 @@ function generateWeeklyReport() {
     report += `<p><strong>🟢 Receitas:</strong> R$ ${incomes.reduce((s, i) => s + i.amount, 0).toFixed(2)}</p>`;
     report += `<p><strong>🔴 Despesas:</strong> R$ ${expenses.reduce((s, i) => s + i.amount, 0).toFixed(2)}</p>`;
     report += `<p><strong>📅 Compromissos:</strong> ${appointments.length}</p>`;
-    document.getElementById('reportContent').innerHTML = report;
+    const reportDiv = document.getElementById('reportContent');
+    if (reportDiv) reportDiv.innerHTML = report;
 }
 
 function generateMonthlyReport() {
@@ -403,7 +423,8 @@ function generateMonthlyReport() {
     report += `<p><strong>🟢 Receitas:</strong> R$ ${incomes.reduce((s, i) => s + i.amount, 0).toFixed(2)}</p>`;
     report += `<p><strong>🔴 Despesas:</strong> R$ ${expenses.reduce((s, i) => s + i.amount, 0).toFixed(2)}</p>`;
     report += `<p><strong>📅 Compromissos:</strong> ${appointments.length}</p>`;
-    document.getElementById('reportContent').innerHTML = report;
+    const reportDiv = document.getElementById('reportContent');
+    if (reportDiv) reportDiv.innerHTML = report;
 }
 
 function generateComparisonReport() {
@@ -414,7 +435,8 @@ function generateComparisonReport() {
     weeklyData.weekLabels.forEach((label, i) => { report += `<p>📌 Semana ${label}: R$ ${weeklyData.balances[i].toFixed(2)}</p>`; });
     report += '<h5>📆 Últimos 6 Meses:</h5>';
     monthlyData.monthLabels.forEach((label, i) => { report += `<p>📌 ${label}: R$ ${monthlyData.balances[i].toFixed(2)}</p>`; });
-    document.getElementById('reportContent').innerHTML = report;
+    const reportDiv = document.getElementById('reportContent');
+    if (reportDiv) reportDiv.innerHTML = report;
 }
 
 // ============ CALENDÁRIO DESKTOP ============
@@ -426,7 +448,9 @@ function renderCalendar() {
     const startDay = firstDay.getDay();
     const totalDays = lastDay.getDate();
     
-    document.getElementById('currentMonth').textContent = currentDate.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
+    const monthDisplay = document.getElementById('currentMonth');
+    if (monthDisplay) monthDisplay.textContent = currentDate.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
+    
     const grid = document.getElementById('calendarGridDesktop');
     if (!grid) return;
     grid.innerHTML = `<div class="weekday">Dom</div><div class="weekday">Seg</div><div class="weekday">Ter</div><div class="weekday">Qua</div><div class="weekday">Qui</div><div class="weekday">Sex</div><div class="weekday">Sáb</div>`;
@@ -482,17 +506,21 @@ function renderCalendar() {
 function updateDayItemsList() {
     const listDiv = document.getElementById('dayItemsList');
     const dateDisplay = document.getElementById('selectedDateDisplay');
+    
     if (!selectedDate) {
         if (dateDisplay) dateDisplay.innerHTML = '';
         if (listDiv) listDiv.innerHTML = '<p style="text-align:center; color:#94a3b8;">📌 Clique em um dia</p>';
         return;
     }
+    
     if (dateDisplay) dateDisplay.innerHTML = `<div class="selected-date">📅 ${selectedDate.toLocaleDateString('pt-BR')}</div>`;
     const dayItems = getItemsForDate(selectedDate);
+    
     if (dayItems.length === 0) {
         if (listDiv) listDiv.innerHTML = '<p style="text-align:center; color:#94a3b8;">✨ Nenhum item</p>';
         return;
     }
+    
     if (!listDiv) return;
     listDiv.innerHTML = '';
     dayItems.forEach(item => {
@@ -683,7 +711,6 @@ async function login() {
         alert('✅ Login realizado com sucesso!');
     } catch (error) {
         let mensagem = '';
-
         if (error.code === 'auth/wrong-password' || error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential') {
             mensagem = '❌ Email ou senha incorretos!';
         } else if (error.code === 'auth/invalid-email') {
@@ -695,7 +722,6 @@ async function login() {
         } else {
             mensagem = '❌ Não foi possível entrar. Tente novamente.';
         }
-
         alert(mensagem);
     } finally {
         hideLoading();
@@ -736,4 +762,231 @@ async function logout() {
 
 // ============ NOTIFICAÇÕES WHATSAPP ============
 function sendNotification() {
-    let phone = document.getElementById('
+    let phone = document.getElementById('whatsappNumber').value;
+    if (!phone) { 
+        alert('📱 Insira seu número!'); 
+        return; 
+    }
+    phone = formatPhoneNumber(phone);
+    const weekBalance = getWeekBalance(new Date());
+    const monthBalance = getMonthBalance(new Date());
+    const weeklyData = getLast4WeeksBalances();
+    
+    let msg = `📊 *DINHEIRO EM DIA* 📊\n\n📅 ${new Date().toLocaleDateString('pt-BR')}\n💰 Semana: ${weekBalance >= 0 ? '+' : '-'} R$ ${Math.abs(weekBalance).toFixed(2)}\n📈 Mês: ${monthBalance >= 0 ? '+' : '-'} R$ ${Math.abs(monthBalance).toFixed(2)}\n\n📊 *Últimas 4 semanas:*\n`;
+    weeklyData.weekLabels.forEach((label, i) => { msg += `• Semana ${label}: ${weeklyData.balances[i] >= 0 ? '+' : '-'} R$ ${Math.abs(weeklyData.balances[i]).toFixed(2)}\n`; });
+    msg += `\n🔔 Acesse o app para mais detalhes!`;
+    window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, '_blank');
+    alert('✅ Notificação preparada! O WhatsApp será aberto para confirmar.');
+}
+
+function scheduleNotification() {
+    const frequency = document.getElementById('notificationFrequency').value;
+    if ('Notification' in window) {
+        Notification.requestPermission().then(perm => {
+            if (perm === 'granted') {
+                alert(`✅ Notificações ${frequency === 'weekly' ? 'semanais' : 'mensais'} agendadas!`);
+                localStorage.setItem('notificationsScheduled', 'true');
+                localStorage.setItem('lastScheduleDate', new Date().toISOString());
+                localStorage.setItem('scheduleFrequency', frequency);
+            } else { 
+                alert('⚠️ Permita notificações do navegador.'); 
+            }
+        });
+    } else { 
+        alert('⚠️ Use "Enviar Agora"'); 
+    }
+}
+
+// ============ EVENT LISTENERS E INICIALIZAÇÃO ============
+document.addEventListener('DOMContentLoaded', () => {
+    // Eventos do calendário desktop
+    const prevMonthBtn = document.getElementById('prevMonth');
+    const nextMonthBtn = document.getElementById('nextMonth');
+    if (prevMonthBtn) prevMonthBtn.addEventListener('click', () => { 
+        currentDate.setMonth(currentDate.getMonth() - 1); 
+        renderCalendar(); 
+    });
+    if (nextMonthBtn) nextMonthBtn.addEventListener('click', () => { 
+        currentDate.setMonth(currentDate.getMonth() + 1); 
+        renderCalendar(); 
+    });
+    
+    // Formulário financeiro
+    const financialForm = document.getElementById('financialForm');
+    if (financialForm) {
+        financialForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const item = {
+                id: Date.now(),
+                type: document.getElementById('type').value,
+                title: document.getElementById('description').value,
+                amount: parseFloat(document.getElementById('amount').value),
+                status: document.getElementById('status').value,
+                recurrence: document.getElementById('recurrence').value,
+                date: formatDateKey(selectedDate)
+            };
+            if (item.recurrence === 'weekly') item.dayOfWeek = parseInt(document.getElementById('dayOfWeek').value);
+            if (item.recurrence === 'monthly') item.dayOfMonth = parseInt(document.getElementById('dayOfMonth').value);
+            items.push(item);
+            saveData();
+            closeModal();
+        });
+    }
+    
+    // Formulário de compromisso
+    const appointmentForm = document.getElementById('appointmentForm');
+    if (appointmentForm) {
+        appointmentForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const item = {
+                id: Date.now(),
+                type: 'appointment',
+                title: document.getElementById('appointmentTitle').value,
+                time: document.getElementById('appointmentTime').value,
+                location: document.getElementById('appointmentLocation').value,
+                description: document.getElementById('appointmentDescription').value,
+                recurrence: document.getElementById('appointmentRecurrence').value,
+                date: formatDateKey(selectedDate)
+            };
+            if (item.recurrence === 'weekly') item.dayOfWeek = selectedDate.getDay();
+            if (item.recurrence === 'monthly') item.dayOfMonth = selectedDate.getDate();
+            items.push(item);
+            saveData();
+            closeModal();
+        });
+    }
+    
+    // Formulário de anotação
+    const noteForm = document.getElementById('noteForm');
+    if (noteForm) {
+        noteForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            items.push({
+                id: Date.now(),
+                type: 'note',
+                title: document.getElementById('noteTitle').value,
+                content: document.getElementById('noteContent').value,
+                color: document.getElementById('noteColor').value,
+                recurrence: 'unique',
+                date: formatDateKey(selectedDate)
+            });
+            saveData();
+            closeModal();
+        });
+    }
+    
+    // Recorrência
+    const recurrenceSelect = document.getElementById('recurrence');
+    if (recurrenceSelect) {
+        recurrenceSelect.addEventListener('change', (e) => {
+            const dayOfWeekGroup = document.getElementById('dayOfWeekGroup');
+            const dayOfMonthGroup = document.getElementById('dayOfMonthGroup');
+            if (dayOfWeekGroup) dayOfWeekGroup.style.display = e.target.value === 'weekly' ? 'block' : 'none';
+            if (dayOfMonthGroup) dayOfMonthGroup.style.display = e.target.value === 'monthly' ? 'block' : 'none';
+        });
+    }
+    
+    // Abas do modal
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            document.getElementById(this.dataset.tab + 'Tab').classList.add('active');
+        });
+    });
+    
+    // WhatsApp
+    const whatsappNumber = document.getElementById('whatsappNumber');
+    const notificationFrequency = document.getElementById('notificationFrequency');
+    if (whatsappNumber) {
+        whatsappNumber.addEventListener('change', () => { 
+            localStorage.setItem('whatsappNumber', whatsappNumber.value); 
+        });
+    }
+    if (notificationFrequency) {
+        notificationFrequency.addEventListener('change', () => { 
+            localStorage.setItem('notificationFrequency', notificationFrequency.value); 
+        });
+    }
+    
+    // Fechar modal ao clicar fora
+    window.onclick = (e) => { 
+        if (e.target === document.getElementById('modal')) closeModal(); 
+    };
+    
+    // Carregar configurações salvas
+    const savedNumber = localStorage.getItem('whatsappNumber');
+    const savedFreq = localStorage.getItem('notificationFrequency');
+    if (savedNumber && whatsappNumber) whatsappNumber.value = savedNumber;
+    if (savedFreq && notificationFrequency) notificationFrequency.value = savedFreq;
+    
+    // Auth state listener
+    auth.onAuthStateChanged(async (user) => {
+        if (user) {
+            currentUser = user;
+            const authSection = document.getElementById('authSection');
+            const userInfo = document.getElementById('userInfo');
+            const userEmailSpan = document.getElementById('userEmail');
+            if (authSection) authSection.style.display = 'none';
+            if (userInfo) userInfo.style.display = 'flex';
+            if (userEmailSpan) userEmailSpan.textContent = user.email;
+            await loadUserData(user.uid);
+        } else {
+            currentUser = null;
+            items = [];
+            const authSection = document.getElementById('authSection');
+            const userInfo = document.getElementById('userInfo');
+            if (authSection) authSection.style.display = 'flex';
+            if (userInfo) userInfo.style.display = 'none';
+            const syncStatus = document.getElementById('syncStatus');
+            if (syncStatus) {
+                syncStatus.textContent = '🔓 Faça login para salvar na nuvem';
+                syncStatus.className = 'sync-status';
+            }
+            renderCalendar();
+            updateCharts();
+            updateDayItemsList();
+            if (window.innerWidth <= 768) {
+                updateMobileTotals();
+                renderMobileWeek();
+            }
+        }
+    });
+    
+    // TORNAR FUNÇÕES GLOBAIS
+    window.login = login;
+    window.signup = signup;
+    window.logout = logout;
+    window.editItem = editItem;
+    window.deleteItem = deleteItem;
+    window.markAsPaid = markAsPaid;
+    window.closeModal = closeModal;
+    window.openGoogleMaps = openGoogleMaps;
+    window.generateWeeklyReport = generateWeeklyReport;
+    window.generateMonthlyReport = generateMonthlyReport;
+    window.generateComparisonReport = generateComparisonReport;
+    window.sendNotification = sendNotification;
+    window.scheduleNotification = scheduleNotification;
+    window.previousWeek = previousWeek;
+    window.nextWeek = nextWeek;
+    window.quickAddTransaction = quickAddTransaction;
+    
+    renderCalendar();
+    
+    // Notificações agendadas
+    setInterval(() => {
+        const scheduled = localStorage.getItem('notificationsScheduled');
+        const lastDate = localStorage.getItem('lastScheduleDate');
+        const frequency = localStorage.getItem('scheduleFrequency');
+        if (scheduled === 'true' && lastDate && frequency) {
+            const last = new Date(lastDate);
+            const now = new Date();
+            const daysDiff = Math.floor((now - last) / (1000 * 60 * 60 * 24));
+            if ((frequency === 'weekly' && daysDiff >= 7) || (frequency === 'monthly' && daysDiff >= 30)) {
+                sendNotification();
+                localStorage.setItem('lastScheduleDate', now.toISOString());
+            }
+        }
+    }, 21600000);
+});
