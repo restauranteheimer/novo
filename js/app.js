@@ -82,16 +82,59 @@ let currentUser = null;
         }
 
         async function login() {
-            const email = document.getElementById('loginEmail').value;
-            const password = document.getElementById('loginPassword').value;
-            if (!email || !password) { alert('Preencha email e senha!'); return; }
-            showLoading();
-            try {
-                await auth.signInWithEmailAndPassword(email, password);
-                alert('✅ Login realizado!');
-            } catch (error) { alert('❌ Erro: ' + error.message); }
-            finally { hideLoading(); }
+    const email = document.getElementById('loginEmail').value;
+    const password = document.getElementById('loginPassword').value;
+
+    if (!email || !password) {
+        alert('Preencha email e senha!');
+        return;
+    }
+
+    showLoading();
+
+    try {
+        await auth.signInWithEmailAndPassword(email, password);
+        alert('✅ Login realizado com sucesso!');
+    } catch (error) {
+
+        let mensagem = 'Erro ao fazer login.';
+
+        switch (error.code) {
+
+            case 'auth/wrong-password':
+                mensagem = '❌ Senha incorreta!';
+                break;
+
+            case 'auth/user-not-found':
+                mensagem = '❌ Usuário não encontrado!';
+                break;
+
+            case 'auth/invalid-email':
+                mensagem = '❌ Email inválido!';
+                break;
+
+            case 'auth/too-many-requests':
+                mensagem = '⚠️ Muitas tentativas. Tente novamente mais tarde!';
+                break;
+
+            case 'auth/network-request-failed':
+                mensagem = '🌐 Sem conexão com a internet!';
+                break;
+
+            case 'auth/invalid-credential':
+                mensagem = '❌ Email ou senha incorretos!';
+                break;
+
+            default:
+                mensagem = '❌ Erro: ' + error.message;
         }
+
+        alert(mensagem);
+
+    } finally {
+        hideLoading();
+    }
+}
 
         async function signup() {
             const email = document.getElementById('loginEmail').value;
