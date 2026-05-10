@@ -439,3 +439,101 @@
             100% { transform: rotate(360deg); }
         }
         @media (max-width: 1200px) { .dashboard { grid-template-columns: 1fr; } }
+
+@media (max-width: 768px) {
+    body {
+        padding: 8px;
+    }
+
+    .container {
+        padding: 15px;
+        border-radius: 16px;
+    }
+
+    .header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    h1 {
+        font-size: 1.8em;
+        text-align: center;
+    }
+
+    .auth-section {
+        width: 100%;
+        flex-direction: column;
+        border-radius: 18px;
+    }
+
+    .auth-section input,
+    .auth-section button {
+        width: 100%;
+    }
+
+    .dashboard {
+        grid-template-columns: 1fr;
+    }
+
+    .calendar-header {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .calendar-header button {
+        width: 100%;
+    }
+
+    .calendar-grid {
+        gap: 4px;
+    }
+
+    .weekday {
+        padding: 8px 2px;
+        font-size: 11px;
+    }
+
+    .calendar-day {
+        min-height: 75px;
+        padding: 5px;
+        font-size: 11px;
+    }
+
+    .day-number {
+        font-size: 13px;
+    }
+
+    .day-expense,
+    .day-income,
+    .day-appointment,
+    .day-note {
+        font-size: 8px;
+    }
+
+    .sidebar {
+        max-height: none;
+        padding: 12px;
+    }
+
+    .balance-positive,
+    .balance-negative {
+        font-size: 24px;
+    }
+
+    .reports-buttons {
+        flex-direction: column;
+    }
+
+    .modal-content {
+        width: 95%;
+        padding: 18px;
+    }
+
+    .modal-tabs {
+        overflow-x: auto;
+    }
+
+    .form-buttons {
+        flex-direction: column;
+    }
+}
