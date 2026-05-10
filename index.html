@@ -161,11 +161,25 @@
         .calendar-day.today .day-appointment,
         .calendar-day.today .day-note { color: white; }
         .day-number { font-weight: 700; font-size: 16px; margin-bottom: 8px; color: #1e293b; }
+        
+        /* Estilos para transações pagas */
+        .day-expense.paid, .day-income.paid {
+            text-decoration: line-through;
+            opacity: 0.7;
+        }
+        .day-expense.paid { color: #10b981 !important; }
+        .day-income.paid { color: #10b981 !important; }
+        .expense-badge.paid, .income-badge.paid {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        
         .day-expense { color: #ef4444; font-size: 10px; margin: 3px 0; overflow: hidden; text-overflow: ellipsis; }
         .day-income { color: #10b981; font-size: 10px; margin: 3px 0; overflow: hidden; text-overflow: ellipsis; }
         .day-appointment { color: #3b82f6; font-size: 10px; margin: 3px 0; overflow: hidden; text-overflow: ellipsis; }
         .day-note { color: #f59e0b; font-size: 10px; margin: 3px 0; font-style: italic; overflow: hidden; text-overflow: ellipsis; }
         .negative-week { border-color: #ef4444; background: #fef2f2; }
+        
         .sidebar {
             background: #f8fafc;
             border-radius: 20px;
@@ -271,13 +285,15 @@
             align-items: center;
         }
         .item-card.expense { border-left-color: #ef4444; }
+        .item-card.expense.paid { border-left-color: #10b981; background: #f0fdf4; }
         .item-card.income { border-left-color: #10b981; }
+        .item-card.income.paid { border-left-color: #10b981; background: #f0fdf4; }
         .item-card.appointment { border-left-color: #3b82f6; }
         .item-card.note { border-left-color: #f59e0b; }
         .item-info { flex: 1; }
         .item-title { font-weight: 700; margin-bottom: 5px; font-size: 13px; }
         .item-details { font-size: 11px; color: #64748b; }
-        .delete-btn, .edit-btn {
+        .delete-btn, .edit-btn, .mark-paid-btn {
             padding: 5px 10px;
             border: none;
             border-radius: 8px;
@@ -290,6 +306,8 @@
         .edit-btn:hover { background: #2563eb; }
         .delete-btn { background: #ef4444; color: white; }
         .delete-btn:hover { background: #dc2626; }
+        .mark-paid-btn { background: #10b981; color: white; }
+        .mark-paid-btn:hover { background: #059669; }
         .selected-date {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
@@ -479,6 +497,7 @@
                     <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);"></div><span>Dia atual</span></div>
                     <div class="legend-item"><div class="legend-color" style="background: #eff6ff; border: 1px solid #3b82f6;"></div><span>Semana atual</span></div>
                     <div class="legend-item"><div class="legend-color" style="background: #fef2f2; border: 1px solid #ef4444;"></div><span>Semana negativa</span></div>
+                    <div class="legend-item"><div class="legend-color" style="background: #10b981;"></div><span>Transação realizada ✅</span></div>
                 </div>
             </div>
 
@@ -551,6 +570,7 @@
                     <div class="form-group"><label>Tipo:</label><select id="type"><option value="expense">🔴 Despesa</option><option value="income">🟢 Receita</option></select></div>
                     <div class="form-group"><label>Descrição:</label><input type="text" id="description" required placeholder="Ex: Aluguel, Salário..."></div>
                     <div class="form-group"><label>Valor (R$):</label><input type="number" id="amount" step="0.01" required placeholder="0,00"></div>
+                    <div class="form-group"><label>Status:</label><select id="status"><option value="pending">⏳ Pendente</option><option value="paid">✅ Pago/Recebido</option></select></div>
                     <div class="form-group"><label>Recorrência:</label><select id="recurrence"><option value="unique">📅 Apenas hoje</option><option value="weekly">🔄 Semanal</option><option value="monthly">📆 Mensal</option></select></div>
                     <div class="form-group" id="dayOfWeekGroup" style="display:none;"><label>Dia da semana:</label><select id="dayOfWeek"><option value="0">Domingo</option><option value="1">Segunda</option><option value="2">Terça</option><option value="3">Quarta</option><option value="4">Quinta</option><option value="5">Sexta</option><option value="6">Sábado</option></select></div>
                     <div class="form-group" id="dayOfMonthGroup" style="display:none;"><label>Dia do mês:</label><input type="number" id="dayOfMonth" min="1" max="31" value="1"></div>
@@ -579,7 +599,7 @@
     </div>
 
     <script>
-        // Configuração do Firebase (seus dados atuais)
+        // Configuração do Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyAE6OgotOg-Y36IGAqUScMvo_LymmTNdK4",
             authDomain: "food-delivery-fb89e.firebaseapp.com",
@@ -590,10 +610,9 @@
             appId: "1:1050430398596:web:1701ff1d161183105e22d1"
         };
 
-        // Inicializar Firebase
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
-        const db = firebase.database();  // Realtime Database
+        const db = firebase.database();
 
         let currentUser = null;
         let items = [];
@@ -609,7 +628,6 @@
             return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`;
         }
 
-        // Carregar dados do Realtime Database
         async function loadUserData(uid) {
             if (!uid) return;
             showLoading();
@@ -639,7 +657,6 @@
             }
         }
 
-        // Salvar no Realtime Database
         async function saveToCloud() {
             if (!currentUser) return;
             const statusDiv = document.getElementById('syncStatus');
@@ -649,7 +666,6 @@
                 await db.ref(`users/${currentUser.uid}/items`).set(items);
                 statusDiv.textContent = '✅ Dados salvos na nuvem';
                 statusDiv.className = 'sync-status synced';
-                console.log('✅ Salvo com UID:', currentUser.uid, items.length);
                 setTimeout(() => {
                     if (currentUser) statusDiv.textContent = '✅ Sincronizado';
                 }, 2000);
@@ -664,60 +680,54 @@
             renderCalendar();
             updateCharts();
             updateDayItemsList();
-            if (currentUser) {
-                saveToCloud();
+            if (currentUser) saveToCloud();
+        }
+
+        // Marcar como pago/recebido
+        async function markAsPaid(index) {
+            const item = items[index];
+            if (!item) return;
+            
+            if (confirm(`✅ Confirmar ${item.type === 'expense' ? 'pagamento' : 'recebimento'} de "${item.title}" (R$ ${item.amount.toFixed(2)})?`)) {
+                item.status = 'paid';
+                item.paidDate = new Date().toISOString();
+                items[index] = item;
+                saveData();
+                alert(`✅ ${item.type === 'expense' ? 'Pagamento' : 'Recebimento'} registrado com sucesso!`);
             }
         }
 
-        // Funções de autenticação
         async function login() {
             const email = document.getElementById('loginEmail').value;
             const password = document.getElementById('loginPassword').value;
-            if (!email || !password) {
-                alert('Preencha email e senha!');
-                return;
-            }
+            if (!email || !password) { alert('Preencha email e senha!'); return; }
             showLoading();
             try {
                 await auth.signInWithEmailAndPassword(email, password);
                 alert('✅ Login realizado!');
-            } catch (error) {
-                alert('❌ Erro: ' + error.message);
-            } finally {
-                hideLoading();
-            }
+            } catch (error) { alert('❌ Erro: ' + error.message); }
+            finally { hideLoading(); }
         }
 
         async function signup() {
             const email = document.getElementById('loginEmail').value;
             const password = document.getElementById('loginPassword').value;
-            if (!email || !password || password.length < 6) {
-                alert('Email e senha (mínimo 6 caracteres) obrigatórios!');
-                return;
-            }
+            if (!email || !password || password.length < 6) { alert('Email e senha (mínimo 6 caracteres) obrigatórios!'); return; }
             showLoading();
             try {
                 await auth.createUserWithEmailAndPassword(email, password);
                 alert('✅ Conta criada! Faça login.');
-            } catch (error) {
-                alert('❌ Erro: ' + error.message);
-            } finally {
-                hideLoading();
-            }
+            } catch (error) { alert('❌ Erro: ' + error.message); }
+            finally { hideLoading(); }
         }
 
         async function logout() {
             showLoading();
-            try {
-                await auth.signOut();
-            } catch (error) {
-                alert('Erro ao sair: ' + error.message);
-            } finally {
-                hideLoading();
-            }
+            try { await auth.signOut(); }
+            catch (error) { alert('Erro ao sair: ' + error.message); }
+            finally { hideLoading(); }
         }
 
-        // Funções de dados
         function getItemsForDate(date) {
             if (!date) return [];
             const dateKey = formatDateKey(date);
@@ -798,12 +808,7 @@
                 type: 'bar',
                 data: {
                     labels: weeklyData.weekLabels,
-                    datasets: [{
-                        label: 'Saldo Semanal (R$)',
-                        data: weeklyData.balances,
-                        backgroundColor: weeklyData.balances.map(b => b >= 0 ? '#10b981' : '#ef4444'),
-                        borderRadius: 8
-                    }]
+                    datasets: [{ label: 'Saldo Semanal (R$)', data: weeklyData.balances, backgroundColor: weeklyData.balances.map(b => b >= 0 ? '#10b981' : '#ef4444'), borderRadius: 8 }]
                 },
                 options: { responsive: true, maintainAspectRatio: true }
             });
@@ -813,19 +818,7 @@
                 type: 'line',
                 data: {
                     labels: monthlyData.monthLabels,
-                    datasets: [{
-                        label: 'Saldo Mensal (R$)',
-                        data: monthlyData.balances,
-                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
-                        borderColor: '#667eea',
-                        borderWidth: 3,
-                        fill: true,
-                        tension: 0.4,
-                        pointBackgroundColor: monthlyData.balances.map(b => b >= 0 ? '#10b981' : '#ef4444'),
-                        pointBorderColor: '#fff',
-                        pointBorderWidth: 2,
-                        pointRadius: 5
-                    }]
+                    datasets: [{ label: 'Saldo Mensal (R$)', data: monthlyData.balances, backgroundColor: 'rgba(102,126,234,0.1)', borderColor: '#667eea', borderWidth: 3, fill: true, tension: 0.4, pointBackgroundColor: monthlyData.balances.map(b => b >= 0 ? '#10b981' : '#ef4444'), pointBorderColor: '#fff', pointBorderWidth: 2, pointRadius: 5 }]
                 },
                 options: { responsive: true, maintainAspectRatio: true }
             });
@@ -892,13 +885,9 @@
             const monthlyData = getLast6MonthsBalances();
             let report = '<h4>📊 Relatório Comparativo</h4>';
             report += '<h5>📅 Últimas 4 Semanas:</h5>';
-            weeklyData.weekLabels.forEach((label, i) => {
-                report += `<p>📌 Semana ${label}: R$ ${weeklyData.balances[i].toFixed(2)}</p>`;
-            });
+            weeklyData.weekLabels.forEach((label, i) => { report += `<p>📌 Semana ${label}: R$ ${weeklyData.balances[i].toFixed(2)}</p>`; });
             report += '<h5>📆 Últimos 6 Meses:</h5>';
-            monthlyData.monthLabels.forEach((label, i) => {
-                report += `<p>📌 ${label}: R$ ${monthlyData.balances[i].toFixed(2)}</p>`;
-            });
+            monthlyData.monthLabels.forEach((label, i) => { report += `<p>📌 ${label}: R$ ${monthlyData.balances[i].toFixed(2)}</p>`; });
             document.getElementById('reportContent').innerHTML = report;
         }
 
@@ -953,10 +942,19 @@
                 const displayItems = dayItems.slice(0, 4);
                 let itemsHtml = '';
                 displayItems.forEach(item => {
-                    if (item.type === 'expense') itemsHtml += `<div class="day-expense">🔴 ${item.title}: R$ ${item.amount.toFixed(2)}</div>`;
-                    else if (item.type === 'income') itemsHtml += `<div class="day-income">🟢 ${item.title}: R$ ${item.amount.toFixed(2)}</div>`;
-                    else if (item.type === 'appointment') itemsHtml += `<div class="day-appointment">📅 ${item.title}${item.time ? ' ' + item.time : ''}</div>`;
-                    else if (item.type === 'note') itemsHtml += `<div class="day-note">📝 ${item.title}</div>`;
+                    const isPaid = item.status === 'paid';
+                    const statusIcon = isPaid ? ' ✅' : '';
+                    const paidClass = isPaid ? 'paid' : '';
+                    
+                    if (item.type === 'expense') {
+                        itemsHtml += `<div class="day-expense ${paidClass}">🔴 ${item.title}: R$ ${item.amount.toFixed(2)}${statusIcon}</div>`;
+                    } else if (item.type === 'income') {
+                        itemsHtml += `<div class="day-income ${paidClass}">🟢 ${item.title}: R$ ${item.amount.toFixed(2)}${statusIcon}</div>`;
+                    } else if (item.type === 'appointment') {
+                        itemsHtml += `<div class="day-appointment">📅 ${item.title}${item.time ? ' - ' + item.time : ''}</div>`;
+                    } else if (item.type === 'note') {
+                        itemsHtml += `<div class="day-note">📝 ${item.title}</div>`;
+                    }
                 });
                 
                 dayDiv.innerHTML = `<div class="day-number">${day}</div>${itemsHtml}`;
@@ -983,14 +981,44 @@
             listDiv.innerHTML = '';
             dayItems.forEach(item => {
                 const globalIndex = items.findIndex(i => i.id === item.id);
+                const isPaid = item.status === 'paid';
                 const itemDiv = document.createElement('div');
                 let className = '', icon = '', details = '';
-                if (item.type === 'expense') { className = 'expense'; icon = '🔴'; details = `R$ ${item.amount.toFixed(2)}`; }
-                else if (item.type === 'income') { className = 'income'; icon = '🟢'; details = `R$ ${item.amount.toFixed(2)}`; }
-                else if (item.type === 'appointment') { className = 'appointment'; icon = '📅'; details = `${item.time || ''} ${item.location || ''}`; }
-                else if (item.type === 'note') { className = 'note'; icon = '📝'; details = item.content ? item.content.substring(0, 50) : ''; }
+                
+                if (item.type === 'expense') {
+                    className = `expense ${isPaid ? 'paid' : ''}`;
+                    icon = isPaid ? '✅' : '🔴';
+                    details = `Valor: R$ ${item.amount.toFixed(2)}`;
+                    if (isPaid) details += ` - Pago em ${new Date(item.paidDate).toLocaleDateString('pt-BR')}`;
+                    else details += ` - ⏳ Pendente`;
+                } else if (item.type === 'income') {
+                    className = `income ${isPaid ? 'paid' : ''}`;
+                    icon = isPaid ? '✅' : '🟢';
+                    details = `Valor: R$ ${item.amount.toFixed(2)}`;
+                    if (isPaid) details += ` - Recebido em ${new Date(item.paidDate).toLocaleDateString('pt-BR')}`;
+                    else details += ` - ⏳ Pendente`;
+                } else if (item.type === 'appointment') {
+                    className = 'appointment';
+                    icon = '📅';
+                    details = `${item.time || ''} ${item.location || ''}`;
+                } else {
+                    className = 'note';
+                    icon = '📝';
+                    details = item.content ? item.content.substring(0, 50) : '';
+                }
+                
                 itemDiv.className = `item-card ${className}`;
-                itemDiv.innerHTML = `<div class="item-info"><div class="item-title">${icon} ${item.title}</div><div class="item-details">${details}</div></div><div><button class="edit-btn" onclick="editItem(${globalIndex})">✏️</button><button class="delete-btn" onclick="deleteItem(${globalIndex})">🗑️</button></div>`;
+                itemDiv.innerHTML = `
+                    <div class="item-info">
+                        <div class="item-title">${icon} ${item.title}</div>
+                        <div class="item-details">${details}</div>
+                    </div>
+                    <div>
+                        ${!isPaid && (item.type === 'expense' || item.type === 'income') ? `<button class="mark-paid-btn" onclick="markAsPaid(${globalIndex})">✅ Marcar como ${item.type === 'expense' ? 'Pago' : 'Recebido'}</button>` : ''}
+                        <button class="edit-btn" onclick="editItem(${globalIndex})">✏️</button>
+                        <button class="delete-btn" onclick="deleteItem(${globalIndex})">🗑️</button>
+                    </div>
+                `;
                 listDiv.appendChild(itemDiv);
             });
         }
@@ -1030,6 +1058,7 @@
                 document.getElementById('type').value = item.type;
                 document.getElementById('description').value = item.title;
                 document.getElementById('amount').value = item.amount;
+                document.getElementById('status').value = item.status || 'pending';
                 document.getElementById('recurrence').value = item.recurrence;
                 if (item.recurrence === 'weekly') {
                     document.getElementById('dayOfWeekGroup').style.display = 'block';
@@ -1067,7 +1096,7 @@
             }
         }
 
-        // Notificações WhatsApp
+        // WhatsApp
         function formatPhoneNumber(phone) {
             let cleaned = phone.replace(/\D/g, '');
             if (cleaned.startsWith('55') && cleaned.length === 12) return cleaned;
@@ -1078,24 +1107,15 @@
 
         function sendNotification() {
             let phone = document.getElementById('whatsappNumber').value;
-            if (!phone) {
-                alert('📱 Insira seu número!');
-                return;
-            }
+            if (!phone) { alert('📱 Insira seu número!'); return; }
             phone = formatPhoneNumber(phone);
             const weekBalance = getWeekBalance(new Date());
             const monthBalance = getMonthBalance(new Date());
             const weeklyData = getLast4WeeksBalances();
             
-            let msg = `📊 *DINHEIRO EM DIA* 📊\n\n`;
-            msg += `📅 ${new Date().toLocaleDateString('pt-BR')}\n`;
-            msg += `💰 Semana: ${weekBalance >= 0 ? '+' : '-'} R$ ${Math.abs(weekBalance).toFixed(2)}\n`;
-            msg += `📈 Mês: ${monthBalance >= 0 ? '+' : '-'} R$ ${Math.abs(monthBalance).toFixed(2)}\n\n`;
-            weeklyData.weekLabels.forEach((label, i) => {
-                msg += `• Semana ${label}: ${weeklyData.balances[i] >= 0 ? '+' : '-'} R$ ${Math.abs(weeklyData.balances[i]).toFixed(2)}\n`;
-            });
+            let msg = `📊 *DINHEIRO EM DIA* 📊\n\n📅 ${new Date().toLocaleDateString('pt-BR')}\n💰 Semana: ${weekBalance >= 0 ? '+' : '-'} R$ ${Math.abs(weekBalance).toFixed(2)}\n📈 Mês: ${monthBalance >= 0 ? '+' : '-'} R$ ${Math.abs(monthBalance).toFixed(2)}\n\n📊 *Últimas 4 semanas:*\n`;
+            weeklyData.weekLabels.forEach((label, i) => { msg += `• Semana ${label}: ${weeklyData.balances[i] >= 0 ? '+' : '-'} R$ ${Math.abs(weeklyData.balances[i]).toFixed(2)}\n`; });
             msg += `\n🔔 Acesse o app para mais detalhes!`;
-            
             window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, '_blank');
             alert('✅ Notificação preparada! O WhatsApp será aberto para confirmar.');
         }
@@ -1109,13 +1129,9 @@
                         localStorage.setItem('notificationsScheduled', 'true');
                         localStorage.setItem('lastScheduleDate', new Date().toISOString());
                         localStorage.setItem('scheduleFrequency', frequency);
-                    } else {
-                        alert('⚠️ Permita notificações do navegador.');
-                    }
+                    } else { alert('⚠️ Permita notificações do navegador.'); }
                 });
-            } else {
-                alert('⚠️ Use "Enviar Agora"');
-            }
+            } else { alert('⚠️ Use "Enviar Agora"'); }
         }
 
         // Event Listeners
@@ -1126,6 +1142,7 @@
                 type: document.getElementById('type').value,
                 title: document.getElementById('description').value,
                 amount: parseFloat(document.getElementById('amount').value),
+                status: document.getElementById('status').value,
                 recurrence: document.getElementById('recurrence').value,
                 date: formatDateKey(selectedDate)
             };
@@ -1187,12 +1204,12 @@
         document.getElementById('prevMonth').addEventListener('click', () => { currentDate.setMonth(currentDate.getMonth() - 1); renderCalendar(); });
         document.getElementById('nextMonth').addEventListener('click', () => { currentDate.setMonth(currentDate.getMonth() + 1); renderCalendar(); });
 
-        // Tornar funções globais
         window.login = login;
         window.signup = signup;
         window.logout = logout;
         window.editItem = editItem;
         window.deleteItem = deleteItem;
+        window.markAsPaid = markAsPaid;
         window.closeModal = closeModal;
         window.openGoogleMaps = openGoogleMaps;
         window.generateWeeklyReport = generateWeeklyReport;
@@ -1201,22 +1218,16 @@
         window.sendNotification = sendNotification;
         window.scheduleNotification = scheduleNotification;
 
-        // Configurações de notificação
         const savedNumber = localStorage.getItem('whatsappNumber');
         const savedFreq = localStorage.getItem('notificationFrequency');
         if (savedNumber) document.getElementById('whatsappNumber').value = savedNumber;
         if (savedFreq) document.getElementById('notificationFrequency').value = savedFreq;
 
-        document.getElementById('whatsappNumber')?.addEventListener('change', () => {
-            localStorage.setItem('whatsappNumber', document.getElementById('whatsappNumber').value);
-        });
-        document.getElementById('notificationFrequency')?.addEventListener('change', () => {
-            localStorage.setItem('notificationFrequency', document.getElementById('notificationFrequency').value);
-        });
+        document.getElementById('whatsappNumber')?.addEventListener('change', () => { localStorage.setItem('whatsappNumber', document.getElementById('whatsappNumber').value); });
+        document.getElementById('notificationFrequency')?.addEventListener('change', () => { localStorage.setItem('notificationFrequency', document.getElementById('notificationFrequency').value); });
 
         window.onclick = (e) => { if (e.target === document.getElementById('modal')) closeModal(); };
 
-        // Auth state listener
         auth.onAuthStateChanged(async (user) => {
             if (user) {
                 currentUser = user;
@@ -1239,7 +1250,6 @@
 
         renderCalendar();
 
-        // Notificações agendadas
         setInterval(() => {
             const scheduled = localStorage.getItem('notificationsScheduled');
             const lastDate = localStorage.getItem('lastScheduleDate');
