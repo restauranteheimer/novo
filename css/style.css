@@ -439,3 +439,14 @@
             100% { transform: rotate(360deg); }
         }
         @media (max-width: 1200px) { .dashboard { grid-template-columns: 1fr; } }
+        .logo-title{
+            display:flex;
+            align-items:center;
+            gap:15px;
+        }
+
+        .logo-icon{
+            width:55px;
+            height:55px;
+            object-fit:contain;
+        }
