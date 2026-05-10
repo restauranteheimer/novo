@@ -596,15 +596,16 @@
     </div>
 
     <script>
-        // Configuração do Firebase
-        const firebaseConfig = {
-            apiKey: "AIzaSyBzVXFCB8u5iN9j1FD7rVJJJCeD7T7Lkp8",
-            authDomain: "food-delivery-fb89e.firebaseapp.com",
-            projectId: "food-delivery-fb89e",
-            storageBucket: "food-delivery-fb89e.firebasestorage.app",
-            messagingSenderId: "1050430398596",
-            appId: "1:1050430398596:web:1701ff1d161183105e22d1"
-        };
+      // Configuração do Firebase - CORRETA
+const firebaseConfig = {
+    apiKey: "AIzaSyBzVXFCB8u5iN9j1FD7rVJJJCeD7T7Lkp8",
+    authDomain: "food-delivery-fb89e.firebaseapp.com",
+    databaseURL: "https://food-delivery-fb89e.firebaseio.com",
+    projectId: "food-delivery-fb89e",
+    storageBucket: "food-delivery-fb89e.firebasestorage.app",
+    messagingSenderId: "1050430398596",
+    appId: "1:1050430398596:web:1701ff1d161183105e22d1"
+};
 
         // Inicializar Firebase
         firebase.initializeApp(firebaseConfig);
