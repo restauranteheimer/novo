@@ -2,10 +2,12 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Dinheiro em Dia - Calendário Financeiro</title>
+    <meta name="theme-color" content="#667eea">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-    <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
@@ -18,7 +20,7 @@
 
     <div class="container">
         <div class="header">
-            <h1>Dinheiro em Dia</h1>
+            <h1>💰 Dinheiro em Dia</h1>
             <div class="auth-section" id="authSection">
                 <input type="email" id="loginEmail" placeholder="Email">
                 <input type="password" id="loginPassword" placeholder="Senha">
@@ -36,30 +38,55 @@
         <div id="syncStatus" class="sync-status">💾 Carregando...</div>
 
         <div class="dashboard">
-            <div class="calendar-container">
+            <!-- DESKTOP: Calendário mensal -->
+            <div class="calendar-container desktop-view">
                 <div class="calendar-header">
                     <button id="prevMonth">◀ Mês anterior</button>
                     <h2 id="currentMonth"></h2>
                     <button id="nextMonth">Próximo mês ▶</button>
                 </div>
-                <div class="calendar-grid" id="calendarGrid">
-                    <div class="weekday">Dom</div>
-                    <div class="weekday">Seg</div>
-                    <div class="weekday">Ter</div>
-                    <div class="weekday">Qua</div>
-                    <div class="weekday">Qui</div>
-                    <div class="weekday">Sex</div>
-                    <div class="weekday">Sáb</div>
-                </div>
-                <div class="legend">
-                    <div class="legend-item"><div class="legend-color" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);"></div><span>Dia atual</span></div>
-                    <div class="legend-item"><div class="legend-color" style="background: #eff6ff; border: 1px solid #3b82f6;"></div><span>Semana atual</span></div>
-                    <div class="legend-item"><div class="legend-color" style="background: #fef2f2; border: 1px solid #ef4444;"></div><span>Semana negativa</span></div>
-                    <div class="legend-item"><div class="legend-color" style="background: #10b981;"></div><span>Transação realizada ✅</span></div>
+                <div class="calendar-grid" id="calendarGridDesktop">
+                    <div class="weekday">Dom</div><div class="weekday">Seg</div><div class="weekday">Ter</div>
+                    <div class="weekday">Qua</div><div class="weekday">Qui</div><div class="weekday">Sex</div><div class="weekday">Sáb</div>
                 </div>
             </div>
 
-            <div class="sidebar">
+            <!-- MOBILE: Card de saldo grande + calendário semanal -->
+            <div class="mobile-view">
+                <div class="mobile-balance-card">
+                    <h3>💳 SALDO ATUAL</h3>
+                    <div class="mobile-balance-value" id="mobileBalanceValue">R$ 0,00</div>
+                    <div class="mobile-balance-variation" id="mobileVariation"></div>
+                </div>
+
+                <div class="mobile-calendar-container">
+                    <div class="mobile-calendar-header">
+                        <button class="week-nav" onclick="previousWeek()">◀</button>
+                        <h3 id="weekRange"></h3>
+                        <button class="week-nav" onclick="nextWeek()">▶</button>
+                    </div>
+                    <div class="mobile-week-grid" id="mobileWeekGrid"></div>
+                </div>
+
+                <div class="quick-stats">
+                    <div class="stat-card">
+                        <span class="stat-label">📈 Receitas</span>
+                        <span class="stat-value income" id="mobileIncomeTotal">R$ 0</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-label">📉 Despesas</span>
+                        <span class="stat-value expense" id="mobileExpenseTotal">R$ 0</span>
+                    </div>
+                </div>
+
+                <div class="upcoming-bills" id="upcomingBills">
+                    <h4>⏰ Próximas contas</h4>
+                    <div id="upcomingList">Carregando...</div>
+                </div>
+            </div>
+
+            <!-- Sidebar (desktop) -->
+            <div class="sidebar desktop-view">
                 <div class="balance-card">
                     <h3>📊 Saldo da Semana Atual</h3>
                     <div id="weekBalanceValue">Calculando...</div>
@@ -70,6 +97,16 @@
                     <h3>📈 Saldo do Mês Atual</h3>
                     <div id="monthBalanceValue">Calculando...</div>
                     <div id="monthlyAlert"></div>
+                </div>
+
+                <div class="balance-card economy-card">
+                    <h3>🎯 Economia do Mês</h3>
+                    <div id="economyValue">Calculando...</div>
+                </div>
+
+                <div class="balance-card comparison-card">
+                    <h3>📈 VS Mês Passado</h3>
+                    <div id="comparisonValue">Calculando...</div>
                 </div>
 
                 <div class="chart-box">
@@ -86,7 +123,6 @@
                     <button onclick="generateMonthlyReport()">📄 Relatório Mês</button>
                     <button onclick="generateComparisonReport()">📊 Comparativo</button>
                 </div>
-
                 <div id="reportContent" class="report-content">
                     <p style="text-align: center; color: #94a3b8;">📌 Clique em um botão para gerar relatório</p>
                 </div>
@@ -101,16 +137,21 @@
                     <button onclick="sendNotification()">📨 Enviar Agora</button>
                     <button onclick="scheduleNotification()">⏰ Agendar</button>
                 </div>
+            </div>
 
-                <div>
-                    <h3 style="margin-bottom: 12px;">📝 Itens do dia</h3>
-                    <div id="selectedDateDisplay"></div>
-                    <div id="dayItemsList" class="items-list"></div>
-                </div>
+            <!-- Lista de itens do dia (compartilhada) -->
+            <div class="items-panel">
+                <h3 style="margin-bottom: 12px;">📝 Itens do dia</h3>
+                <div id="selectedDateDisplay"></div>
+                <div id="dayItemsList" class="items-list"></div>
             </div>
         </div>
     </div>
 
+    <!-- Botão flutuante mobile -->
+    <div class="fab-add" onclick="quickAddTransaction()">+</div>
+
+    <!-- Modal -->
     <div id="modal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
@@ -126,6 +167,16 @@
             <div id="financialTab" class="tab-content active">
                 <form id="financialForm">
                     <div class="form-group"><label>Tipo:</label><select id="type"><option value="expense">🔴 Despesa</option><option value="income">🟢 Receita</option></select></div>
+                    <div class="form-group"><label>Categoria:</label><select id="category">
+                        <option value="outro">📌 Outro</option>
+                        <option value="moradia">🏠 Moradia</option>
+                        <option value="alimentacao">🍕 Alimentação</option>
+                        <option value="transporte">🚗 Transporte</option>
+                        <option value="saude">💊 Saúde</option>
+                        <option value="lazer">🎬 Lazer</option>
+                        <option value="educacao">📚 Educação</option>
+                        <option value="contas">💡 Contas</option>
+                    </select></div>
                     <div class="form-group"><label>Descrição:</label><input type="text" id="description" required placeholder="Ex: Aluguel, Salário..."></div>
                     <div class="form-group"><label>Valor (R$):</label><input type="number" id="amount" step="0.01" required placeholder="0,00"></div>
                     <div class="form-group"><label>Status:</label><select id="status"><option value="pending">⏳ Pendente</option><option value="paid">✅ Pago/Recebido</option></select></div>
@@ -155,6 +206,7 @@
             </div>
         </div>
     </div>
+
     <script src="js/firebase-config.js"></script>
     <script src="js/app.js"></script>
 </body>
