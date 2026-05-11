@@ -249,8 +249,23 @@ document.getElementById('noteForm').addEventListener('submit',(e)=>{ e.preventDe
 document.querySelectorAll('.tab-btn').forEach(btn=>{ btn.addEventListener('click',function(){ document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active')); this.classList.add('active'); document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active')); document.getElementById(this.dataset.tab+'Tab').classList.add('active'); }); });
 window.onclick=(e)=>{ if(e.target===document.getElementById('modal')) closeModal(); if(e.target===document.getElementById('reportModal')) closeReportModal(); };
 
-// ========== EXPORTAÇÕES ==========
-window.login=login; window.signup=signup; window.logout=logout; window.openNewTransaction=openNewTransaction; window.editTransaction=editTransaction; window.closeModal=closeModal; window.deleteItem=deleteItem; window.generateWeeklyReport=generateWeeklyReport; window.generateMonthlyReport=generateMonthlyReport; window.generateComparisonReport=generateComparisonReport; window.closeReportModal=closeReportModal; window.prevMonth=prevMonth; window.nextMonth=nextMonth; window.selectDate=selectDate; window.sendTransactionViaWhatsApp=sendTransactionViaWhatsApp; window.sendWeeklyReportToWhatsApp=sendWeeklyReportToWhatsApp;
-
+// No final do arquivo, substitua a linha de exportações por:
+window.login = login;
+window.signup = signup;
+window.logout = logout;
+window.openNewTransaction = openNewTransaction;
+window.editTransaction = editTransaction;
+window.closeModal = closeModal;
+window.deleteItem = deleteItem;
+window.openFullReport = openFullReport;           // NOVA FUNÇÃO
+window.generateWeeklyReport = generateWeeklyReport;
+window.generateMonthlyReport = generateMonthlyReport;
+window.generateComparisonReport = generateComparisonReport;
+window.closeReportModal = closeReportModal;
+window.prevMonth = prevMonth;
+window.nextMonth = nextMonth;
+window.selectDate = selectDate;
+window.sendTransactionViaWhatsApp = sendTransactionViaWhatsApp;
+window.sendWeeklyReportToWhatsApp = sendWeeklyReportToWhatsApp;
 // ========== INICIALIZAÇÃO ==========
 selectedDate=new Date(); refreshAllUI(); document.getElementById('selectedDateTitle').innerHTML=formatDateDisplay(selectedDate);
