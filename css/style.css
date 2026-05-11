@@ -361,11 +361,22 @@ body {
 .indicator-up { color: var(--success); }
 .indicator-down { color: var(--danger); }
 
-/* Força texto branco no mês selecionado para todos os elementos */
+/* CORREÇÃO: Texto PRETO no dia selecionado do mês (fundo claro) */
+.month-day.today {
+    background: var(--primary-light, #ede9fe);
+    color: #1e1e2f !important;  /* Preto/cinza escuro */
+    font-weight: 700;
+}
+
+.month-day.today .day-number {
+    color: #1e1e2f !important;  /* Preto */
+}
+
+/* Mantém os ícones visíveis no dia selecionado */
 .month-day.today .indicator-up,
 .month-day.today .indicator-down {
-    color: white !important;
-    opacity: 0.9;
+    color: #1e1e2f !important;
+    opacity: 0.8;
 }
 
 .transactions-card {
