@@ -122,6 +122,115 @@ function sendWeeklyReportToWhatsApp() {
     const relatorio = `📊 *RELATÓRIO FINANCEIRO*\n\n📅 Semana:\n💰 Saldo: ${week.balance>=0?'+':'-'} R$ ${Math.abs(week.balance).toFixed(2)}\n🟢 + R$ ${week.income.toFixed(2)}\n🔴 - R$ ${week.expense.toFixed(2)}\n\n📆 Mês:\n💰 Saldo: ${month.balance>=0?'+':'-'} R$ ${Math.abs(month.balance).toFixed(2)}`;
     window.open(`https://wa.me/${phone}?text=${encodeURIComponent(relatorio)}`, '_blank');
 }
+// ========== RELATÓRIO COMPLETO (RESUMO) ==========
+function openFullReport() {
+    const week = getWeekBalance(new Date());
+    const month = getMonthStats();
+    const allItems = items;
+    
+    // Calcular total geral
+    let totalGeral = 0;
+    allItems.forEach(item => {
+        if (item.type === 'income') totalGeral += item.amount;
+        if (item.type === 'expense') totalGeral -= item.amount;
+    });
+    
+    // Contar número de transações
+    const totalTransacoes = allItems.length;
+    const transacoesReceita = allItems.filter(i => i.type === 'income').length;
+    const transacoesDespesa = allItems.filter(i => i.type === 'expense').length;
+    
+    const content = document.getElementById('reportModalContent');
+    content.innerHTML = `
+        <div style="line-height: 1.6;">
+            <strong>📊 RESUMO COMPLETO</strong><br><br>
+            
+            <div style="background: #f0fdf4; padding: 12px; border-radius: 16px; margin-bottom: 16px;">
+                <strong>💰 SALDO TOTAL</strong><br>
+                <span style="font-size: 1.8rem; font-weight: 800; color: ${totalGeral >= 0 ? '#10b981' : '#ef4444'}">
+                    ${totalGeral >= 0 ? '+' : '-'} R$ ${Math.abs(totalGeral).toLocaleString('pt-BR', {minimumFractionDigits: 2})}
+                </span>
+            </div>
+            
+            <div style="display: flex; gap: 12px; margin-bottom: 16px;">
+                <div style="flex: 1; background: #f0fdf4; padding: 12px; border-radius: 16px; text-align: center;">
+                    <div>🟢 RECEITAS</div>
+                    <div style="font-size: 1.2rem; font-weight: 700;">R$ ${month.income.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</div>
+                    <div style="font-size: 0.7rem; color: #6b7280;">${transacoesReceita} transações</div>
+                </div>
+                <div style="flex: 1; background: #fef2f2; padding: 12px; border-radius: 16px; text-align: center;">
+                    <div>🔴 DESPESAS</div>
+                    <div style="font-size: 1.2rem; font-weight: 700;">R$ ${month.expense.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</div>
+                    <div style="font-size: 0.7rem; color: #6b7280;">${transacoesDespesa} transações</div>
+                </div>
+            </div>
+            
+            <div style="background: #f3f4f6; padding: 12px; border-radius: 16px; margin-bottom: 16px;">
+                <strong>📆 ESTA SEMANA</strong><br>
+                🟢 Receitas: R$ ${week.income.toFixed(2)}<br>
+                🔴 Despesas: R$ ${week.expense.toFixed(2)}<br>
+                💰 Saldo: ${week.balance >= 0 ? '+' : '-'} R$ ${Math.abs(week.balance).toFixed(2)}
+            </div>
+            
+            <div style="background: #f3f4f6; padding: 12px; border-radius: 16px; margin-bottom: 16px;">
+                <strong>📅 ESTE MÊS</strong><br>
+                🟢 Receitas: R$ ${month.income.toFixed(2)}<br>
+                🔴 Despesas: R$ ${month.expense.toFixed(2)}<br>
+                💰 Saldo: ${month.balance >= 0 ? '+' : '-'} R$ ${Math.abs(month.balance).toFixed(2)}
+            </div>
+            
+            <div style="color: #6b7280; font-size: 0.7rem; text-align: center;">
+                Total de transações: ${totalTransacoes}
+            </div>
+        </div>
+    `;
+    document.getElementById('reportModal').style.display = 'flex';
+}
+
+// Função para relatório rápido da semana (mantida para compatibilidade)
+function generateWeeklyReport() {
+    const week = getWeekBalance(new Date());
+    const content = document.getElementById('reportModalContent');
+    content.innerHTML = `
+        <strong>📊 RELATÓRIO DA SEMANA</strong><br><br>
+        📅 Período: ${getWeekRange()}<br>
+        🟢 Receitas: R$ ${week.income.toFixed(2)}<br>
+        🔴 Despesas: R$ ${week.expense.toFixed(2)}<br>
+        💰 Saldo: ${week.balance >= 0 ? '+' : '-'} R$ ${Math.abs(week.balance).toFixed(2)}
+    `;
+    document.getElementById('reportModal').style.display = 'flex';
+}
+
+function generateMonthlyReport() {
+    const month = getMonthStats();
+    const content = document.getElementById('reportModalContent');
+    content.innerHTML = `
+        <strong>📅 RELATÓRIO DO MÊS</strong><br><br>
+        📆 ${new Date().toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })}<br>
+        🟢 Receitas: R$ ${month.income.toFixed(2)}<br>
+        🔴 Despesas: R$ ${month.expense.toFixed(2)}<br>
+        💰 Saldo: ${month.balance >= 0 ? '+' : '-'} R$ ${Math.abs(month.balance).toFixed(2)}
+    `;
+    document.getElementById('reportModal').style.display = 'flex';
+}
+
+function generateComparisonReport() {
+    const week = getWeekBalance(new Date());
+    const month = getMonthStats();
+    const content = document.getElementById('reportModalContent');
+    content.innerHTML = `
+        <strong>📊 COMPARATIVO</strong><br><br>
+        <strong>Semana:</strong><br>
+        🟢 + R$ ${week.income.toFixed(2)}<br>
+        🔴 - R$ ${week.expense.toFixed(2)}<br>
+        💰 Saldo: ${week.balance >= 0 ? '+' : '-'} R$ ${Math.abs(week.balance).toFixed(2)}<br><br>
+        <strong>Mês:</strong><br>
+        🟢 + R$ ${month.income.toFixed(2)}<br>
+        🔴 - R$ ${month.expense.toFixed(2)}<br>
+        💰 Saldo: ${month.balance >= 0 ? '+' : '-'} R$ ${Math.abs(month.balance).toFixed(2)}
+    `;
+    document.getElementById('reportModal').style.display = 'flex';
+}
 
 // ========== AUTENTICAÇÃO ==========
 async function login() { const email=document.getElementById('loginEmail').value, password=document.getElementById('loginPassword').value; if(!email||!password){ alert('📧 Preencha email e senha'); return; } showLoading(); try{ await auth.signInWithEmailAndPassword(email,password); alert('✅ Login realizado!'); } catch(error){ let msg=''; switch(error.code){ case 'auth/wrong-password': msg='❌ Senha incorreta.'; break; case 'auth/user-not-found': msg='❌ Email não cadastrado. Crie uma conta.'; break; default: msg='❌ Erro: '+error.message; } alert(msg); } finally{ hideLoading(); } }
