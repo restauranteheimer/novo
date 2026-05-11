@@ -740,6 +740,15 @@ body {
     border-radius: 50%;
     animation: spin 0.8s linear infinite;
 }
+/* Garantir que o modal de relatório tenha z-index alto */
+.report-modal {
+    z-index: 1500;
+}
+
+/* Botão de fechar estilizado */
+.close-report-modal:hover {
+    background: #e5e7eb;
+}
 
 @keyframes spin { to { transform: rotate(360deg); } }
 @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
