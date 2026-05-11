@@ -899,4 +899,40 @@ body {
     .day-indicators {
         font-size: 0.6rem;
     }
+    /* Garante que a data seja editável */
+.date-selector input {
+    cursor: pointer;
+    background: white;
+}
+
+/* Ajustes finais de responsividade */
+@media (max-width: 480px) {
+    .balance-card {
+        margin: 12px;
+        padding: 16px;
+    }
+    
+    .main-balance {
+        font-size: 2rem;
+    }
+    
+    .shortcut-item {
+        font-size: 0.7rem;
+        padding: 10px 6px;
+    }
+    
+    .day-chip {
+        min-width: 55px;
+        padding: 8px 10px;
+    }
+    
+    .day-number {
+        font-size: 0.9rem;
+    }
+    
+    .month-day {
+        min-height: 50px;
+        font-size: 0.7rem;
+    }
+}
 }
