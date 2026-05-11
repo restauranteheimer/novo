@@ -56,13 +56,18 @@ function updateBalances() {
     let week = getWeekBalance(new Date()); 
     let month = getMonthStats(); 
     
-    // CORREÇÃO: Saldo principal agora é do MÊS, não da semana
+    // Saldo principal = SALDO DO MÊS (não da semana)
     document.getElementById('mainBalance').innerHTML = `R$ ${month.balance.toLocaleString('pt-BR',{minimumFractionDigits:2})}`; 
     
+    // Estatísticas do mês
     document.getElementById('monthIncome').innerHTML = `R$ ${month.income.toLocaleString('pt-BR',{minimumFractionDigits:2})}`; 
     document.getElementById('monthExpense').innerHTML = `R$ ${month.expense.toLocaleString('pt-BR',{minimumFractionDigits:2})}`; 
+    
+    // Estatísticas da semana
     document.getElementById('weekIncome').innerHTML = `R$ ${week.income.toLocaleString('pt-BR',{minimumFractionDigits:2})}`; 
     document.getElementById('weekExpense').innerHTML = `R$ ${week.expense.toLocaleString('pt-BR',{minimumFractionDigits:2})}`; 
+    
+    // Resumo da semana (sidebar)
     document.getElementById('totalExpense').innerHTML = `R$ ${week.expense.toFixed(2)}`; 
     document.getElementById('totalIncome').innerHTML = `R$ ${week.income.toFixed(2)}`; 
     document.getElementById('totalBalance').innerHTML = `R$ ${week.balance.toFixed(2)}`; 
