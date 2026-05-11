@@ -239,7 +239,7 @@ body {
     border: 1px solid var(--border);
 }
 
-/* CORREÇÃO: Texto branco no dia selecionado (HOJE) */
+/* Dia atual na semana - fundo roxo ESCURO com texto BRANCO (destaca) */
 .day-chip.today {
     background: var(--primary-dark, #6d28d9);
     border-color: var(--primary-dark);
@@ -316,6 +316,7 @@ body {
     padding: 10px 0;
 }
 
+/* Estilo padrão dos dias do mês */
 .month-day {
     text-align: center;
     padding: 10px 4px;
@@ -328,18 +329,30 @@ body {
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    color: #1e1e2f; /* Texto preto/cinza escuro */
 }
 
-/* CORREÇÃO: Texto branco no dia selecionado do mês */
+/* CORREÇÃO: Dia atual (hoje) com fundo roxo CLARO e texto PRETO */
 .month-day.today {
-    background: var(--primary-dark, #6d28d9);
-    color: white !important;
+    background: var(--primary-light, #ede9fe);
+    color: #1e1e2f !important;
+    font-weight: 700;
+    border: 1px solid var(--primary);
 }
 
 .month-day.today .day-number {
-    color: white !important;
+    color: #1e1e2f !important;
+    font-weight: 800;
 }
 
+/* Indicadores no dia atual */
+.month-day.today .indicator-up,
+.month-day.today .indicator-down {
+    color: #1e1e2f !important;
+    opacity: 0.8;
+}
+
+/* Dias com receita/despesa */
 .month-day.has-income {
     border: 1px solid var(--success);
     background: #f0fdf4;
@@ -350,35 +363,10 @@ body {
     background: #fef2f2;
 }
 
-.day-indicators {
-    font-size: 0.7rem;
-    margin-top: 4px;
-    display: flex;
-    gap: 4px;
-    justify-content: center;
+.month-day.has-both {
+    border: 1px solid var(--primary);
+    background: var(--primary-soft);
 }
-
-.indicator-up { color: var(--success); }
-.indicator-down { color: var(--danger); }
-
-/* CORREÇÃO: Texto PRETO no dia selecionado do mês (fundo claro) */
-.month-day.today {
-    background: var(--primary-light, #ede9fe);
-    color: #1e1e2f !important;  /* Preto/cinza escuro */
-    font-weight: 700;
-}
-
-.month-day.today .day-number {
-    color: #1e1e2f !important;  /* Preto */
-}
-
-/* Mantém os ícones visíveis no dia selecionado */
-.month-day.today .indicator-up,
-.month-day.today .indicator-down {
-    color: #1e1e2f !important;
-    opacity: 0.8;
-}
-
 .transactions-card {
     background: var(--card-bg);
     margin: 0 16px 20px;
