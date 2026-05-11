@@ -1,4 +1,4 @@
-// Variáveis globais
+// ========== VARIÁVEIS GLOBAIS ==========
 let currentUser = null;
 let items = [];
 let selectedDate = new Date();
@@ -35,7 +35,7 @@ function renderMonthCalendar() {
     document.getElementById('monthTitle').innerHTML=currentMonth.toLocaleDateString('pt-BR',{month:'long',year:'numeric'}).replace(/^./,l=>l.toUpperCase());
     const grid=document.getElementById('monthGrid'); grid.innerHTML='';
     weekDays.forEach(day=>{ let h=document.createElement('div'); h.className='weekday-header'; h.textContent=day; grid.appendChild(h); });
-    for(let i=0;i<startDay;i++){ let e=document.createElement('div'); e.className='month-day'; e.style.background='transparent'; e.style.cursor='default'; e.style.minHeight='65px'; grid.appendChild(e); }
+    for(let i=0;i<startDay;i++){ let e=document.createElement('div'); e.className='month-day'; e.style.background='transparent'; e.style.cursor='default'; e.style.minHeight='55px'; grid.appendChild(e); }
     for(let day=1;day<=totalDays;day++){ let d=new Date(year,month,day), summary=getDaySummary(d), isToday=d.toDateString()===today.toDateString(); let indicatorClass=''; if(summary.income>0&&summary.expense>0) indicatorClass='has-both'; else if(summary.income>0) indicatorClass='has-income'; else if(summary.expense>0) indicatorClass='has-expense'; let dayDiv=document.createElement('div'); dayDiv.className=`month-day ${isToday?'today':''} ${indicatorClass}`; let indicators=''; if(summary.income>0) indicators+=`<span class="indicator-up">↑${summary.income.toFixed(0)}</span>`; if(summary.expense>0) indicators+=`<span class="indicator-down">↓${summary.expense.toFixed(0)}</span>`; dayDiv.innerHTML=`<div class="day-number">${day}</div>${indicators?`<div class="day-indicators">${indicators}</div>`:''}`; dayDiv.onclick=()=>selectDate(d); grid.appendChild(dayDiv); }
 }
 
@@ -48,40 +48,51 @@ function updateSelectedDateTransactions() {
     dayItems.forEach(item=>{ let globalIndex=items.findIndex(i=>i.id===item.id); let amountClass=item.type==='expense'?'amount-negative':'amount-positive'; let signal=item.type==='expense'?'-':'+'; let icon=item.type==='expense'?'💸':'💰'; let div=document.createElement('div'); div.className='transaction-item'; div.innerHTML=`<div class="transaction-icon">${icon}</div><div class="transaction-info"><div class="transaction-title">${item.title}</div><div class="transaction-date">${item.time||formatDateDisplay(selectedDate)}</div></div><div class="transaction-amount ${amountClass}">${signal} R$ ${item.amount.toFixed(2)}</div><button class="edit-transaction" onclick="editTransaction(${globalIndex})">✏️</button><button class="delete-transaction" onclick="deleteItem(${globalIndex})">🗑️</button>`; container.appendChild(div); });
 }
 
-function editTransaction(index) { let item=items[index]; if(!item) return; editingItemId=item.id; selectedDate=new Date(item.date); document.getElementById('modalTitle').innerHTML='Editar transação'; document.getElementById('modalDateInfo').innerHTML=`📅 ${formatDateDisplay(selectedDate)}`; document.getElementById('modal').style.display='flex'; document.querySelector('[data-tab="financial"]').click(); document.getElementById('type').value=item.type; document.getElementById('description').value=item.title; document.getElementById('amount').value=item.amount; document.getElementById('status').value=item.status||'pending'; items.splice(index,1); }
-
-function openNewTransaction(date, presetType=null) { editingItemId=null; selectedDate=date; document.getElementById('modalTitle').innerHTML='Nova transação'; document.getElementById('modalDateInfo').innerHTML=`📅 ${formatDateDisplay(date)}`; document.getElementById('modal').style.display='flex'; document.getElementById('financialForm').reset(); if(presetType) document.getElementById('type').value=presetType; }
-
-function updateBalances() { 
-    let week = getWeekBalance(new Date()); 
-    let month = getMonthStats(); 
-    
-    // Saldo principal = SALDO DO MÊS (não da semana)
-    document.getElementById('mainBalance').innerHTML = `R$ ${month.balance.toLocaleString('pt-BR',{minimumFractionDigits:2})}`; 
-    
-    // Estatísticas do mês
-    document.getElementById('monthIncome').innerHTML = `R$ ${month.income.toLocaleString('pt-BR',{minimumFractionDigits:2})}`; 
-    document.getElementById('monthExpense').innerHTML = `R$ ${month.expense.toLocaleString('pt-BR',{minimumFractionDigits:2})}`; 
-    
-    // Estatísticas da semana
-    document.getElementById('weekIncome').innerHTML = `R$ ${week.income.toLocaleString('pt-BR',{minimumFractionDigits:2})}`; 
-    document.getElementById('weekExpense').innerHTML = `R$ ${week.expense.toLocaleString('pt-BR',{minimumFractionDigits:2})}`; 
-    
-    // Resumo da semana (sidebar)
-    document.getElementById('totalExpense').innerHTML = `R$ ${week.expense.toFixed(2)}`; 
-    document.getElementById('totalIncome').innerHTML = `R$ ${week.income.toFixed(2)}`; 
-    document.getElementById('totalBalance').innerHTML = `R$ ${week.balance.toFixed(2)}`; 
+function editTransaction(index) {
+    const item = items[index];
+    if (!item) return;
+    editingItemId = item.id;
+    selectedDate = new Date(item.date);
+    document.getElementById('modalTitle').innerHTML = 'Editar transação';
+    const modalDateInfo = document.getElementById('modalDateInfo');
+    modalDateInfo.innerHTML = `<div class="date-selector"><span>📅 Data:</span><input type="date" id="transactionDate" value="${formatDateKey(selectedDate)}"></div>`;
+    const dateInput = document.getElementById('transactionDate');
+    if (dateInput) dateInput.addEventListener('change', (e) => { const newDate = new Date(e.target.value); if (!isNaN(newDate.getTime())) selectedDate = newDate; });
+    document.getElementById('modal').style.display = 'flex';
+    document.querySelector('[data-tab="financial"]').click();
+    document.getElementById('type').value = item.type;
+    document.getElementById('description').value = item.title;
+    document.getElementById('amount').value = item.amount;
+    document.getElementById('status').value = item.status || 'pending';
+    items.splice(index, 1);
 }
+
+function openNewTransaction(date, presetType = null) {
+    editingItemId = null;
+    selectedDate = date || new Date();
+    document.getElementById('modalTitle').innerHTML = 'Nova transação';
+    const modalDateInfo = document.getElementById('modalDateInfo');
+    modalDateInfo.innerHTML = `<div class="date-selector"><span>📅 Data:</span><input type="date" id="transactionDate" value="${formatDateKey(selectedDate)}"></div>`;
+    const dateInput = document.getElementById('transactionDate');
+    if (dateInput) dateInput.addEventListener('change', (e) => { const newDate = new Date(e.target.value); if (!isNaN(newDate.getTime())) selectedDate = newDate; });
+    document.getElementById('modal').style.display = 'flex';
+    document.getElementById('financialForm').reset();
+    if (presetType) document.getElementById('type').value = presetType;
+}
+
+function updateBalances() { let week=getWeekBalance(new Date()), month=getMonthStats(); document.getElementById('mainBalance').innerHTML=`R$ ${month.balance.toLocaleString('pt-BR',{minimumFractionDigits:2})}`; document.getElementById('monthIncome').innerHTML=`R$ ${month.income.toLocaleString('pt-BR',{minimumFractionDigits:2})}`; document.getElementById('monthExpense').innerHTML=`R$ ${month.expense.toLocaleString('pt-BR',{minimumFractionDigits:2})}`; document.getElementById('weekIncome').innerHTML=`R$ ${week.income.toLocaleString('pt-BR',{minimumFractionDigits:2})}`; document.getElementById('weekExpense').innerHTML=`R$ ${week.expense.toLocaleString('pt-BR',{minimumFractionDigits:2})}`; document.getElementById('totalExpense').innerHTML=`R$ ${week.expense.toFixed(2)}`; document.getElementById('totalIncome').innerHTML=`R$ ${week.income.toFixed(2)}`; document.getElementById('totalBalance').innerHTML=`R$ ${week.balance.toFixed(2)}`; }
 
 function refreshAllUI() { renderWeekCalendar(); renderMonthCalendar(); if(selectedDate){ document.getElementById('selectedDateTitle').innerHTML=formatDateDisplay(selectedDate); updateSelectedDateTransactions(); } updateBalances(); }
 function saveData() { refreshAllUI(); if(currentUser) saveToCloud(); }
 function closeModal() { document.getElementById('modal').style.display='none'; editingItemId=null; refreshAllUI(); }
 function deleteItem(index) { if(confirm('Excluir esta transação?')){ items.splice(index,1); saveData(); } }
 
-// ========== RELATÓRIOS ==========
-function generateWeeklyReport() { let week=getWeekBalance(new Date()); let report=document.getElementById('reportContent'); report.innerHTML=`<strong>📊 RELATÓRIO DA SEMANA</strong><br><br>📅 Período: ${getWeekRange()}<br>🟢 Receitas: R$ ${week.income.toFixed(2)}<br>🔴 Despesas: R$ ${week.expense.toFixed(2)}<br>💰 Saldo: ${week.balance>=0?'+':'-'} R$ ${Math.abs(week.balance).toFixed(2)}`; report.classList.add('show'); setTimeout(()=>report.classList.remove('show'),5000); }
-function generateMonthlyReport() { let month=getMonthStats(); let report=document.getElementById('reportContent'); report.innerHTML=`<strong>📅 RELATÓRIO DO MÊS</strong><br><br>📆 ${new Date().toLocaleDateString('pt-BR',{month:'long',year:'numeric'})}<br>🟢 Receitas: R$ ${month.income.toFixed(2)}<br>🔴 Despesas: R$ ${month.expense.toFixed(2)}<br>💰 Saldo: ${month.balance>=0?'+':'-'} R$ ${Math.abs(month.balance).toFixed(2)}`; report.classList.add('show'); setTimeout(()=>report.classList.remove('show'),5000); }
-function generateComparisonReport() { generateWeeklyReport(); }
+// ========== RELATÓRIOS (MODAL) ==========
+function generateWeeklyReport() { const week=getWeekBalance(new Date()), month=getMonthStats(), content=document.getElementById('reportModalContent'); content.innerHTML=`<strong>📊 RELATÓRIO DA SEMANA</strong><br><br>📅 Período: ${getWeekRange()}<br>🟢 Receitas: R$ ${week.income.toFixed(2)}<br>🔴 Despesas: R$ ${week.expense.toFixed(2)}<br>💰 Saldo: ${week.balance>=0?'+':'-'} R$ ${Math.abs(week.balance).toFixed(2)}<br><br><strong>📅 RESUMO DO MÊS</strong><br>🟢 Receitas: R$ ${month.income.toFixed(2)}<br>🔴 Despesas: R$ ${month.expense.toFixed(2)}<br>💰 Saldo: ${month.balance>=0?'+':'-'} R$ ${Math.abs(month.balance).toFixed(2)}`; document.getElementById('reportModal').style.display='flex'; }
+function generateMonthlyReport() { const month=getMonthStats(), content=document.getElementById('reportModalContent'); content.innerHTML=`<strong>📅 RELATÓRIO DO MÊS</strong><br><br>📆 ${new Date().toLocaleDateString('pt-BR',{month:'long',year:'numeric'})}<br>🟢 Receitas: R$ ${month.income.toFixed(2)}<br>🔴 Despesas: R$ ${month.expense.toFixed(2)}<br>💰 Saldo: ${month.balance>=0?'+':'-'} R$ ${Math.abs(month.balance).toFixed(2)}`; document.getElementById('reportModal').style.display='flex'; }
+function generateComparisonReport() { const week=getWeekBalance(new Date()), month=getMonthStats(), content=document.getElementById('reportModalContent'); content.innerHTML=`<strong>📊 COMPARATIVO</strong><br><br><strong>Semana:</strong><br>🟢 + R$ ${week.income.toFixed(2)}<br>🔴 - R$ ${week.expense.toFixed(2)}<br>💰 Saldo: ${week.balance>=0?'+':'-'} R$ ${Math.abs(week.balance).toFixed(2)}<br><br><strong>Mês:</strong><br>🟢 + R$ ${month.income.toFixed(2)}<br>🔴 - R$ ${month.expense.toFixed(2)}<br>💰 Saldo: ${month.balance>=0?'+':'-'} R$ ${Math.abs(month.balance).toFixed(2)}`; document.getElementById('reportModal').style.display='flex'; }
+function closeReportModal() { document.getElementById('reportModal').style.display='none'; }
+
 function prevMonth() { currentMonth.setMonth(currentMonth.getMonth()-1); renderMonthCalendar(); }
 function nextMonth() { currentMonth.setMonth(currentMonth.getMonth()+1); renderMonthCalendar(); }
 
@@ -125,11 +136,12 @@ auth.onAuthStateChanged(async (user)=>{ if(user){ currentUser=user; document.get
 document.getElementById('financialForm').addEventListener('submit',(e)=>{ e.preventDefault(); items.push({ id:editingItemId||Date.now(), type:document.getElementById('type').value, title:document.getElementById('description').value, amount:parseFloat(document.getElementById('amount').value), status:document.getElementById('status').value, date:formatDateKey(selectedDate) }); saveData(); closeModal(); });
 document.getElementById('appointmentForm').addEventListener('submit',(e)=>{ e.preventDefault(); items.push({ id:Date.now(), type:'appointment', title:document.getElementById('appointmentTitle').value, time:document.getElementById('appointmentTime').value, location:document.getElementById('appointmentLocation').value, date:formatDateKey(selectedDate) }); saveData(); closeModal(); });
 document.getElementById('noteForm').addEventListener('submit',(e)=>{ e.preventDefault(); items.push({ id:Date.now(), type:'note', title:document.getElementById('noteTitle').value, content:document.getElementById('noteContent').value, date:formatDateKey(selectedDate) }); saveData(); closeModal(); });
+
 document.querySelectorAll('.tab-btn').forEach(btn=>{ btn.addEventListener('click',function(){ document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active')); this.classList.add('active'); document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active')); document.getElementById(this.dataset.tab+'Tab').classList.add('active'); }); });
-window.onclick=(e)=>{ if(e.target===document.getElementById('modal')) closeModal(); };
+window.onclick=(e)=>{ if(e.target===document.getElementById('modal')) closeModal(); if(e.target===document.getElementById('reportModal')) closeReportModal(); };
 
 // ========== EXPORTAÇÕES ==========
-window.login=login; window.signup=signup; window.logout=logout; window.openNewTransaction=openNewTransaction; window.editTransaction=editTransaction; window.closeModal=closeModal; window.deleteItem=deleteItem; window.generateWeeklyReport=generateWeeklyReport; window.generateMonthlyReport=generateMonthlyReport; window.generateComparisonReport=generateComparisonReport; window.prevMonth=prevMonth; window.nextMonth=nextMonth; window.selectDate=selectDate; window.sendTransactionViaWhatsApp=sendTransactionViaWhatsApp; window.sendWeeklyReportToWhatsApp=sendWeeklyReportToWhatsApp;
+window.login=login; window.signup=signup; window.logout=logout; window.openNewTransaction=openNewTransaction; window.editTransaction=editTransaction; window.closeModal=closeModal; window.deleteItem=deleteItem; window.generateWeeklyReport=generateWeeklyReport; window.generateMonthlyReport=generateMonthlyReport; window.generateComparisonReport=generateComparisonReport; window.closeReportModal=closeReportModal; window.prevMonth=prevMonth; window.nextMonth=nextMonth; window.selectDate=selectDate; window.sendTransactionViaWhatsApp=sendTransactionViaWhatsApp; window.sendWeeklyReportToWhatsApp=sendWeeklyReportToWhatsApp;
 
 // ========== INICIALIZAÇÃO ==========
 selectedDate=new Date(); refreshAllUI(); document.getElementById('selectedDateTitle').innerHTML=formatDateDisplay(selectedDate);
