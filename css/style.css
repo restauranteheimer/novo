@@ -662,6 +662,139 @@ body {
     font-weight: 600;
     color: var(--primary);
 }
+// ========== FUNÇÕES DE RELATÓRIO (janela modal) ==========
+function generateWeeklyReport() {
+    const week = getWeekBalance(new Date());
+    const month = getMonthStats();
+    const content = document.getElementById('reportModalContent');
+    content.innerHTML = `
+        <strong>📊 RELATÓRIO DA SEMANA</strong><br><br>
+        📅 Período: ${getWeekRange()}<br>
+        🟢 Receitas: R$ ${week.income.toFixed(2)}<br>
+        🔴 Despesas: R$ ${week.expense.toFixed(2)}<br>
+        💰 Saldo: ${week.balance >= 0 ? '+' : '-'} R$ ${Math.abs(week.balance).toFixed(2)}<br>
+        <br>
+        <strong>📅 RESUMO DO MÊS</strong><br>
+        🟢 Receitas: R$ ${month.income.toFixed(2)}<br>
+        🔴 Despesas: R$ ${month.expense.toFixed(2)}<br>
+        💰 Saldo: ${month.balance >= 0 ? '+' : '-'} R$ ${Math.abs(month.balance).toFixed(2)}
+    `;
+    document.getElementById('reportModal').style.display = 'flex';
+}
+
+function generateMonthlyReport() {
+    const month = getMonthStats();
+    const content = document.getElementById('reportModalContent');
+    content.innerHTML = `
+        <strong>📅 RELATÓRIO DO MÊS</strong><br><br>
+        📆 ${new Date().toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })}<br>
+        🟢 Receitas: R$ ${month.income.toFixed(2)}<br>
+        🔴 Despesas: R$ ${month.expense.toFixed(2)}<br>
+        💰 Saldo: ${month.balance >= 0 ? '+' : '-'} R$ ${Math.abs(month.balance).toFixed(2)}
+    `;
+    document.getElementById('reportModal').style.display = 'flex';
+}
+
+function generateComparisonReport() {
+    const week = getWeekBalance(new Date());
+    const month = getMonthStats();
+    const content = document.getElementById('reportModalContent');
+    content.innerHTML = `
+        <strong>📊 COMPARATIVO</strong><br><br>
+        <strong>Semana:</strong><br>
+        🟢 + R$ ${week.income.toFixed(2)}<br>
+        🔴 - R$ ${week.expense.toFixed(2)}<br>
+        💰 Saldo: ${week.balance >= 0 ? '+' : '-'} R$ ${Math.abs(week.balance).toFixed(2)}<br><br>
+        <strong>Mês:</strong><br>
+        🟢 + R$ ${month.income.toFixed(2)}<br>
+        🔴 - R$ ${month.expense.toFixed(2)}<br>
+        💰 Saldo: ${month.balance >= 0 ? '+' : '-'} R$ ${Math.abs(month.balance).toFixed(2)}
+    `;
+    document.getElementById('reportModal').style.display = 'flex';
+}
+
+function closeReportModal() {
+    document.getElementById('reportModal').style.display = 'none';
+}
+
+// ========== FUNÇÃO EDITAR DATA NO MODAL ==========
+// Substitua a função openNewTransaction por esta:
+
+function openNewTransaction(date, presetType = null) {
+    editingItemId = null;
+    selectedDate = date || new Date();
+    
+    document.getElementById('modalTitle').innerHTML = 'Nova transação';
+    
+    // Criar seletor de data no modal
+    const modalDateInfo = document.getElementById('modalDateInfo');
+    modalDateInfo.innerHTML = `
+        <div class="date-selector">
+            <span>📅 Data:</span>
+            <input type="date" id="transactionDate" value="${formatDateKey(selectedDate)}">
+        </div>
+    `;
+    
+    // Adicionar evento para mudar a data selecionada
+    const dateInput = document.getElementById('transactionDate');
+    if (dateInput) {
+        dateInput.addEventListener('change', (e) => {
+            const newDate = new Date(e.target.value);
+            if (!isNaN(newDate.getTime())) {
+                selectedDate = newDate;
+                modalDateInfo.querySelector('.date-selector span').innerHTML = `📅 ${formatDateDisplay(selectedDate)}`;
+            }
+        });
+    }
+    
+    document.getElementById('modal').style.display = 'flex';
+    document.getElementById('financialForm').reset();
+    
+    if (presetType) {
+        document.getElementById('type').value = presetType;
+    }
+}
+
+// Atualizar a função editTransaction também
+function editTransaction(index) {
+    const item = items[index];
+    if (!item) return;
+    
+    editingItemId = item.id;
+    selectedDate = new Date(item.date);
+    
+    document.getElementById('modalTitle').innerHTML = 'Editar transação';
+    
+    const modalDateInfo = document.getElementById('modalDateInfo');
+    modalDateInfo.innerHTML = `
+        <div class="date-selector">
+            <span>📅 Data:</span>
+            <input type="date" id="transactionDate" value="${formatDateKey(selectedDate)}">
+        </div>
+    `;
+    
+    const dateInput = document.getElementById('transactionDate');
+    if (dateInput) {
+        dateInput.addEventListener('change', (e) => {
+            const newDate = new Date(e.target.value);
+            if (!isNaN(newDate.getTime())) {
+                selectedDate = newDate;
+            }
+        });
+    }
+    
+    document.getElementById('modal').style.display = 'flex';
+    document.querySelector('[data-tab="financial"]').click();
+    document.getElementById('type').value = item.type;
+    document.getElementById('description').value = item.title;
+    document.getElementById('amount').value = item.amount;
+    document.getElementById('status').value = item.status || 'pending';
+    
+    items.splice(index, 1);
+}
+
+// ========== EXPORTAÇÃO DAS NOVAS FUNÇÕES ==========
+window.closeReportModal = closeReportModal;
 /* Adicione ao final do seu style.css */
 
 /* Corrige fundo roxo apenas no body, não no container */
