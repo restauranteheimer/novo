@@ -2,8 +2,8 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Dinheiro em Dia</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
+    <title>Dinheiro em Dia • Banco Digital</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
@@ -18,8 +18,8 @@
 <div class="app-container">
     <div class="header">
         <div class="logo">
-            <h1>Dinheiro em dia</h1>
-            <p>Controlador de finanças</p>
+            <h1>💰 dinheiro em dia</h1>
+            <p>conta digital</p>
         </div>
         <div id="authSection" class="auth-section">
             <input type="email" id="loginEmail" placeholder="seu@email.com">
@@ -62,13 +62,13 @@
                 </div>
             </div>
 
-         <div class="shortcuts">
-    <div class="shortcut-item" onclick="openNewTransaction(new Date(), 'income')">💰 Receita</div>
-    <div class="shortcut-item" onclick="openNewTransaction(new Date(), 'expense')">💸 Despesa</div>
-    <div class="shortcut-item" onclick="generateWeeklyReport()">📊 Resumo</div>
-    <div class="shortcut-item" onclick="sendTransactionViaWhatsApp()">📱 WhatsApp</div>
-    <div class="shortcut-item" onclick="sendWeeklyReportToWhatsApp()">📨 Relatório</div>
-</div>
+            <div class="shortcuts">
+                <div class="shortcut-item" onclick="openNewTransaction(new Date(), 'income')">💰 Receita</div>
+                <div class="shortcut-item" onclick="openNewTransaction(new Date(), 'expense')">💸 Despesa</div>
+                <div class="shortcut-item" onclick="generateWeeklyReport()">📊 Resumo</div>
+                <div class="shortcut-item" onclick="sendTransactionViaWhatsApp()">📱 WhatsApp</div>
+                <div class="shortcut-item" onclick="sendWeeklyReportToWhatsApp()">📨 Relatório</div>
+            </div>
 
             <div class="section-header">
                 <span>📅 Esta semana</span>
@@ -115,12 +115,11 @@
             <button class="desktop-fab" onclick="openNewTransaction(selectedDate || new Date())">➕ Nova transação</button>
         </div>
     </div>
-
-    <div id="reportContent" class="report-content"></div>
 </div>
 
 <button class="fab" onclick="openNewTransaction(new Date())">+</button>
 
+<!-- Modal de Transação -->
 <div id="modal" class="modal">
     <div class="modal-content">
         <div class="modal-header">
@@ -135,14 +134,74 @@
         </div>
         <div id="financialTab" class="tab-content active">
             <form id="financialForm">
-                <div class="form-group"><label>Tipo</label><select id="type"><option value="expense">🔴 Despesa</option><option value="income">🟢 Receita</option></select></div>
-                <div class="form-group"><label>Descrição</label><input type="text" id="description" required placeholder="Ex: Almoço, Salário"></div>
-                <div class="form-group"><label>Valor (R$)</label><input type="number" id="amount" step="0.01" required placeholder="0,00"></div>
-                <div class="form-group"><label>Status</label><select id="status"><option value="pending">⏳ Pendente</option><option value="paid">✅ Pago/Recebido</option></select></div>
-                <div class="form-buttons"><button type="button" class="btn-cancel" onclick="closeModal()">Cancelar</button><button type="submit" class="btn-save">Salvar</button></div>
+                <div class="form-group">
+                    <label>Tipo</label>
+                    <select id="type">
+                        <option value="expense">🔴 Despesa</option>
+                        <option value="income">🟢 Receita</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Descrição</label>
+                    <input type="text" id="description" required placeholder="Ex: Almoço, Salário">
+                </div>
+                <div class="form-group">
+                    <label>Valor (R$)</label>
+                    <input type="number" id="amount" step="0.01" required placeholder="0,00">
+                </div>
+                <div class="form-group">
+                    <label>Status</label>
+                    <select id="status">
+                        <option value="pending">⏳ Pendente</option>
+                        <option value="paid">✅ Pago/Recebido</option>
+                    </select>
+                </div>
+                <div class="form-buttons">
+                    <button type="button" class="btn-cancel" onclick="closeModal()">Cancelar</button>
+                    <button type="submit" class="btn-save">Salvar</button>
+                </div>
             </form>
         </div>
-        <!-- Modal de Relatório (janela flutuante) -->
+        <div id="appointmentTab" class="tab-content">
+            <form id="appointmentForm">
+                <div class="form-group">
+                    <label>Título</label>
+                    <input type="text" id="appointmentTitle" required>
+                </div>
+                <div class="form-group">
+                    <label>Horário</label>
+                    <input type="time" id="appointmentTime">
+                </div>
+                <div class="form-group">
+                    <label>Local</label>
+                    <input type="text" id="appointmentLocation">
+                </div>
+                <div class="form-buttons">
+                    <button type="button" class="btn-cancel" onclick="closeModal()">Cancelar</button>
+                    <button type="submit" class="btn-save">Salvar</button>
+                </div>
+            </form>
+        </div>
+        <div id="noteTab" class="tab-content">
+            <form id="noteForm">
+                <div class="form-group">
+                    <label>Título</label>
+                    <input type="text" id="noteTitle" required>
+                </div>
+                <div class="form-group">
+                    <label>Conteúdo</label>
+                    <textarea id="noteContent" rows="4"></textarea>
+                </div>
+                <div class="form-buttons">
+                    <button type="button" class="btn-cancel" onclick="closeModal()">Cancelar</button>
+                    <button type="submit" class="btn-save">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Relatório -->
 <div id="reportModal" class="report-modal">
     <div class="report-modal-content">
         <div class="report-modal-header">
@@ -150,10 +209,6 @@
             <button class="close-report-modal" onclick="closeReportModal()">Fechar</button>
         </div>
         <div id="reportModalContent"></div>
-    </div>
-</div>
-        <div id="appointmentTab" class="tab-content"><form id="appointmentForm"><div class="form-group"><label>Título</label><input type="text" id="appointmentTitle" required></div><div class="form-group"><label>Horário</label><input type="time" id="appointmentTime"></div><div class="form-group"><label>Local</label><input type="text" id="appointmentLocation"></div><div class="form-buttons"><button type="button" class="btn-cancel" onclick="closeModal()">Cancelar</button><button type="submit" class="btn-save">Salvar</button></div></form></div>
-        <div id="noteTab" class="tab-content"><form id="noteForm"><div class="form-group"><label>Título</label><input type="text" id="noteTitle" required></div><div class="form-group"><label>Conteúdo</label><textarea id="noteContent" rows="4"></textarea></div><div class="form-buttons"><button type="button" class="btn-cancel" onclick="closeModal()">Cancelar</button><button type="submit" class="btn-save">Salvar</button></div></form></div>
     </div>
 </div>
 
