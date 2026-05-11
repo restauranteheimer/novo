@@ -142,6 +142,16 @@
                 <div class="form-buttons"><button type="button" class="btn-cancel" onclick="closeModal()">Cancelar</button><button type="submit" class="btn-save">Salvar</button></div>
             </form>
         </div>
+        <!-- Modal de Relatório (janela flutuante) -->
+<div id="reportModal" class="report-modal">
+    <div class="report-modal-content">
+        <div class="report-modal-header">
+            <h3>📊 Relatório</h3>
+            <button class="close-report-modal" onclick="closeReportModal()">Fechar</button>
+        </div>
+        <div id="reportModalContent"></div>
+    </div>
+</div>
         <div id="appointmentTab" class="tab-content"><form id="appointmentForm"><div class="form-group"><label>Título</label><input type="text" id="appointmentTitle" required></div><div class="form-group"><label>Horário</label><input type="time" id="appointmentTime"></div><div class="form-group"><label>Local</label><input type="text" id="appointmentLocation"></div><div class="form-buttons"><button type="button" class="btn-cancel" onclick="closeModal()">Cancelar</button><button type="submit" class="btn-save">Salvar</button></div></form></div>
         <div id="noteTab" class="tab-content"><form id="noteForm"><div class="form-group"><label>Título</label><input type="text" id="noteTitle" required></div><div class="form-group"><label>Conteúdo</label><textarea id="noteContent" rows="4"></textarea></div><div class="form-buttons"><button type="button" class="btn-cancel" onclick="closeModal()">Cancelar</button><button type="submit" class="btn-save">Salvar</button></div></form></div>
     </div>
