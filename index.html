@@ -21,12 +21,12 @@
             <h1>💰 dinheiro em dia</h1>
             <p>conta digital</p>
         </div>
-        <div style="display: flex; align-items: center; gap: 12px;">
+        <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
             <button id="darkModeToggle" class="dark-mode-toggle">🌙 Modo escuro</button>
             <div id="authSection" class="auth-section">
                 <input type="email" id="loginEmail" placeholder="seu@email.com">
                 <input type="password" id="loginPassword" placeholder="senha">
-                <button onclick="login()">Entrar</button>
+                <button id="loginBtn">Entrar</button>
                 <button onclick="signup()">Criar</button>
             </div>
             <div id="userInfo" style="display: none;" class="user-info">
