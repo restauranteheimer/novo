@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enviar Receita ou Despesa</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f3ff;
+        }
+        .card {
+            background: white;
+            padding: 24px;
+            border-radius: 24px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            margin: 20px 0;
+        }
+        h1 {
+            color: #6d28d9;
+            font-size: 1.5rem;
+            margin-bottom: 8px;
+        }
+        .sub {
+            color: #6b7280;
+            font-size: 0.875rem;
+            margin-bottom: 24px;
+        }
+        label {
+            display: block;
+            font-weight: 600;
+            margin: 16px 0 6px 0;
+            color: #374151;
+        }
+        input, select, button {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #e5e7eb;
+            border-radius: 16px;
+            font-size: 1rem;
+            box-sizing: border-box;
+            transition: all 0.2s;
+        }
+        input:focus, select:focus {
+            outline: none;
+            border-color: #8b5cf6;
+            box-shadow: 0 0 0 3px rgba(139,92,246,0.2);
+        }
+        button {
+            background: #8b5cf6;
+            color: white;
+            font-weight: bold;
+            border: none;
+            cursor: pointer;
+            margin-top: 24px;
+        }
+        button:hover {
+            background: #6d28d9;
+        }
+        .tipo-selector {
+            display: flex;
+            gap: 12px;
+            margin: 16px 0;
+        }
+        .tipo-btn {
+            flex: 1;
+            text-align: center;
+            padding: 12px;
+            border-radius: 40px;
+            background: #f3f4f6;
+            color: #374151;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        .tipo-btn.selected {
+            background: #8b5cf6;
+            color: white;
+        }
+        .status {
+            margin-top: 16px;
+            padding: 12px;
+            border-radius: 16px;
+            text-align: center;
+            font-size: 0.875rem;
+        }
+        .status-success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        .status-error {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        .status-loading {
+            background: #e0e7ff;
+            color: #3730a3;
+        }
+        footer {
+            text-align: center;
+            font-size: 0.75rem;
+            color: #9ca3af;
+            margin-top: 32px;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>💰 Registrar movimento</h1>
+        <div class="sub">Envie receitas ou despesas para o app do cliente</div>
+
+        <label>📧 E-mail do cliente</label>
+        <input type="email" id="clienteEmail" placeholder="cliente@exemplo.com">
+
+        <label>📌 Tipo</label>
+        <div class="tipo-selector" id="tipoSelector">
+            <div class="tipo-btn" data-tipo="income">🟢 Receita</div>
+            <div class="tipo-btn" data-tipo="expense">🔴 Despesa</div>
+        </div>
+        <input type="hidden" id="tipo" value="income">
+
+        <label>📝 Descrição</label>
+        <input type="text" id="descricao" placeholder="Ex: Venda de produto / Aluguel">
+
+        <label>💰 Valor (R$)</label>
+        <input type="number" id="valor" step="0.01" placeholder="0,00">
+
+        <label>📅 Data (opcional)</label>
+        <input type="date" id="data">
+
+        <button id="enviarBtn">✅ Registrar</button>
+        <div id="status"></div>
+    </div>
+    <footer>Os dados serão adicionados automaticamente ao app do cliente</footer>
+
+    <script>
+        // ========== CONFIGURAÇÃO ==========
+        const API_URL = 'https://us-central1-seu-projeto.cloudfunctions.net/adicionarTransacao';
+        const API_KEY = 'SEU_TOKEN_SECRETO_SUPER_SEGURO_123'; // mesma chave da API
+
+        // ========== LÓGICA DO TIPO ==========
+        const tipoBtns = document.querySelectorAll('.tipo-btn');
+        const tipoInput = document.getElementById('tipo');
+
+        tipoBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                tipoBtns.forEach(b => b.classList.remove('selected'));
+                btn.classList.add('selected');
+                tipoInput.value = btn.dataset.tipo;
+            });
+        });
+
+        // ========== ENVIO ==========
+        const enviarBtn = document.getElementById('enviarBtn');
+        const statusDiv = document.getElementById('status');
+
+        async function enviarTransacao() {
+            const email = document.getElementById('clienteEmail').value.trim();
+            const tipo = tipoInput.value;
+            const descricao = document.getElementById('descricao').value.trim();
+            const valor = parseFloat(document.getElementById('valor').value);
+            let data = document.getElementById('data').value;
+
+            if (!email) {
+                showStatus('❌ Digite o e-mail do cliente', 'error');
+                return;
+            }
+            if (!descricao) {
+                showStatus('❌ Digite uma descrição', 'error');
+                return;
+            }
+            if (isNaN(valor) || valor <= 0) {
+                showStatus('❌ Digite um valor válido (maior que zero)', 'error');
+                return;
+            }
+
+            // Se data não preenchida, usa hoje
+            if (!data) {
+                data = new Date().toISOString().split('T')[0];
+            }
+
+            showStatus('⏳ Enviando...', 'loading');
+            enviarBtn.disabled = true;
+
+            try {
+                const resposta = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'x-api-key': API_KEY
+                    },
+                    body: JSON.stringify({
+                        userEmail: email,
+                        transaction: {
+                            type: tipo,
+                            title: descricao,
+                            amount: valor,
+                            date: data,
+                            status: 'paid'      // já pago/recebido
+                        }
+                    })
+                });
+
+                const dados = await resposta.json();
+
+                if (resposta.ok && dados.sucesso) {
+                    const tipoTexto = tipo === 'income' ? 'receita' : 'despesa';
+                    showStatus(`✅ ${tipoTexto.toUpperCase()} de R$ ${valor.toFixed(2)} registrada para ${email}`, 'success');
+                    // limpar campos
+                    document.getElementById('descricao').value = '';
+                    document.getElementById('valor').value = '';
+                    document.getElementById('data').value = '';
+                } else {
+                    showStatus(`❌ Erro: ${dados.erro || 'Falha na comunicação'}`, 'error');
+                }
+            } catch (erro) {
+                console.error(erro);
+                showStatus('❌ Erro de conexão com a API. Verifique sua internet.', 'error');
+            } finally {
+                enviarBtn.disabled = false;
+            }
+        }
+
+        function showStatus(mensagem, tipo) {
+            statusDiv.className = 'status';
+            if (tipo === 'success') statusDiv.classList.add('status-success');
+            else if (tipo === 'error') statusDiv.classList.add('status-error');
+            else if (tipo === 'loading') statusDiv.classList.add('status-loading');
+            statusDiv.textContent = mensagem;
+        }
+
+        enviarBtn.addEventListener('click', enviarTransacao);
+
+        // Enter no campo valor também envia
+        document.getElementById('valor').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') enviarTransacao();
+        });
+    </script>
+</body>
+</html>
