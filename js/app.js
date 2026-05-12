@@ -139,51 +139,10 @@ function renderCategoryChart() {
 }
 
 // ========== FUNÇÕES DE DADOS ==========
-function getItemsForDate(date) { return items.filter(i => i.date === formatDateKey(date)); } // agora inclui todos os tipos
-function getFinancialItemsForDate(date) { return items.filter(i => i.date === formatDateKey(date) && (i.type === 'income' || i.type === 'expense')); }
-function getAppointmentsForDate(date) { return items.filter(i => i.date === formatDateKey(date) && i.type === 'appointment'); }
-function getNotesForDate(date) { return items.filter(i => i.date === formatDateKey(date) && i.type === 'note'); }
-
-function getDaySummary(date) { let income=0, expense=0; getFinancialItemsForDate(date).forEach(i=>{ if(i.type==='income') income+=i.amount; if(i.type==='expense') expense+=i.amount; }); return { income, expense, balance: income-expense }; }
-function getWeekBalance(date) { let income=0, expense=0, start=new Date(date); start.setDate(date.getDate()-date.getDay()); for(let i=0;i<7;i++){ let d=new Date(start); d.setDate(start.getDate()+i); getFinancialItemsForDate(d).forEach(i=>{ if(i.type==='income') income+=i.amount; if(i.type==='expense') expense+=i.amount; }); } return { balance: income-expense, income, expense }; }
-function getMonthStats() { let income=0, expense=0, today=new Date(); for(let d=1;d<=31;d++){ let date=new Date(today.getFullYear(),today.getMonth(),d); if(date.getMonth()!==today.getMonth()) break; getFinancialItemsForDate(date).forEach(i=>{ if(i.type==='income') income+=i.amount; if(i.type==='expense') expense+=i.amount; }); } return { income, expense, balance: income-expense }; }
-
-// ========== INSIGHTS AUTOMÁTICOS ==========
-function generateInsights() {
-    const monthStats = getMonthStats();
-    const weekStats = getWeekBalance(new Date());
-    const totalItems = items.length;
-    const pendingTransactions = items.filter(i => (i.type === 'income' || i.type === 'expense') && i.status === 'pending').length;
-    const highExpenses = items.filter(i => i.type === 'expense' && i.amount > 200).length;
-    
-    let insights = [];
-    if (monthStats.expense > monthStats.income) {
-        insights.push('⚠️ Você está gastando mais do que ganha este mês. Revise suas despesas.');
-    } else if (monthStats.balance > 0 && monthStats.balance < 500) {
-        insights.push('💪 Continue economizando! Você tem saldo positivo neste mês.');
-    } else if (monthStats.balance > 1000) {
-        insights.push('🎉 Parabéns! Seu saldo está ótimo. Considere investir o excedente.');
-    }
-    if (pendingTransactions > 0) {
-        insights.push(`⏳ Você tem ${pendingTransactions} transação(ões) pendente(s). Não se esqueça de quitá-las.`);
-    }
-    if (weekStats.balance < 0) {
-        insights.push(`📉 Nesta semana seu saldo está negativo (R$ ${Math.abs(weekStats.balance).toFixed(2)}). Tente reduzir gastos extras.`);
-    }
-    if (highExpenses > 3) {
-        insights.push(`💸 Você fez ${highExpenses} despesas acima de R$200 este mês. Avalie se são realmente necessárias.`);
-    }
-    if (totalItems === 0) {
-        insights.push('👋 Comece adicionando suas receitas e despesas. Assim posso te dar dicas personalizadas!');
-    }
-    if (insights.length === 0) {
-        insights.push('✅ Tudo em ordem! Continue gerenciando suas finanças.');
-    }
-    const container = document.getElementById('insightsContent');
-    if (container) {
-        container.innerHTML = insights.map(ins => `<div class="insight-item">${ins}</div>`).join('');
-    }
-}
+function getItemsForDate(date) { return items.filter(i => i.date === formatDateKey(date) && (i.type === 'income' || i.type === 'expense')); }
+function getDaySummary(date) { let income=0, expense=0; getItemsForDate(date).forEach(i=>{ if(i.type==='income') income+=i.amount; if(i.type==='expense') expense+=i.amount; }); return { income, expense, balance: income-expense }; }
+function getWeekBalance(date) { let income=0, expense=0, start=new Date(date); start.setDate(date.getDate()-date.getDay()); for(let i=0;i<7;i++){ let d=new Date(start); d.setDate(start.getDate()+i); getItemsForDate(d).forEach(i=>{ if(i.type==='income') income+=i.amount; if(i.type==='expense') expense+=i.amount; }); } return { balance: income-expense, income, expense }; }
+function getMonthStats() { let income=0, expense=0, today=new Date(); for(let d=1;d<=31;d++){ let date=new Date(today.getFullYear(),today.getMonth(),d); if(date.getMonth()!==today.getMonth()) break; getItemsForDate(date).forEach(i=>{ if(i.type==='income') income+=i.amount; if(i.type==='expense') expense+=i.amount; }); } return { income, expense, balance: income-expense }; }
 
 // ========== RENDERIZAÇÃO ==========
 function renderWeekCalendar() {
@@ -199,141 +158,23 @@ function renderMonthCalendar() {
     const grid=document.getElementById('monthGrid'); grid.innerHTML='';
     weekDays.forEach(day=>{ let h=document.createElement('div'); h.className='weekday-header'; h.textContent=day; grid.appendChild(h); });
     for(let i=0;i<startDay;i++){ let e=document.createElement('div'); e.className='month-day'; e.style.background='transparent'; e.style.cursor='default'; e.style.minHeight='55px'; grid.appendChild(e); }
-    for(let day=1;day<=totalDays;day++){ let d=new Date(year,month,day), dayItems=getItemsForDate(d); let income=0, expense=0, allPaid=true; 
-        dayItems.forEach(i=>{ if(i.type==='income') income+=i.amount; if(i.type==='expense') expense+=i.amount; if(i.status !== 'paid') allPaid=false; }); 
-        let isToday=d.toDateString()===today.toDateString(); 
-        let indicatorClass=''; 
-        if(income>0&&expense>0) indicatorClass='has-both'; else if(income>0) indicatorClass='has-income'; else if(expense>0) indicatorClass='has-expense';
-        // Verificar se tem compromisso ou anotação
-        const hasAppointment = dayItems.some(i => i.type === 'appointment');
-        const hasNote = dayItems.some(i => i.type === 'note');
-        if (hasAppointment) indicatorClass += ' has-appointment';
-        if (hasNote) indicatorClass += ' has-note';
-        let dayDiv=document.createElement('div'); 
-        dayDiv.className=`month-day ${isToday?'today':''} ${indicatorClass}`; 
-        let indicators=''; 
-        if(income>0) indicators+=`<span class="indicator-up ${allPaid?'paid':''}">↑${income.toFixed(0)}</span>`; 
-        if(expense>0) indicators+=`<span class="indicator-down ${allPaid?'paid':''}">↓${expense.toFixed(0)}</span>`;
-        if (hasAppointment) indicators += `<span class="indicator-appointment">📅</span>`;
-        if (hasNote) indicators += `<span class="indicator-note">📝</span>`;
-        dayDiv.innerHTML=`<div class="day-number">${day}</div>${indicators?`<div class="day-indicators">${indicators}</div>`:''}`; 
-        dayDiv.onclick=()=>selectDate(d); 
-        grid.appendChild(dayDiv); 
-    }
+    for(let day=1;day<=totalDays;day++){ let d=new Date(year,month,day), dayItems=getItemsForDate(d); let income=0, expense=0, allPaid=true; dayItems.forEach(i=>{ if(i.type==='income') income+=i.amount; if(i.type==='expense') expense+=i.amount; if(i.status !== 'paid') allPaid=false; }); let isToday=d.toDateString()===today.toDateString(); let indicatorClass=''; if(income>0&&expense>0) indicatorClass='has-both'; else if(income>0) indicatorClass='has-income'; else if(expense>0) indicatorClass='has-expense'; let dayDiv=document.createElement('div'); dayDiv.className=`month-day ${isToday?'today':''} ${indicatorClass}`; let indicators=''; if(income>0) indicators+=`<span class="indicator-up ${allPaid?'paid':''}">↑${income.toFixed(0)}</span>`; if(expense>0) indicators+=`<span class="indicator-down ${allPaid?'paid':''}">↓${expense.toFixed(0)}</span>`; dayDiv.innerHTML=`<div class="day-number">${day}</div>${indicators?`<div class="day-indicators">${indicators}</div>`:''}`; dayDiv.onclick=()=>selectDate(d); grid.appendChild(dayDiv); }
 }
 
-function selectDate(date) { 
-    selectedDate = date; 
-    document.getElementById('selectedDateTitle').innerHTML = formatDateDisplay(date);
-    updateDayDetail();
-    // Mostrar botão fechar (comportamento de janela única)
-    const closeBtn = document.getElementById('closeDayDetailBtn');
-    if (closeBtn) closeBtn.style.display = 'inline-block';
+function selectDate(date) { selectedDate=date; document.getElementById('selectedDateTitle').innerHTML=formatDateDisplay(date); updateSelectedDateTransactions(); }
+
+function updateSelectedDateTransactions() {
+    let dayItems=items.filter(i => i.date === formatDateKey(selectedDate) && (i.type==='income' || i.type==='expense')), container=document.getElementById('selectedDateTransactions');
+    if(dayItems.length===0){ container.innerHTML='<div class="empty-transactions">Nenhuma transação neste dia</div>'; return; }
+    container.innerHTML='';
+    dayItems.forEach(item=>{ let globalIndex=items.findIndex(i=>i.id===item.id); let amountClass=item.type==='expense'?'amount-negative':'amount-positive'; let signal=item.type==='expense'?'-':'+'; let icon=item.type==='expense'?'💸':'💰'; let div=document.createElement('div'); div.className=`transaction-item ${item.status === 'paid' ? 'paid' : ''}`; div.innerHTML=`<div class="transaction-icon">${icon}</div><div class="transaction-info"><div class="transaction-title">${item.title}</div><div class="transaction-date">${item.category ? `📁 ${item.category}` : ''} • ${item.status === 'paid' ? '✅ Pago' : '⏳ Pendente'}</div></div><div class="transaction-amount ${amountClass}">${signal} R$ ${item.amount.toFixed(2)}</div><button class="edit-transaction" onclick="editTransaction(${globalIndex})">✏️</button><button class="delete-transaction" onclick="deleteItem(${globalIndex})">🗑️</button>`; container.appendChild(div); });
 }
 
-function closeDayDetail() {
-    // Limpa o conteúdo do dia, mas mantém o card vazio
-    document.getElementById('selectedDateTransactions').innerHTML = '<div class="empty-transactions">Nenhum dia selecionado</div>';
-    document.getElementById('appointmentsList').innerHTML = '';
-    document.getElementById('notesList').innerHTML = '';
-    document.getElementById('appointmentsSection').style.display = 'none';
-    document.getElementById('notesSection').style.display = 'none';
-    document.getElementById('selectedDateTitle').innerHTML = 'Nenhum dia';
-    const closeBtn = document.getElementById('closeDayDetailBtn');
-    if (closeBtn) closeBtn.style.display = 'none';
-    selectedDate = null;
-}
-
-function updateDayDetail() {
-    if (!selectedDate) return;
-    // 1. Transações financeiras
-    let dayItems = getFinancialItemsForDate(selectedDate);
-    let container = document.getElementById('selectedDateTransactions');
-    if(dayItems.length === 0){ 
-        container.innerHTML = '<div class="empty-transactions">Nenhuma transação financeira neste dia</div>'; 
-    } else {
-        container.innerHTML = '';
-        dayItems.forEach(item => { 
-            let globalIndex = items.findIndex(i => i.id === item.id); 
-            let amountClass = item.type === 'expense' ? 'amount-negative' : 'amount-positive'; 
-            let signal = item.type === 'expense' ? '-' : '+'; 
-            let icon = item.type === 'expense' ? '💸' : '💰'; 
-            let div = document.createElement('div'); 
-            div.className = `transaction-item ${item.status === 'paid' ? 'paid' : ''}`; 
-            div.innerHTML = `<div class="transaction-icon">${icon}</div><div class="transaction-info"><div class="transaction-title">${item.title}</div><div class="transaction-date">${item.category ? `📁 ${item.category}` : ''} • ${item.status === 'paid' ? '✅ Pago' : '⏳ Pendente'}</div></div><div class="transaction-amount ${amountClass}">${signal} R$ ${item.amount.toFixed(2)}</div><button class="edit-transaction" onclick="editTransaction(${globalIndex})">✏️</button><button class="delete-transaction" onclick="deleteItem(${globalIndex})">🗑️</button><button class="repeat-transaction" onclick="repeatTransaction(${globalIndex})">↻</button>`; 
-            container.appendChild(div); 
-        });
-    }
-    
-    // 2. Compromissos
-    let appointments = getAppointmentsForDate(selectedDate);
-    const appointmentsSection = document.getElementById('appointmentsSection');
-    const appointmentsList = document.getElementById('appointmentsList');
-    if (appointments.length === 0) {
-        appointmentsSection.style.display = 'none';
-    } else {
-        appointmentsSection.style.display = 'block';
-        appointmentsList.innerHTML = '';
-        appointments.forEach(app => {
-            let div = document.createElement('div');
-            div.className = 'non-financial-item';
-            div.innerHTML = `<div class="non-financial-icon">📅</div>
-                            <div class="non-financial-info">
-                                <div class="non-financial-title">${app.title}</div>
-                                <div class="non-financial-detail">${app.time ? `🕒 ${app.time}` : ''} ${app.location ? `📍 ${app.location}` : ''}</div>
-                            </div>
-                            <button class="delete-transaction" onclick="deleteItem(items.findIndex(i=>i.id===${app.id}))">🗑️</button>`;
-            appointmentsList.appendChild(div);
-        });
-    }
-    
-    // 3. Anotações
-    let notes = getNotesForDate(selectedDate);
-    const notesSection = document.getElementById('notesSection');
-    const notesList = document.getElementById('notesList');
-    if (notes.length === 0) {
-        notesSection.style.display = 'none';
-    } else {
-        notesSection.style.display = 'block';
-        notesList.innerHTML = '';
-        notes.forEach(note => {
-            let div = document.createElement('div');
-            div.className = 'non-financial-item';
-            div.innerHTML = `<div class="non-financial-icon">📝</div>
-                            <div class="non-financial-info">
-                                <div class="non-financial-title">${note.title}</div>
-                                <div class="non-financial-detail">${note.content ? note.content.substring(0, 100) : ''}</div>
-                            </div>
-                            <button class="delete-transaction" onclick="deleteItem(items.findIndex(i=>i.id===${note.id}))">🗑️</button>`;
-            notesList.appendChild(div);
-        });
-    }
-}
-
-function repeatTransaction(index) {
-    const original = items[index];
-    if (!original) return;
-    // Abrir modal de nova transação com os dados preenchidos
-    selectedDate = new Date();
-    document.getElementById('modalTitle').innerHTML = 'Repetir transação';
-    const modalDateInfo = document.getElementById('modalDateInfo');
-    modalDateInfo.innerHTML = `<div class="date-selector"><span>📅 Data:</span><input type="date" id="transactionDate" value="${formatDateKey(selectedDate)}"></div>`;
-    const dateInput = document.getElementById('transactionDate');
-    if (dateInput) dateInput.addEventListener('change', (e) => { const newDate = new Date(e.target.value); if (!isNaN(newDate.getTime())) selectedDate = newDate; });
-    document.getElementById('modal').style.display = 'flex';
-    document.querySelector('[data-tab="financial"]').click();
-    document.getElementById('type').value = original.type;
-    document.getElementById('description').value = original.title;
-    document.getElementById('category').value = original.category || '';
-    document.getElementById('amount').value = original.amount;
-    document.getElementById('status').value = original.status || 'pending';
-    editingItemId = null; // garante que seja uma nova transação
-}
-
+// ========== EDIÇÃO CORRIGIDA (sem remoção) ==========
 function editTransaction(index) { 
     const item = items[index]; 
     if (!item) return; 
-    editingItemId = item.id;
+    editingItemId = item.id;   // guarda o ID do item a ser editado
     selectedDate = new Date(item.date); 
     document.getElementById('modalTitle').innerHTML = 'Editar transação'; 
     const modalDateInfo = document.getElementById('modalDateInfo'); 
@@ -350,6 +191,7 @@ function editTransaction(index) {
     document.getElementById('category').value = item.category || ''; 
     document.getElementById('amount').value = item.amount; 
     document.getElementById('status').value = item.status || 'pending'; 
+    // NÃO remover o item aqui! Ele será atualizado no submit.
 }
 
 function openNewTransaction(date, presetType = null) { 
@@ -368,40 +210,15 @@ function openNewTransaction(date, presetType = null) {
     if (presetType) document.getElementById('type').value = presetType; 
 }
 
-function updateBalances() { 
-    let week=getWeekBalance(new Date()), month=getMonthStats(); 
-    document.getElementById('mainBalance').innerHTML=`R$ ${month.balance.toLocaleString('pt-BR',{minimumFractionDigits:2})}`; 
-    document.getElementById('monthIncome').innerHTML=`R$ ${month.income.toLocaleString('pt-BR',{minimumFractionDigits:2})}`; 
-    document.getElementById('monthExpense').innerHTML=`R$ ${month.expense.toLocaleString('pt-BR',{minimumFractionDigits:2})}`; 
-    document.getElementById('weekIncome').innerHTML=`R$ ${week.income.toLocaleString('pt-BR',{minimumFractionDigits:2})}`; 
-    document.getElementById('weekExpense').innerHTML=`R$ ${week.expense.toLocaleString('pt-BR',{minimumFractionDigits:2})}`; 
-    document.getElementById('totalExpense').innerHTML=`R$ ${week.expense.toFixed(2)}`; 
-    document.getElementById('totalIncome').innerHTML=`R$ ${week.income.toFixed(2)}`; 
-    document.getElementById('totalBalance').innerHTML=`R$ ${week.balance.toFixed(2)}`; 
-    updateMetaUI(); 
-    generateInsights(); 
-}
+function updateBalances() { let week=getWeekBalance(new Date()), month=getMonthStats(); document.getElementById('mainBalance').innerHTML=`R$ ${month.balance.toLocaleString('pt-BR',{minimumFractionDigits:2})}`; document.getElementById('monthIncome').innerHTML=`R$ ${month.income.toLocaleString('pt-BR',{minimumFractionDigits:2})}`; document.getElementById('monthExpense').innerHTML=`R$ ${month.expense.toLocaleString('pt-BR',{minimumFractionDigits:2})}`; document.getElementById('weekIncome').innerHTML=`R$ ${week.income.toLocaleString('pt-BR',{minimumFractionDigits:2})}`; document.getElementById('weekExpense').innerHTML=`R$ ${week.expense.toLocaleString('pt-BR',{minimumFractionDigits:2})}`; document.getElementById('totalExpense').innerHTML=`R$ ${week.expense.toFixed(2)}`; document.getElementById('totalIncome').innerHTML=`R$ ${week.income.toFixed(2)}`; document.getElementById('totalBalance').innerHTML=`R$ ${week.balance.toFixed(2)}`; updateMetaUI(); }
 
-function refreshAllUI() { 
-    renderWeekCalendar(); 
-    renderMonthCalendar(); 
-    if(selectedDate){ 
-        document.getElementById('selectedDateTitle').innerHTML=formatDateDisplay(selectedDate); 
-        updateDayDetail(); 
-    } 
-    updateBalances(); 
-    updateDescriptionDatalist(); 
-    updateCategoryDatalist(); 
-}
+function refreshAllUI() { renderWeekCalendar(); renderMonthCalendar(); if(selectedDate){ document.getElementById('selectedDateTitle').innerHTML=formatDateDisplay(selectedDate); updateSelectedDateTransactions(); } updateBalances(); updateDescriptionDatalist(); updateCategoryDatalist(); }
 
-function saveData() { 
-    refreshAllUI(); 
-    if(currentUser) saveToCloud(); 
-}
+function saveData() { refreshAllUI(); if(currentUser) saveToCloud(); }
 
 function closeModal() { 
     document.getElementById('modal').style.display='none'; 
-    editingItemId = null; 
+    editingItemId = null;   // reseta o ID de edição (sem excluir nada)
     refreshAllUI(); 
 }
 
@@ -412,7 +229,7 @@ function deleteItem(index) {
     } 
 }
 
-// ========== RELATÓRIOS (mesmos anteriores) ==========
+// ========== RELATÓRIOS ==========
 function openFullReport() {
     const week = getWeekBalance(new Date());
     const month = getMonthStats();
@@ -428,8 +245,8 @@ function openFullReport() {
 function generateWeeklyReport() { const week=getWeekBalance(new Date()); const content=document.getElementById('reportModalContent'); content.innerHTML=`<strong>📊 RELATÓRIO DA SEMANA</strong><br><br>📅 Período: ${getWeekRange()}<br>🟢 Receitas: R$ ${week.income.toFixed(2)}<br>🔴 Despesas: R$ ${week.expense.toFixed(2)}<br>💰 Saldo: ${week.balance>=0?'+':'-'} R$ ${Math.abs(week.balance).toFixed(2)}`; document.getElementById('reportModal').style.display='flex'; document.getElementById('categoryChart').style.display='none'; }
 function generateMonthlyReport() { const month=getMonthStats(); const content=document.getElementById('reportModalContent'); content.innerHTML=`<strong>📅 RELATÓRIO DO MÊS</strong><br><br>📆 ${new Date().toLocaleDateString('pt-BR',{month:'long',year:'numeric'})}<br>🟢 Receitas: R$ ${month.income.toFixed(2)}<br>🔴 Despesas: R$ ${month.expense.toFixed(2)}<br>💰 Saldo: ${month.balance>=0?'+':'-'} R$ ${Math.abs(month.balance).toFixed(2)}`; document.getElementById('reportModal').style.display='flex'; document.getElementById('categoryChart').style.display='none'; }
 function closeReportModal() { document.getElementById('reportModal').style.display='none'; }
-function prevMonth() { currentMonth.setMonth(currentMonth.getMonth()-1); renderMonthCalendar(); if(selectedDate) selectDate(selectedDate); }
-function nextMonth() { currentMonth.setMonth(currentMonth.getMonth()+1); renderMonthCalendar(); if(selectedDate) selectDate(selectedDate); }
+function prevMonth() { currentMonth.setMonth(currentMonth.getMonth()-1); renderMonthCalendar(); }
+function nextMonth() { currentMonth.setMonth(currentMonth.getMonth()+1); renderMonthCalendar(); }
 
 // ========== AUTENTICAÇÃO ==========
 async function login() { 
@@ -502,6 +319,7 @@ auth.onAuthStateChanged(async (user)=>{
     } 
 });
 
+// SUBMIT DO FORMULÁRIO FINANCEIRO (CRIAÇÃO/EDIÇÃO CORRIGIDA)
 document.getElementById('financialForm').addEventListener('submit',(e)=>{ 
     e.preventDefault(); 
     const category = document.getElementById('category').value.trim(); 
@@ -516,9 +334,14 @@ document.getElementById('financialForm').addEventListener('submit',(e)=>{
         date: formatDateKey(selectedDate) 
     };
     if (editingItemId) {
+        // Atualiza o item existente
         const index = items.findIndex(i => i.id === editingItemId);
-        if (index !== -1) items[index] = newTransaction;
-        else items.push(newTransaction);
+        if (index !== -1) {
+            items[index] = newTransaction;
+        } else {
+            // fallback (não deveria acontecer)
+            items.push(newTransaction);
+        }
     } else {
         items.push(newTransaction);
     }
@@ -602,7 +425,6 @@ window.closeModal = closeModal; window.deleteItem = deleteItem;
 window.openFullReport = openFullReport; window.generateWeeklyReport = generateWeeklyReport; 
 window.generateMonthlyReport = generateMonthlyReport; window.closeReportModal = closeReportModal; 
 window.prevMonth = prevMonth; window.nextMonth = nextMonth; window.selectDate = selectDate; 
-window.closeDayDetail = closeDayDetail; window.repeatTransaction = repeatTransaction;
 window.editMeta = editMeta; window.saveMeta = saveMeta; window.closeMetaModal = closeMetaModal; 
 window.addNewCategory = addNewCategory;
 
