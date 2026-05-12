@@ -170,7 +170,7 @@ function updateSelectedDateTransactions() {
     dayItems.forEach(item=>{ let globalIndex=items.findIndex(i=>i.id===item.id); let amountClass=item.type==='expense'?'amount-negative':'amount-positive'; let signal=item.type==='expense'?'-':'+'; let icon=item.type==='expense'?'💸':'💰'; let div=document.createElement('div'); div.className=`transaction-item ${item.status === 'paid' ? 'paid' : ''}`; div.innerHTML=`<div class="transaction-icon">${icon}</div><div class="transaction-info"><div class="transaction-title">${item.title}</div><div class="transaction-date">${item.category ? `📁 ${item.category}` : ''} • ${item.status === 'paid' ? '✅ Pago' : '⏳ Pendente'}</div></div><div class="transaction-amount ${amountClass}">${signal} R$ ${item.amount.toFixed(2)}</div><button class="edit-transaction" onclick="editTransaction(${globalIndex})">✏️</button><button class="delete-transaction" onclick="deleteItem(${globalIndex})">🗑️</button>`; container.appendChild(div); });
 }
 
-// ========== EDIÇÃO CORRIGIDA (sem remoção antecipada) ==========
+// ========== EDIÇÃO CORRIGIDA (sem remoção) ==========
 function editTransaction(index) { 
     const item = items[index]; 
     if (!item) return; 
@@ -191,7 +191,7 @@ function editTransaction(index) {
     document.getElementById('category').value = item.category || ''; 
     document.getElementById('amount').value = item.amount; 
     document.getElementById('status').value = item.status || 'pending'; 
-    // NÃO remover o item aqui! Ele só será atualizado no submit.
+    // NÃO remover o item aqui! Ele será atualizado no submit.
 }
 
 function openNewTransaction(date, presetType = null) { 
