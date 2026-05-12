@@ -1141,14 +1141,14 @@
         if (!transaction) { alert("Nada para enviar."); return; }
         let raw = phoneNumber.toString().replace(/\D/g, '');
         if (!raw.startsWith('55')) raw = '55' + raw;
-        const tipo = transaction.type === 'expense' ? '🔴 Nota Aberta' : '🟢 Eu devo';
+        const tipo = transaction.type === 'expense' ? ' A Pagar' : '🟢 A Receber';
         const msg = `💰 *${tipo}*\n📝 ${transaction.title}\n💵 R$ ${transaction.amount.toFixed(2)}\n📅 Data: ${transaction.date}\n⏳ Status: ${transaction.status === 'paid' ? 'Pago/Recebido' : 'Pendente'}`;
         window.open(`https://wa.me/${raw}?text=${encodeURIComponent(msg)}`, '_blank');
     }
     function openWhatsAppModal(transaction) {
         lastSavedTransaction = transaction;
         const preview = document.getElementById('whatsappMessagePreview');
-        if(preview) preview.innerHTML = `<strong>📄 Transação:</strong> ${transaction.type === 'expense' ? '🔴 Despesa' : '🟢 Receita'}<br>${transaction.title}<br>R$ ${transaction.amount.toFixed(2)}<br>${transaction.date}`;
+        if(preview) preview.innerHTML = `<strong>📄 Transação:</strong> ${transaction.type === 'expense' ? '🔴 Pagar' : '🟢 Receber'}<br>${transaction.title}<br>R$ ${transaction.amount.toFixed(2)}<br>${transaction.date}`;
         document.getElementById('contactSelect').value = '';
         document.getElementById('dddInput').value = '81';
         document.getElementById('phoneNumberInput').value = '';
