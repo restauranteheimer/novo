@@ -757,3 +757,98 @@ body {
 .week-scroll::-webkit-scrollbar { height: 4px; }
 .week-scroll::-webkit-scrollbar-track { background: var(--border); border-radius: 10px; }
 .week-scroll::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 10px; }
+/* Adicione ao final do seu arquivo style.css */
+/* Modo escuro */
+body.dark-mode {
+    --primary: #a78bfa;
+    --primary-dark: #8b5cf6;
+    --primary-light: #4c1d95;
+    --primary-soft: #2e1065;
+    --background: #111827;
+    --card-bg: #1f2937;
+    --text-dark: #f9fafb;
+    --text-gray: #9ca3af;
+    --border: #374151;
+    --success: #34d399;
+    --danger: #f87171;
+}
+body.dark-mode .month-day {
+    background: #374151;
+}
+body.dark-mode .month-day.today {
+    background: #4c1d95;
+}
+body.dark-mode .day-chip {
+    background: #1f2937;
+}
+body.dark-mode .transaction-item {
+    border-bottom-color: #374151;
+}
+/* Dark mode toggle */
+.dark-mode-toggle {
+    background: rgba(255,255,255,0.2);
+    border: none;
+    padding: 6px 12px;
+    border-radius: 30px;
+    color: white;
+    cursor: pointer;
+    font-size: 0.75rem;
+}
+/* Meta card */
+.meta-card {
+    background: var(--card-bg);
+    margin: 16px;
+    border-radius: 24px;
+    padding: 16px;
+    text-align: center;
+}
+@media (min-width: 900px) {
+    .meta-card { margin: 0 0 20px 0; }
+}
+.meta-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+.edit-meta-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
+}
+.meta-value {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--primary);
+}
+.progress-bar-container {
+    background: #e5e7eb;
+    border-radius: 20px;
+    height: 12px;
+    margin: 12px 0;
+    overflow: hidden;
+}
+.progress-bar {
+    background: var(--success);
+    width: 0%;
+    height: 100%;
+    border-radius: 20px;
+    transition: width 0.3s;
+}
+.meta-status {
+    font-size: 0.7rem;
+    color: var(--text-gray);
+}
+.small-btn {
+    background: var(--primary);
+    border: none;
+    color: white;
+    border-radius: 30px;
+    padding: 0 12px;
+    cursor: pointer;
+    font-weight: bold;
+}
+body.dark-mode .progress-bar-container {
+    background: #4b5563;
+}
