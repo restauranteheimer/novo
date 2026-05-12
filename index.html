@@ -105,12 +105,29 @@
         </div>
 
         <div class="right-column">
-            <div class="transactions-card">
-                <div class="transactions-header">
-                    <span>📌 <span id="selectedDateTitle">Hoje</span></span>
-                    <button class="shortcut-item" style="padding:6px 12px; background:var(--primary-soft);" onclick="openNewTransaction(selectedDate || new Date())">+ Nova</button>
+            <div class="day-detail-card" id="dayDetailCard">
+                <div class="day-detail-header">
+                    <span>📅 <span id="selectedDateTitle">Hoje</span></span>
+                    <button class="close-day-detail" onclick="closeDayDetail()" id="closeDayDetailBtn" style="display: none;">× Fechar</button>
                 </div>
-                <div id="selectedDateTransactions" class="empty-transactions">Selecione um dia no calendário</div>
+                <div id="dayDetailContent">
+                    <!-- Transações financeiras -->
+                    <div class="detail-section">
+                        <div class="detail-section-title">💰 Financeiro</div>
+                        <div id="selectedDateTransactions" class="empty-transactions">Selecione um dia no calendário</div>
+                    </div>
+                    <!-- Compromissos -->
+                    <div class="detail-section" id="appointmentsSection" style="display: none;">
+                        <div class="detail-section-title">📅 Compromissos</div>
+                        <div id="appointmentsList"></div>
+                    </div>
+                    <!-- Anotações -->
+                    <div class="detail-section" id="notesSection" style="display: none;">
+                        <div class="detail-section-title">📝 Anotações</div>
+                        <div id="notesList"></div>
+                    </div>
+                </div>
+                <button class="add-shortcut" onclick="openNewTransaction(selectedDate || new Date())">+ Adicionar transação</button>
             </div>
 
             <div class="week-summary">
@@ -126,6 +143,11 @@
                     <div class="summary-label">💰 Saldo</div>
                     <div class="summary-value" id="totalBalance">R$ 0</div>
                 </div>
+            </div>
+
+            <div class="insights-card">
+                <div class="insights-header">💡 Insights do momento</div>
+                <div id="insightsContent" class="insights-content">Carregando...</div>
             </div>
 
             <button class="desktop-fab" onclick="openNewTransaction(selectedDate || new Date())">➕ Nova transação</button>
