@@ -21,15 +21,18 @@
             <h1>💰 dinheiro em dia</h1>
             <p>conta digital</p>
         </div>
-        <div id="authSection" class="auth-section">
-            <input type="email" id="loginEmail" placeholder="seu@email.com">
-            <input type="password" id="loginPassword" placeholder="senha">
-            <button onclick="login()">Entrar</button>
-            <button onclick="signup()">Criar</button>
-        </div>
-        <div id="userInfo" style="display: none;" class="user-info">
-            <span>👤 <span id="userEmail"></span></span>
-            <button class="logout-btn" onclick="logout()">Sair</button>
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <button id="darkModeToggle" class="dark-mode-toggle">🌙 Modo escuro</button>
+            <div id="authSection" class="auth-section">
+                <input type="email" id="loginEmail" placeholder="seu@email.com">
+                <input type="password" id="loginPassword" placeholder="senha">
+                <button onclick="login()">Entrar</button>
+                <button onclick="signup()">Criar</button>
+            </div>
+            <div id="userInfo" style="display: none;" class="user-info">
+                <span>👤 <span id="userEmail"></span></span>
+                <button class="logout-btn" onclick="logout()">Sair</button>
+            </div>
         </div>
     </div>
 
@@ -37,6 +40,19 @@
 
     <div class="dashboard-grid">
         <div class="left-column">
+            <!-- Card de Meta de Economia -->
+            <div class="meta-card" id="metaCard">
+                <div class="meta-header">
+                    <span>🎯 Meta de economia mensal</span>
+                    <button class="edit-meta-btn" onclick="editMeta()">✏️</button>
+                </div>
+                <div class="meta-value" id="metaValueDisplay">R$ 0,00</div>
+                <div class="progress-bar-container">
+                    <div class="progress-bar" id="progressBar" style="width: 0%;"></div>
+                </div>
+                <div class="meta-status" id="metaStatus">Defina uma meta para começar</div>
+            </div>
+
             <div class="balance-card">
                 <div class="balance-label">saldo disponível</div>
                 <div class="main-balance" id="mainBalance">R$ 0,00</div>
@@ -62,13 +78,13 @@
                 </div>
             </div>
 
-           <div class="shortcuts">
-    <div class="shortcut-item" onclick="openNewTransaction(new Date(), 'income')">💰 Receita</div>
-    <div class="shortcut-item" onclick="openNewTransaction(new Date(), 'expense')">💸 Despesa</div>
-    <div class="shortcut-item" onclick="openFullReport()">📊 Resumo Geral</div>
-    <div class="shortcut-item" onclick="generateWeeklyReport()">📅 Semana</div>
-    <div class="shortcut-item" onclick="generateMonthlyReport()">📆 Mês</div>
-</div>
+            <div class="shortcuts">
+                <div class="shortcut-item" onclick="openNewTransaction(new Date(), 'income')">💰 Receita</div>
+                <div class="shortcut-item" onclick="openNewTransaction(new Date(), 'expense')">💸 Despesa</div>
+                <div class="shortcut-item" onclick="openFullReport()">📊 Resumo Geral</div>
+                <div class="shortcut-item" onclick="generateWeeklyReport()">📅 Semana</div>
+                <div class="shortcut-item" onclick="generateMonthlyReport()">📆 Mês</div>
+            </div>
 
             <div class="section-header">
                 <span>📅 Esta semana</span>
@@ -143,7 +159,16 @@
                 </div>
                 <div class="form-group">
                     <label>Descrição</label>
-                    <input type="text" id="description" required placeholder="Ex: Almoço, Salário">
+                    <input type="text" id="description" list="descSuggestions" required placeholder="Ex: Almoço, Salário">
+                    <datalist id="descSuggestions"></datalist>
+                </div>
+                <div class="form-group">
+                    <label>Categoria</label>
+                    <div style="display: flex; gap: 8px;">
+                        <input type="text" id="category" list="categorySuggestions" placeholder="Ex: Alimentação" style="flex:1">
+                        <button type="button" class="small-btn" onclick="addNewCategory()">➕</button>
+                    </div>
+                    <datalist id="categorySuggestions"></datalist>
                 </div>
                 <div class="form-group">
                     <label>Valor (R$)</label>
@@ -203,12 +228,28 @@
 
 <!-- Modal de Relatório -->
 <div id="reportModal" class="report-modal">
-    <div class="report-modal-content">
+    <div class="report-modal-content" style="max-width: 500px;">
         <div class="report-modal-header">
             <h3>📊 Relatório</h3>
             <button class="close-report-modal" onclick="closeReportModal()">Fechar</button>
         </div>
         <div id="reportModalContent"></div>
+        <canvas id="categoryChart" style="margin-top: 20px; max-height: 200px;"></canvas>
+    </div>
+</div>
+
+<!-- Modal para editar meta -->
+<div id="metaModal" class="modal">
+    <div class="modal-content" style="max-width: 300px;">
+        <div class="modal-header">
+            <h3>Definir meta mensal</h3>
+            <button class="close-modal" onclick="closeMetaModal()">Fechar</button>
+        </div>
+        <div style="padding: 20px;">
+            <label>Valor da meta (R$)</label>
+            <input type="number" id="metaAmountInput" step="100" placeholder="Ex: 2000" style="width:100%; margin-top:8px;">
+            <button onclick="saveMeta()" class="btn-save" style="margin-top:16px;">Salvar meta</button>
+        </div>
     </div>
 </div>
 
