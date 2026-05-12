@@ -170,9 +170,73 @@ function updateSelectedDateTransactions() {
     dayItems.forEach(item=>{ let globalIndex=items.findIndex(i=>i.id===item.id); let amountClass=item.type==='expense'?'amount-negative':'amount-positive'; let signal=item.type==='expense'?'-':'+'; let icon=item.type==='expense'?'💸':'💰'; let div=document.createElement('div'); div.className=`transaction-item ${item.status === 'paid' ? 'paid' : ''}`; div.innerHTML=`<div class="transaction-icon">${icon}</div><div class="transaction-info"><div class="transaction-title">${item.title}</div><div class="transaction-date">${item.category ? `📁 ${item.category}` : ''} • ${item.status === 'paid' ? '✅ Pago' : '⏳ Pendente'}</div></div><div class="transaction-amount ${amountClass}">${signal} R$ ${item.amount.toFixed(2)}</div><button class="edit-transaction" onclick="editTransaction(${globalIndex})">✏️</button><button class="delete-transaction" onclick="deleteItem(${globalIndex})">🗑️</button>`; container.appendChild(div); });
 }
 
-function editTransaction(index) { const item = items[index]; if (!item) return; editingItemId = item.id; selectedDate = new Date(item.date); document.getElementById('modalTitle').innerHTML = 'Editar transação'; const modalDateInfo = document.getElementById('modalDateInfo'); modalDateInfo.innerHTML = `<div class="date-selector"><span>📅 Data:</span><input type="date" id="transactionDate" value="${formatDateKey(selectedDate)}"></div>`; const dateInput = document.getElementById('transactionDate'); if (dateInput) dateInput.addEventListener('change', (e) => { const newDate = new Date(e.target.value); if (!isNaN(newDate.getTime())) selectedDate = newDate; }); document.getElementById('modal').style.display = 'flex'; document.querySelector('[data-tab="financial"]').click(); document.getElementById('type').value = item.type; document.getElementById('description').value = item.title; document.getElementById('category').value = item.category || ''; document.getElementById('amount').value = item.amount; document.getElementById('status').value = item.status || 'pending'; items.splice(index, 1); }
+function editTransaction(index) { 
+    const item = items[index]; 
+    if (!item) return; 
+    editingItemId = item.id; 
+    // Não remover o item ainda! Apenas guardar o ID.
+    selectedDate = new Date(item.date); 
+    document.getElementById('modalTitle').innerHTML = 'Editar transação'; 
+    const modalDateInfo = document.getElementById('modalDateInfo'); 
+    modalDateInfo.innerHTML = `<div class="date-selector"><span>📅 Data:</span><input type="date" id="transactionDate" value="${formatDateKey(selectedDate)}"></div>`; 
+    const dateInput = document.getElementById('transactionDate'); 
+    if (dateInput) dateInput.addEventListener('change', (e) => { 
+        const newDate = new Date(e.target.value); 
+        if (!isNaN(newDate.getTime())) selectedDate = newDate; 
+    }); 
+    document.getElementById('modal').style.display = 'flex'; 
+    document.querySelector('[data-tab="financial"]').click(); 
+    document.getElementById('type').value = item.type; 
+    document.getElementById('description').value = item.title; 
+    document.getElementById('category').value = item.category || ''; 
+    document.getElementById('amount').value = item.amount; 
+    document.getElementById('status').value = item.status || 'pending'; 
+    // Não remover o item
+}
 
-function openNewTransaction(date, presetType = null) { editingItemId = null; selectedDate = date || new Date(); document.getElementById('modalTitle').innerHTML = 'Nova transação'; const modalDateInfo = document.getElementById('modalDateInfo'); modalDateInfo.innerHTML = `<div class="date-selector"><span>📅 Data:</span><input type="date" id="transactionDate" value="${formatDateKey(selectedDate)}"></div>`; const dateInput = document.getElementById('transactionDate'); if (dateInput) dateInput.addEventListener('change', (e) => { const newDate = new Date(e.target.value); if (!isNaN(newDate.getTime())) selectedDate = newDate; }); document.getElementById('modal').style.display = 'flex'; document.getElementById('financialForm').reset(); if (presetType) document.getElementById('type').value = presetType; }
+// No submit do financialForm:
+document.getElementById('financialForm').addEventListener('submit',(e)=>{ 
+    e.preventDefault(); 
+    const category = document.getElementById('category').value.trim(); 
+    const finalCategory = category === '' ? 'Sem categoria' : category; 
+    const newTransaction = { 
+        id: editingItemId || Date.now(), 
+        type: document.getElementById('type').value, 
+        title: document.getElementById('description').value, 
+        category: finalCategory, 
+        amount: parseFloat(document.getElementById('amount').value), 
+        status: document.getElementById('status').value, 
+        date: formatDateKey(selectedDate) 
+    };
+    if (editingItemId) {
+        // Atualizar item existente
+        const index = items.findIndex(i => i.id === editingItemId);
+        if (index !== -1) {
+            items[index] = newTransaction;
+        } else {
+            // Caso não encontre (fallback), adiciona
+            items.push(newTransaction);
+        }
+    } else {
+        items.push(newTransaction);
+    }
+    saveData(); 
+    closeModal(); 
+    editingItemId = null; // reset
+});
+
+// No closeModal, garantir que editingItemId seja resetado apenas se não salvou? Melhor resetar sempre.
+function closeModal() { 
+    document.getElementById('modal').style.display='none'; 
+    editingItemId = null; // importante: se fechar sem salvar, perde a referência, mas o item original continua existindo
+    refreshAllUI(); 
+}
+
+// Em openNewTransaction, garantir que editingItemId seja null.
+function openNewTransaction(date, presetType = null) { 
+    editingItemId = null; 
+    // ... resto igual
+}
 
 function updateBalances() { let week=getWeekBalance(new Date()), month=getMonthStats(); document.getElementById('mainBalance').innerHTML=`R$ ${month.balance.toLocaleString('pt-BR',{minimumFractionDigits:2})}`; document.getElementById('monthIncome').innerHTML=`R$ ${month.income.toLocaleString('pt-BR',{minimumFractionDigits:2})}`; document.getElementById('monthExpense').innerHTML=`R$ ${month.expense.toLocaleString('pt-BR',{minimumFractionDigits:2})}`; document.getElementById('weekIncome').innerHTML=`R$ ${week.income.toLocaleString('pt-BR',{minimumFractionDigits:2})}`; document.getElementById('weekExpense').innerHTML=`R$ ${week.expense.toLocaleString('pt-BR',{minimumFractionDigits:2})}`; document.getElementById('totalExpense').innerHTML=`R$ ${week.expense.toFixed(2)}`; document.getElementById('totalIncome').innerHTML=`R$ ${week.income.toFixed(2)}`; document.getElementById('totalBalance').innerHTML=`R$ ${week.balance.toFixed(2)}`; updateMetaUI(); }
 
