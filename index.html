@@ -19,6 +19,7 @@
             -webkit-tap-highlight-color: transparent;
         }
 
+        /* Tema claro (padrão) */
         :root {
             --primary: #8b5cf6;
             --primary-dark: #6d28d9;
@@ -33,6 +34,7 @@
             --danger: #ef4444;
         }
 
+        /* Tema escuro */
         body.dark-mode {
             --primary: #a78bfa;
             --primary-dark: #8b5cf6;
@@ -68,22 +70,51 @@
             padding: 0 0 80px 0;
         }
 
+        /* Layout adaptativo para telas muito pequenas (até 480px) */
         @media (max-width: 480px) {
-            .dashboard-grid { padding-bottom: 70px; }
-            .balance-card, .meta-card, .shortcuts, .week-scroll, .month-card, .week-summary, .contacts-card, .prediction-card {
+            .dashboard-grid {
+                padding-bottom: 70px;
+            }
+            .balance-card, .meta-card, .shortcuts, .week-scroll, .month-card, .week-summary, .contacts-card {
                 margin: 8px;
                 padding: 12px;
                 border-radius: 20px;
             }
-            .main-balance { font-size: 1.8rem; }
-            .month-day { font-size: 0.65rem; min-height: 45px; padding: 4px 2px; }
-            .day-indicators { font-size: 0.5rem; gap: 2px; }
-            .shortcut-item { padding: 8px 4px; font-size: 0.7rem; }
-            .week-summary .summary-value { font-size: 0.75rem; }
-            .header { padding: 12px; }
-            .logo h1 { font-size: 1.2rem; }
-            .contacts-card .contact-item { flex-wrap: wrap; }
-            .fab { width: 50px; height: 50px; bottom: 15px; right: 15px; font-size: 22px; }
+            .main-balance {
+                font-size: 1.8rem;
+            }
+            .month-day {
+                font-size: 0.65rem;
+                min-height: 45px;
+                padding: 4px 2px;
+            }
+            .day-indicators {
+                font-size: 0.5rem;
+                gap: 2px;
+            }
+            .shortcut-item {
+                padding: 8px 4px;
+                font-size: 0.7rem;
+            }
+            .week-summary .summary-value {
+                font-size: 0.75rem;
+            }
+            .header {
+                padding: 12px 12px;
+            }
+            .logo h1 {
+                font-size: 1.2rem;
+            }
+            .contacts-card .contact-item {
+                flex-wrap: wrap;
+            }
+            .fab {
+                width: 50px;
+                height: 50px;
+                bottom: 15px;
+                right: 15px;
+                font-size: 22px;
+            }
         }
 
         @media (min-width: 901px) {
@@ -101,6 +132,7 @@
             .desktop-fab { display: none; }
         }
 
+        /* Header */
         .header {
             background: var(--primary);
             padding: 20px 20px 16px;
@@ -199,6 +231,7 @@
             margin-top: 8px;
         }
 
+        /* Cards */
         .balance-card, .meta-card, .shortcuts, .week-scroll, .month-card, .week-summary, .contacts-card, .prediction-card {
             background: var(--card-bg);
             margin: 16px;
@@ -395,6 +428,7 @@
             box-shadow: 0 4px 12px rgba(0,0,0,0.2);
         }
 
+        /* Modais */
         .modal, .report-modal {
             display: none;
             position: fixed;
@@ -629,6 +663,7 @@
         #map { height: 300px; width: 100%; border-radius: 16px; margin-bottom: 12px; }
         .address-search { display: flex; gap: 8px; margin-bottom: 12px; }
 
+        /* Estilos para previsão IA */
         .prediction-header {
             display: flex;
             justify-content: space-between;
@@ -757,6 +792,7 @@
 
             <button class="desktop-fab" id="desktopFabBtn">➕ Nova transação</button>
 
+            <!-- Card de Previsão IA -->
             <div class="prediction-card" id="predictionCard">
                 <div class="prediction-header">
                     <span>🧠 Previsão IA (Ciclos)</span>
@@ -773,7 +809,7 @@
                 <div id="contactsList" style="max-height: 200px; overflow-y: auto;"></div>
                 <div style="display: flex; gap: 8px; margin-top: 8px;">
                     <input type="text" id="contactName" placeholder="Nome" style="flex:1;">
-                    <input type="tel" id="contactPhone" placeholder="Número (ex: 81999999999)" style="flex:1;">
+                    <input type="tel" id="contactPhone" placeholder="Número (com DDI)" style="flex:1;">
                     <button id="addContactBtn" class="small-btn">+</button>
                 </div>
             </div>
@@ -787,23 +823,137 @@
 
 <button class="fab" id="fabBtn">+</button>
 
-<!-- Modais (resumidos para brevidade, mantenha igual ao seu original) -->
-<div id="modal" class="modal"><div class="modal-content"><div class="modal-header"><h3 id="modalTitle">Nova transação</h3><button class="close-modal" id="closeModalBtn">Fechar</button></div><div id="modalDateInfo" class="selected-date-info"></div><div class="modal-tabs"><button class="tab-btn active" data-tab="financial">💰 Financeiro</button><button class="tab-btn" data-tab="appointment">📅 Compromisso</button><button class="tab-btn" data-tab="note">📝 Anotação</button></div><div id="financialTab" class="tab-content active"><form id="financialForm"><div class="form-group"><label>Tipo</label><select id="type"><option value="expense">🔴 Despesa</option><option value="income">🟢 Receita</option></select></div><div class="form-group"><label>Descrição</label><input type="text" id="description" list="descSuggestions" required><datalist id="descSuggestions"></datalist></div><div class="form-group"><label>Valor (R$)</label><input type="number" id="amount" step="0.01" required></div><div class="form-group"><label>Status</label><select id="status"><option value="pending">⏳ Pendente</option><option value="paid">✅ Pago/Recebido</option></select></div><div class="form-buttons"><button type="button" class="btn-cancel" id="cancelModalBtn">Cancelar</button><button type="submit" class="btn-save">Salvar</button></div></form></div><div id="appointmentTab" class="tab-content"><form id="appointmentForm"><div class="form-group"><label>Título</label><input type="text" id="appointmentTitle" required></div><div class="form-group"><label>Horário</label><input type="time" id="appointmentTime"></div><div class="form-group"><label>Local</label><div style="display:flex;gap:8px;"><input type="text" id="appointmentLocation"><button type="button" id="openMapBtn" class="small-btn">📍 Mapa</button></div></div><div class="form-buttons"><button type="button" class="btn-cancel" id="cancelAppointmentBtn">Cancelar</button><button type="submit" class="btn-save">Salvar</button></div></form></div><div id="noteTab" class="tab-content"><form id="noteForm"><div class="form-group"><label>Título</label><input type="text" id="noteTitle" required></div><div class="form-group"><label>Conteúdo</label><textarea id="noteContent" rows="4"></textarea></div><div class="form-buttons"><button type="button" class="btn-cancel" id="cancelNoteBtn">Cancelar</button><button type="submit" class="btn-save">Salvar</button></div></form></div></div></div>
+<!-- Modal de Transação -->
+<div id="modal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header"><h3 id="modalTitle">Nova transação</h3><button class="close-modal" id="closeModalBtn">Fechar</button></div>
+        <div id="modalDateInfo" class="selected-date-info"></div>
+        <div class="modal-tabs">
+            <button class="tab-btn active" data-tab="financial">💰 Financeiro</button>
+            <button class="tab-btn" data-tab="appointment">📅 Compromisso</button>
+            <button class="tab-btn" data-tab="note">📝 Anotação</button>
+        </div>
+        <div id="financialTab" class="tab-content active">
+            <form id="financialForm">
+                <div class="form-group"><label>Tipo</label><select id="type"><option value="expense">🔴 Despesa</option><option value="income">🟢 Receita</option></select></div>
+                <div class="form-group"><label>Descrição</label><input type="text" id="description" list="descSuggestions" required placeholder="Ex: Almoço, Salário"><datalist id="descSuggestions"></datalist></div>
+                <div class="form-group"><label>Valor (R$)</label><input type="number" id="amount" step="0.01" required placeholder="0,00"></div>
+                <div class="form-group"><label>Status</label><select id="status"><option value="pending">⏳ Pendente</option><option value="paid">✅ Pago/Recebido</option></select></div>
+                <div class="form-buttons"><button type="button" class="btn-cancel" id="cancelModalBtn">Cancelar</button><button type="submit" class="btn-save">Salvar</button></div>
+            </form>
+        </div>
+        <div id="appointmentTab" class="tab-content">
+            <form id="appointmentForm">
+                <div class="form-group"><label>Título</label><input type="text" id="appointmentTitle" required></div>
+                <div class="form-group"><label>Horário</label><input type="time" id="appointmentTime"></div>
+                <div class="form-group">
+                    <label>Local</label>
+                    <div style="display: flex; gap: 8px;">
+                        <input type="text" id="appointmentLocation" placeholder="Digite ou use o mapa">
+                        <button type="button" id="openMapBtn" class="small-btn">📍 Mapa</button>
+                    </div>
+                </div>
+                <div class="form-buttons"><button type="button" class="btn-cancel" id="cancelAppointmentBtn">Cancelar</button><button type="submit" class="btn-save">Salvar</button></div>
+            </form>
+        </div>
+        <div id="noteTab" class="tab-content">
+            <form id="noteForm">
+                <div class="form-group"><label>Título</label><input type="text" id="noteTitle" required></div>
+                <div class="form-group"><label>Conteúdo</label><textarea id="noteContent" rows="4" placeholder="Escreva sua anotação..."></textarea></div>
+                <div class="form-buttons"><button type="button" class="btn-cancel" id="cancelNoteBtn">Cancelar</button><button type="submit" class="btn-save">Salvar</button></div>
+            </form>
+        </div>
+    </div>
+</div>
 
-<div id="dayModal" class="modal"><div class="modal-content"><div class="modal-header"><h3 id="dayModalTitle">Detalhes do dia</h3><button class="close-modal" id="closeDayModalBtn">Fechar</button></div><div id="dayModalContent" style="padding:0 0 20px 0;"></div><div class="bulk-actions"><button id="deleteSelectedBtn" class="btn-cancel" style="background:#ef4444;color:white;">🗑️ Excluir selecionados</button></div><div style="padding:0 20px 20px;"><button class="btn-save" id="addTransactionFromDayBtn">+ Adicionar transação</button></div></div></div>
+<!-- Modal de Detalhe do Dia -->
+<div id="dayModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header"><h3 id="dayModalTitle">Detalhes do dia</h3><button class="close-modal" id="closeDayModalBtn">Fechar</button></div>
+        <div id="dayModalContent" style="padding: 0 0 20px 0;"></div>
+        <div class="bulk-actions">
+            <button id="deleteSelectedBtn" class="btn-cancel" style="background:#ef4444; color:white;">🗑️ Excluir selecionados</button>
+        </div>
+        <div style="padding: 0 20px 20px;">
+            <button class="btn-save" id="addTransactionFromDayBtn">+ Adicionar transação</button>
+        </div>
+    </div>
+</div>
 
-<div id="mapModal" class="modal"><div class="modal-content" style="max-width:600px;"><div class="modal-header"><h3>📍 Selecione o local</h3><button class="close-modal" id="closeMapModalBtn">Fechar</button></div><div style="padding:20px;"><div class="address-search"><input type="text" id="addressSearchInput" placeholder="Digite um endereço ou CEP"><button id="searchAddressBtn">Buscar</button><button id="useGpsBtn" class="small-btn">📍 Minha localização</button></div><div id="map"></div><button id="useLocationBtn" class="btn-save">Usar este local</button></div></div></div>
+<!-- Modal do Mapa -->
+<div id="mapModal" class="modal">
+    <div class="modal-content" style="max-width:600px;">
+        <div class="modal-header"><h3>📍 Selecione o local</h3><button class="close-modal" id="closeMapModalBtn">Fechar</button></div>
+        <div style="padding:20px;">
+            <div class="address-search">
+                <input type="text" id="addressSearchInput" placeholder="Digite um endereço ou CEP">
+                <button id="searchAddressBtn">Buscar</button>
+                <button id="useGpsBtn" class="small-btn">📍 Minha localização</button>
+            </div>
+            <div id="map"></div>
+            <button id="useLocationBtn" class="btn-save">Usar este local</button>
+        </div>
+    </div>
+</div>
 
-<div id="whatsappModal" class="modal" style="z-index: 9999;"><div class="modal-content" style="pointer-events: auto; max-width: 400px;"><div class="modal-header"><h3>📲 Enviar via WhatsApp</h3><button class="close-modal" id="closeWhatsappModalBtn" style="cursor: pointer;">Fechar</button></div><div style="padding:20px;"><p id="whatsappMessagePreview" style="background: var(--primary-soft); padding: 12px; border-radius: 12px; margin-bottom: 16px;"></p><div class="form-group"><label>Contato favorito</label><select id="contactSelect" style="cursor: pointer;"><option value="">-- Selecione --</option></select></div><div class="form-group"><label>Ou digite o número (apenas DDD + celular)</label><div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;"><span style="background: var(--primary-light); padding: 8px 12px; border-radius: 40px; font-weight: bold;">+55</span><input type="tel" id="dddInput" placeholder="DDD" value="81" maxlength="2" style="width: 70px; text-align: center;"><input type="tel" id="phoneNumberInput" placeholder="Número do celular" style="flex: 1;"></div><small style="color: var(--text-gray);">Exemplo: 987654321</small></div><button id="sendWhatsappBtn" class="btn-save" style="cursor: pointer; width: 100%;">📤 Enviar mensagem</button></div></div></div>
+<!-- Modal WhatsApp corrigido -->
+<div id="whatsappModal" class="modal" style="z-index: 9999;">
+    <div class="modal-content" style="pointer-events: auto; max-width: 400px;">
+        <div class="modal-header">
+            <h3>📲 Enviar via WhatsApp</h3>
+            <button class="close-modal" id="closeWhatsappModalBtn" style="cursor: pointer;">Fechar</button>
+        </div>
+        <div style="padding: 20px;">
+            <p id="whatsappMessagePreview" style="background: var(--primary-soft); padding: 12px; border-radius: 12px; margin-bottom: 16px;"></p>
+            <div class="form-group">
+                <label>Contato favorito</label>
+                <select id="contactSelect" style="cursor: pointer;">
+                    <option value="">-- Selecione --</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Ou digite o número (apenas DDD + celular)</label>
+                <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                    <span style="background: var(--primary-light); padding: 8px 12px; border-radius: 40px; font-weight: bold;">+55</span>
+                    <input type="tel" id="dddInput" placeholder="DDD" value="81" maxlength="2" style="width: 70px; text-align: center;">
+                    <input type="tel" id="phoneNumberInput" placeholder="Número do celular" style="flex: 1;">
+                </div>
+                <small style="color: var(--text-gray);">Exemplo: 987654321</small>
+            </div>
+            <button id="sendWhatsappBtn" class="btn-save" style="cursor: pointer; width: 100%;">📤 Enviar mensagem</button>
+        </div>
+    </div>
+</div>
 
-<div id="insightsModal" class="modal"><div class="modal-content"><div class="modal-header"><h3>💡 Insights do momento</h3><button class="close-modal" id="closeInsightsModalBtn">Fechar</button></div><div id="insightsModalContent" style="padding:20px;"></div></div></div>
+<!-- Modal de Insights -->
+<div id="insightsModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header"><h3>💡 Insights do momento</h3><button class="close-modal" id="closeInsightsModalBtn">Fechar</button></div>
+        <div id="insightsModalContent" style="padding:20px;"></div>
+    </div>
+</div>
 
-<div id="reportModal" class="report-modal"><div class="report-modal-content"><div class="report-modal-header"><h3>📊 Relatório</h3><button class="close-report-modal" id="closeReportModalBtn">Fechar</button></div><div id="reportModalContent" style="padding:20px;"></div></div></div>
+<!-- Modal de Relatório -->
+<div id="reportModal" class="report-modal">
+    <div class="report-modal-content">
+        <div class="report-modal-header"><h3>📊 Relatório</h3><button class="close-report-modal" id="closeReportModalBtn">Fechar</button></div>
+        <div id="reportModalContent" style="padding:20px;"></div>
+    </div>
+</div>
 
-<div id="metaModal" class="modal"><div class="modal-content"><div class="modal-header"><h3>Definir meta mensal</h3><button class="close-modal" id="closeMetaModalBtn">Fechar</button></div><div style="padding:20px;"><input type="number" id="metaAmountInput" placeholder="Valor da meta (R$)" style="width:100%; margin-bottom:16px;"><button id="saveMetaBtn" class="btn-save">Salvar meta</button></div></div></div>
+<!-- Modal da Meta -->
+<div id="metaModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header"><h3>Definir meta mensal</h3><button class="close-modal" id="closeMetaModalBtn">Fechar</button></div>
+        <div style="padding:20px;">
+            <input type="number" id="metaAmountInput" placeholder="Valor da meta (R$)" style="width:100%; margin-bottom:16px;">
+            <button id="saveMetaBtn" class="btn-save">Salvar meta</button>
+        </div>
+    </div>
+</div>
 
 <script>
-    // Firebase Config (mantido)
+    // ==================== CONFIGURAÇÃO FIREBASE ====================
     const firebaseConfig = {
         apiKey: "AIzaSyAE6OgotOg-Y36IGAqUScMvo_LymmTNdK4",
         authDomain: "food-delivery-fb89e.firebaseapp.com",
@@ -817,7 +967,7 @@
     const auth = firebase.auth();
     const db = firebase.database();
 
-    // Variáveis globais
+    // ==================== VARIÁVEIS GLOBAIS ====================
     let currentUser = null;
     let items = [];
     let currentMonth = new Date();
@@ -827,7 +977,7 @@
     let lastSavedTransaction = null;
     let currentDayModalDate = null;
 
-    // Funções auxiliares (mantidas)
+    // ==================== FUNÇÕES AUXILIARES ====================
     function showLoading() { document.getElementById('loadingOverlay').style.display = 'flex'; }
     function hideLoading() { document.getElementById('loadingOverlay').style.display = 'none'; }
     function formatDateKey(d) { let dd = new Date(d); return `${dd.getFullYear()}-${String(dd.getMonth()+1).padStart(2,'0')}-${String(dd.getDate()).padStart(2,'0')}`; }
@@ -835,6 +985,7 @@
     function formatDateDisplay(d) { return new Date(d).toLocaleDateString('pt-BR'); }
     function escapeHtml(str) { if(!str) return ''; return str.replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'})[m]); }
 
+    // ==================== FIREBASE ====================
     async function saveToCloud() {
         if(!currentUser) return;
         await db.ref(`users/${currentUser.uid}/items`).set(items);
@@ -854,11 +1005,12 @@
             document.getElementById('syncStatus').textContent = `✅ ${items.length} itens carregados`;
             document.getElementById('syncStatus').classList.add('synced');
             refreshAllUI();
-            updatePredictionCard();
+            updatePredictionCard(); // IA
         } catch(e) { console.error(e); }
         finally { hideLoading(); }
     }
 
+    // ==================== AUTOCOMPLETE DESCRIÇÃO ====================
     function getDescriptionSuggestions() {
         let freq = new Map();
         items.filter(i => i.type === 'income' || i.type === 'expense').forEach(t => freq.set(t.title, (freq.get(t.title)||0)+1));
@@ -878,6 +1030,7 @@
         }
     }
 
+    // ==================== META ====================
     function updateMetaUI() {
         let meta = userSettings.meta || 0;
         document.getElementById('metaValueDisplay').innerHTML = `R$ ${meta.toFixed(2)}`;
@@ -891,6 +1044,7 @@
     function closeMetaModal() { document.getElementById('metaModal').style.display = 'none'; }
     function saveMeta() { let v = parseFloat(document.getElementById('metaAmountInput').value); if(!isNaN(v) && v>=0) { userSettings.meta = v; if(currentUser) saveToCloud(); updateMetaUI(); closeMetaModal(); updatePredictionCard(); } }
 
+    // ==================== DADOS FINANCEIROS ====================
     function getFinancialItemsForDate(d) { let key = formatDateKey(d); return items.filter(i => i.date === key && (i.type === 'income' || i.type === 'expense')); }
     function getItemsForDate(d) { return items.filter(i => i.date === formatDateKey(d)); }
     function getDaySummary(d) { let inc=0, exp=0; getFinancialItemsForDate(d).forEach(i => { if(i.type === 'income') inc += i.amount; else exp += i.amount; }); return { balance: inc-exp, income: inc, expense: exp }; }
@@ -898,6 +1052,7 @@
     function getMonthStats() { let inc=0, exp=0, today=new Date(); for(let d=1;d<=31;d++){ let date=new Date(today.getFullYear(),today.getMonth(),d); if(date.getMonth()!==today.getMonth()) break; getFinancialItemsForDate(date).forEach(i=>{ if(i.type==='income') inc+=i.amount; else exp+=i.amount; }); } return { income: inc, expense: exp, balance: inc-exp }; }
     function updateBalances() { let week=getWeekBalance(new Date()), month=getMonthStats(); document.getElementById('mainBalance').innerHTML = `R$ ${month.balance.toFixed(2)}`; document.getElementById('monthIncome').innerHTML = `R$ ${month.income.toFixed(2)}`; document.getElementById('monthExpense').innerHTML = `R$ ${month.expense.toFixed(2)}`; document.getElementById('weekIncome').innerHTML = `R$ ${week.income.toFixed(2)}`; document.getElementById('weekExpense').innerHTML = `R$ ${week.expense.toFixed(2)}`; document.getElementById('totalExpense').innerHTML = `R$ ${week.expense.toFixed(2)}`; document.getElementById('totalIncome').innerHTML = `R$ ${week.income.toFixed(2)}`; document.getElementById('totalBalance').innerHTML = `R$ ${week.balance.toFixed(2)}`; updateMetaUI(); }
 
+    // ==================== CALENDÁRIOS ====================
     function renderWeekCalendar() {
         let today = new Date(), start = new Date(today); start.setDate(today.getDate()-today.getDay());
         let weekDays = ['DOM','SEG','TER','QUA','QUI','SEX','SÁB'];
@@ -917,6 +1072,7 @@
     }
     function refreshAllUI() { renderWeekCalendar(); renderMonthCalendar(); updateBalances(); updateDescriptionDatalist(); updatePredictionCard(); }
 
+    // ==================== MODAL DO DIA ====================
     function showDayModal(date) {
         currentDayModalDate = date;
         document.getElementById('dayModalTitle').innerHTML = formatDateDisplay(date);
@@ -962,68 +1118,24 @@
         if(currentDayModalDate) showDayModal(currentDayModalDate); else closeDayModal();
     }
 
-    // CONTATOS CORRIGIDOS ===
+    // ==================== CONTATOS ====================
     function renderContacts() {
-        let container = document.getElementById('contactsList');
-        if (!container) return;
+        let container = document.getElementById('contactsList'); if(!container) return;
         container.innerHTML = '';
         (userSettings.contacts || []).forEach((c, idx) => {
-            let div = document.createElement('div');
-            div.className = 'contact-item';
-            let formattedPhone = c.phone.replace(/^55/, '+55 ').replace(/(\d{2})(\d{5})(\d{4})/, '$1 $2-$3');
-            div.innerHTML = `<span><strong>${escapeHtml(c.name)}</strong><br><small>${formattedPhone}</small></span>
-                             <div>
-                                <button class="send-wa-contact" data-phone="${c.phone}">📲</button>
-                                <button class="del-contact" data-idx="${idx}">🗑️</button>
-                             </div>`;
+            let div = document.createElement('div'); div.className = 'contact-item';
+            div.innerHTML = `<span><strong>${escapeHtml(c.name)}</strong><br><small>${c.phone}</small></span>
+                             <div><button class="send-wa-contact" data-phone="${c.phone}">📲</button>
+                             <button class="del-contact" data-idx="${idx}">🗑️</button></div>`;
             container.appendChild(div);
         });
-        document.querySelectorAll('.send-wa-contact').forEach(btn => {
-            btn.addEventListener('click', () => sendWhatsAppMessageDirect(btn.dataset.phone));
-        });
-        document.querySelectorAll('.del-contact').forEach(btn => {
-            btn.addEventListener('click', () => {
-                let idx = parseInt(btn.dataset.idx);
-                userSettings.contacts.splice(idx, 1);
-                if (currentUser) saveToCloud();
-                renderContacts();
-            });
-        });
-        let select = document.getElementById('contactSelect');
-        if (select) {
-            select.innerHTML = '<option value="">-- Contato favorito --</option>';
-            userSettings.contacts.forEach(c => {
-                let opt = document.createElement('option');
-                opt.value = c.phone;
-                opt.textContent = `${c.name} (${c.phone})`;
-                select.appendChild(opt);
-            });
-        }
+        document.querySelectorAll('.send-wa-contact').forEach(btn => btn.addEventListener('click', () => sendWhatsAppMessageDirect(btn.dataset.phone)));
+        document.querySelectorAll('.del-contact').forEach(btn => btn.addEventListener('click', () => { userSettings.contacts.splice(parseInt(btn.dataset.idx),1); if(currentUser) saveToCloud(); renderContacts(); }));
+        let select = document.getElementById('contactSelect'); if(select) { select.innerHTML = '<option value="">-- Contato favorito --</option>'; userSettings.contacts.forEach(c => { let opt = document.createElement('option'); opt.value = c.phone; opt.textContent = `${c.name} (${c.phone})`; select.appendChild(opt); }); }
     }
+    function addContact() { let name = document.getElementById('contactName').value.trim(), phone = document.getElementById('contactPhone').value.trim(); if(!name || !phone) { alert('Preencha nome e número'); return; } if(!userSettings.contacts) userSettings.contacts = []; userSettings.contacts.push({name, phone}); if(currentUser) saveToCloud(); renderContacts(); document.getElementById('contactName').value = ''; document.getElementById('contactPhone').value = ''; }
 
-    function addContact() {
-        let name = document.getElementById('contactName').value.trim();
-        let phone = document.getElementById('contactPhone').value.trim();
-        if (!name || !phone) {
-            alert('Preencha nome e número');
-            return;
-        }
-        let rawPhone = phone.replace(/\D/g, '');
-        if (!rawPhone.startsWith('55')) {
-            rawPhone = '55' + rawPhone;
-        }
-        if (rawPhone.length < 12) {
-            alert('Número inválido. Use DDD + número (ex: 81999999999). O código 55 será adicionado automaticamente.');
-            return;
-        }
-        if (!userSettings.contacts) userSettings.contacts = [];
-        userSettings.contacts.push({ name, phone: rawPhone });
-        if (currentUser) saveToCloud();
-        renderContacts();
-        document.getElementById('contactName').value = '';
-        document.getElementById('contactPhone').value = '';
-    }
-
+    // ==================== WHATSAPP CORRIGIDO ====================
     function sendWhatsAppMessageDirect(phoneNumber, transaction) {
         if (!transaction && lastSavedTransaction) transaction = lastSavedTransaction;
         if (!transaction) { alert("Nada para enviar."); return; }
@@ -1061,7 +1173,7 @@
         lastSavedTransaction = null;
     }
 
-    // Funções de mapa (resumidas, funcionais)
+    // ==================== MAPA ====================
     function initMapWithGPS() {
         if(map) map.remove();
         let defaultLat = -7.933, defaultLng = -34.873;
@@ -1105,7 +1217,7 @@
     function useLocationFromMap() { if(selectedAddress) document.getElementById('appointmentLocation').value = selectedAddress; document.getElementById('mapModal').style.display = 'none'; }
     function getCurrentLocationGPS() { if(navigator.geolocation) { navigator.geolocation.getCurrentPosition(pos => { let {latitude, longitude} = pos.coords; map.setView([latitude, longitude], 16); if(currentMarker) map.removeLayer(currentMarker); currentMarker = L.marker([latitude, longitude]).addTo(map); reverseGeocodeNow(latitude, longitude); }, err => alert('Não foi possível obter localização')); } else alert('Geolocalização não suportada'); async function reverseGeocodeNow(lat,lng){ let res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&accept-language=pt-BR`); let data = await res.json(); selectedAddress = data.display_name || `${lat}, ${lng}`; document.getElementById('addressSearchInput').value = selectedAddress; } }
 
-    // Transações
+    // ==================== TRANSAÇÕES ====================
     function handleFinancialSubmit(e) {
         e.preventDefault();
         let dateInput = document.getElementById('transactionDate');
@@ -1141,20 +1253,23 @@
         document.querySelector(`.tab-btn[data-tab="${tab}"]`).classList.add('active');
         document.getElementById(`${tab}Tab`).classList.add('active');
     }
+    function editTransaction(index) { let item = items[index]; if(!item) return; editingItemId = item.id; let editDate = parseLocalDate(item.date); openModalWithDate(editDate, 'financial'); document.getElementById('type').value = item.type; document.getElementById('description').value = item.title; document.getElementById('amount').value = item.amount; document.getElementById('status').value = item.status || 'pending'; document.getElementById('modalTitle').innerHTML = 'Editar transação'; }
+    function repeatTransaction(index) { let original = items[index]; if(!original) return; editingItemId = null; let today = new Date(); openModalWithDate(today, 'financial'); document.getElementById('type').value = original.type; document.getElementById('description').value = original.title; document.getElementById('amount').value = original.amount; document.getElementById('status').value = original.status || 'pending'; document.getElementById('modalTitle').innerHTML = 'Repetir transação'; }
     function closeModal() { document.getElementById('modal').style.display = 'none'; editingItemId = null; }
     function saveData() { refreshAllUI(); if(currentUser) saveToCloud(); }
+    function deleteItem(index) { if(confirm('Excluir este item?')) { items.splice(index,1); saveData(); } }
 
-    // Relatórios e insights
+    // ==================== RELATÓRIOS E INSIGHTS ====================
     function openFullReport() { let week = getWeekBalance(new Date()), month = getMonthStats(); let total=0, rec=0, desp=0; items.filter(i=>i.type==='income'||i.type==='expense').forEach(i=>{ if(i.type==='income'){ total+=i.amount; rec++; } else { total-=i.amount; desp++; } }); let html = `<div><strong>📊 RESUMO COMPLETO</strong><br><div style="background:var(--primary-soft);padding:12px;border-radius:16px;margin-bottom:16px">💰 SALDO TOTAL: ${total>=0?'+':'-'} R$ ${Math.abs(total).toFixed(2)}</div><div>🟢 Receitas mês: R$ ${month.income.toFixed(2)} (${rec} transações)</div><div>🔴 Despesas mês: R$ ${month.expense.toFixed(2)} (${desp} transações)</div><div>📆 Semana: Saldo ${week.balance>=0?'+':'-'} R$ ${Math.abs(week.balance).toFixed(2)}</div></div>`; document.getElementById('reportModalContent').innerHTML = html; document.getElementById('reportModal').style.display = 'flex'; }
     function generateWeeklyReport() { let week = getWeekBalance(new Date()); document.getElementById('reportModalContent').innerHTML = `<strong>📊 RELATÓRIO DA SEMANA</strong><br>Receitas: R$ ${week.income.toFixed(2)}<br>Despesas: R$ ${week.expense.toFixed(2)}<br>Saldo: ${week.balance>=0?'+':'-'} R$ ${Math.abs(week.balance).toFixed(2)}`; document.getElementById('reportModal').style.display = 'flex'; }
     function generateMonthlyReport() { let month = getMonthStats(); document.getElementById('reportModalContent').innerHTML = `<strong>📅 RELATÓRIO DO MÊS</strong><br>Receitas: R$ ${month.income.toFixed(2)}<br>Despesas: R$ ${month.expense.toFixed(2)}<br>Saldo: ${month.balance>=0?'+':'-'} R$ ${Math.abs(month.balance).toFixed(2)}`; document.getElementById('reportModal').style.display = 'flex'; }
     function closeReportModal() { document.getElementById('reportModal').style.display = 'none'; }
-    function showInsightsModal() { let monthStats = getMonthStats(); let pending = items.filter(i=>(i.type==='income'||i.type==='expense')&&i.status==='pending').length; let html = `<div>💰 Saldo do mês: ${monthStats.balance>=0?'positivo':'negativo'} (R$ ${Math.abs(monthStats.balance).toFixed(2)})</div><div>${pending>0?`⏳ ${pending} transação(ões) pendente(s)`:'✅ Todas as transações estão em dia'}</div>`; document.getElementById('insightsModalContent').innerHTML = html; document.getElementById('insightsModal').style.display = 'flex'; }
+    function showInsightsModal() { let monthStats = getMonthStats(); let pending = items.filter(i=>(i.type==='income'||i.type==='expense')&&i.status==='pending').length; let html = `<div class="insight-item">💰 Saldo do mês: ${monthStats.balance>=0?'positivo':'negativo'} (R$ ${Math.abs(monthStats.balance).toFixed(2)})</div><div class="insight-item">${pending>0?`⏳ ${pending} transação(ões) pendente(s)`:'✅ Todas as transações estão em dia'}</div>`; document.getElementById('insightsModalContent').innerHTML = html; document.getElementById('insightsModal').style.display = 'flex'; }
     function closeInsightsModal() { document.getElementById('insightsModal').style.display = 'none'; }
     function prevMonth() { currentMonth.setMonth(currentMonth.getMonth()-1); renderMonthCalendar(); }
     function nextMonth() { currentMonth.setMonth(currentMonth.getMonth()+1); renderMonthCalendar(); }
 
-    // IA Previsão
+    // ==================== IA LOCAL - PREVISÃO DE CICLOS ====================
     class FinancialPredictor {
         constructor(transactions, metaMensal = 0) {
             this.transactions = transactions.filter(t => t.type === 'expense' && t.amount > 0);
@@ -1264,21 +1379,26 @@
         }
     }
 
-    // Gestos e atalhos
+    // ==================== GESTOS E ATALHOS ====================
+    // Deslizar para excluir (simulado com toque longo + arrasto em dispositivos móveis)
     let touchStartX = null;
     document.addEventListener('touchstart', (e) => { touchStartX = e.touches[0].clientX; });
     document.addEventListener('touchend', (e) => {
         if (!touchStartX) return;
         const diff = e.changedTouches[0].clientX - touchStartX;
-        if (Math.abs(diff) > 80 && document.getElementById('dayModal').style.display === 'flex') {
-            const checkboxes = document.querySelectorAll('#dayModalContent .day-item-checkbox');
-            if (checkboxes.length > 0) {
-                checkboxes[0].click();
-                deleteSelectedItems();
+        if (Math.abs(diff) > 80) {
+            // Se o modal do dia estiver aberto, tenta excluir o primeiro item (simplificado)
+            if (document.getElementById('dayModal').style.display === 'flex') {
+                const checkboxes = document.querySelectorAll('#dayModalContent .day-item-checkbox');
+                if (checkboxes.length > 0) {
+                    checkboxes[0].click();
+                    deleteSelectedItems();
+                }
             }
         }
         touchStartX = null;
     });
+    // Atalhos de teclado: 'i' para receita, 'e' para despesa, 'r' para relatório
     document.addEventListener('keydown', (e) => {
         if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
         switch(e.key.toLowerCase()) {
@@ -1286,15 +1406,16 @@
             case 'e': openNewTransaction(new Date(), 'expense'); break;
             case 'r': openFullReport(); break;
             case 'm': document.getElementById('metaModal').style.display = 'flex'; break;
+            default: break;
         }
     });
 
-    // Autenticação
+    // ==================== AUTENTICAÇÃO ====================
     async function login() { let email = document.getElementById('loginEmail').value, pass = document.getElementById('loginPassword').value; if(!email||!pass){alert('Preencha e-mail e senha');return;} showLoading(); try{ await auth.signInWithEmailAndPassword(email,pass); alert('✅ Login realizado!'); document.getElementById('loginEmail').value = ''; document.getElementById('loginPassword').value = ''; } catch(e){ alert('❌ '+e.message); } finally{ hideLoading(); } }
     async function signup() { let email = document.getElementById('loginEmail').value, pass = document.getElementById('loginPassword').value; if(!email||pass.length<6){alert('E-mail inválido ou senha com menos de 6 caracteres');return;} showLoading(); try{ await auth.createUserWithEmailAndPassword(email,pass); alert('✅ Conta criada! Faça login.'); document.getElementById('loginPassword').value = ''; } catch(e){ alert('❌ '+e.message); } finally{ hideLoading(); } }
     async function logout() { try{ await auth.signOut(); } catch(e){ alert(e.message); } }
 
-    // Event listeners
+    // ==================== EVENT LISTENERS ====================
     document.getElementById('openMapBtn')?.addEventListener('click', initMapWithGPS);
     document.getElementById('closeMapModalBtn')?.addEventListener('click', () => document.getElementById('mapModal').style.display = 'none');
     document.getElementById('searchAddressBtn')?.addEventListener('click', searchAddress);
