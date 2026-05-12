@@ -25,6 +25,7 @@ body {
     background: linear-gradient(145deg, var(--primary) 0%, var(--primary-dark) 100%);
     min-height: 100vh;
     padding: 0;
+    transition: background 0.3s, color 0.3s;
 }
 
 .app-container {
@@ -34,6 +35,7 @@ body {
     background: var(--background);
     min-height: 100vh;
     box-shadow: 0 0 40px rgba(0,0,0,0.1);
+    transition: background 0.3s;
 }
 
 /* Layout Responsivo */
@@ -357,10 +359,6 @@ body {
     border: 1px solid var(--primary);
 }
 
-.month-day.today .day-number {
-    color: var(--text-dark) !important;
-}
-
 .month-day.has-income {
     border: 1px solid var(--success);
     background: #f0fdf4;
@@ -369,6 +367,13 @@ body {
 .month-day.has-expense {
     border: 1px solid var(--danger);
     background: #fef2f2;
+}
+
+/* Transação com status pago - risco */
+.transaction-item.paid .transaction-title,
+.transaction-item.paid .transaction-amount {
+    text-decoration: line-through;
+    opacity: 0.7;
 }
 
 .day-indicators {
@@ -381,6 +386,10 @@ body {
 
 .indicator-up { color: var(--success); }
 .indicator-down { color: var(--danger); }
+.indicator-up.paid, .indicator-down.paid {
+    text-decoration: line-through;
+    opacity: 0.6;
+}
 
 /* Transações */
 .transactions-card {
@@ -740,61 +749,8 @@ body {
     border-radius: 50%;
     animation: spin 0.8s linear infinite;
 }
-/* Garantir que o modal de relatório tenha z-index alto */
-.report-modal {
-    z-index: 1500;
-}
 
-/* Botão de fechar estilizado */
-.close-report-modal:hover {
-    background: #e5e7eb;
-}
-
-@keyframes spin { to { transform: rotate(360deg); } }
-@keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
-
-/* Scrollbar */
-.week-scroll::-webkit-scrollbar { height: 4px; }
-.week-scroll::-webkit-scrollbar-track { background: var(--border); border-radius: 10px; }
-.week-scroll::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 10px; }
-/* Adicione ao final do seu arquivo style.css */
-/* Modo escuro */
-body.dark-mode {
-    --primary: #a78bfa;
-    --primary-dark: #8b5cf6;
-    --primary-light: #4c1d95;
-    --primary-soft: #2e1065;
-    --background: #111827;
-    --card-bg: #1f2937;
-    --text-dark: #f9fafb;
-    --text-gray: #9ca3af;
-    --border: #374151;
-    --success: #34d399;
-    --danger: #f87171;
-}
-body.dark-mode .month-day {
-    background: #374151;
-}
-body.dark-mode .month-day.today {
-    background: #4c1d95;
-}
-body.dark-mode .day-chip {
-    background: #1f2937;
-}
-body.dark-mode .transaction-item {
-    border-bottom-color: #374151;
-}
-/* Dark mode toggle */
-.dark-mode-toggle {
-    background: rgba(255,255,255,0.2);
-    border: none;
-    padding: 6px 12px;
-    border-radius: 30px;
-    color: white;
-    cursor: pointer;
-    font-size: 0.75rem;
-}
-/* Meta card */
+/* Meta Card */
 .meta-card {
     background: var(--card-bg);
     margin: 16px;
@@ -849,6 +805,63 @@ body.dark-mode .transaction-item {
     cursor: pointer;
     font-weight: bold;
 }
+
+/* Modo escuro */
+body.dark-mode {
+    --primary: #a78bfa;
+    --primary-dark: #8b5cf6;
+    --primary-light: #4c1d95;
+    --primary-soft: #2e1065;
+    --background: #111827;
+    --card-bg: #1f2937;
+    --text-dark: #f9fafb;
+    --text-gray: #9ca3af;
+    --border: #374151;
+    --success: #34d399;
+    --danger: #f87171;
+}
+body.dark-mode .month-day {
+    background: #374151;
+}
+body.dark-mode .month-day.today {
+    background: #4c1d95;
+}
+body.dark-mode .day-chip {
+    background: #1f2937;
+}
+body.dark-mode .transaction-item {
+    border-bottom-color: #374151;
+}
+body.dark-mode .dark-mode-toggle {
+    background: rgba(255,255,255,0.2);
+    color: white;
+}
 body.dark-mode .progress-bar-container {
     background: #4b5563;
 }
+body.dark-mode .modal-content,
+body.dark-mode .report-modal-content {
+    background: #1f2937;
+    color: #f9fafb;
+}
+body.dark-mode .close-modal,
+body.dark-mode .close-report-modal {
+    background: #374151;
+    color: white;
+}
+body.dark-mode .form-group input,
+body.dark-mode .form-group select,
+body.dark-mode .form-group textarea {
+    background: #374151;
+    border-color: #4b5563;
+    color: white;
+}
+
+/* Animations */
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+
+/* Scrollbar */
+.week-scroll::-webkit-scrollbar { height: 4px; }
+.week-scroll::-webkit-scrollbar-track { background: var(--border); border-radius: 10px; }
+.week-scroll::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 10px; }
