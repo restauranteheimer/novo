@@ -1141,7 +1141,7 @@
         if (!transaction) { alert("Nada para enviar."); return; }
         let raw = phoneNumber.toString().replace(/\D/g, '');
         if (!raw.startsWith('55')) raw = '55' + raw;
-        const tipo = transaction.type === 'expense' ? '🔴 DESPESA' : '🟢 RECEITA';
+        const tipo = transaction.type === 'expense' ? '🔴 Nota Aberta' : '🟢 Eu devo';
         const msg = `💰 *${tipo}*\n📝 ${transaction.title}\n💵 R$ ${transaction.amount.toFixed(2)}\n📅 Data: ${transaction.date}\n⏳ Status: ${transaction.status === 'paid' ? 'Pago/Recebido' : 'Pendente'}`;
         window.open(`https://wa.me/${raw}?text=${encodeURIComponent(msg)}`, '_blank');
     }
