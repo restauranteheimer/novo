@@ -1,0 +1,1127 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Sistema de Entregas - Relatório por Motoqueiro</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            user-select: none;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 28px;
+        }
+
+        .header p {
+            margin: 5px 0 0;
+            opacity: 0.9;
+        }
+
+        .turno-bar {
+            background: #f8f9fa;
+            padding: 15px 30px;
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            border-bottom: 2px solid #e0e0e0;
+            flex-wrap: wrap;
+        }
+
+        .turno-btn {
+            padding: 10px 30px;
+            font-size: 18px;
+            font-weight: bold;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .turno-btn.manha {
+            background: #ffd93d;
+            color: #333;
+        }
+
+        .turno-btn.noite {
+            background: #2c3e50;
+            color: white;
+        }
+
+        .turno-btn.active {
+            transform: scale(1.05);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .turno-info {
+            font-size: 18px;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .atalho-info {
+            margin-left: auto;
+            font-size: 12px;
+            color: #666;
+        }
+
+        .registro-area {
+            background: white;
+            padding: 25px 30px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .registro-box {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 15px;
+        }
+
+        .row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .input-group {
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 12px;
+            font-weight: bold;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .input-group input, .input-group select {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            transition: all 0.3s;
+            background: white;
+        }
+
+        .input-group input:focus, .input-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .payment-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 22px;
+            flex-wrap: wrap;
+        }
+
+        .payment-btn {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #ddd;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+            min-width: 80px;
+        }
+
+        .payment-btn.selected {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .payment-btn.dinheiro.selected { background: #27ae60; border-color: #27ae60; }
+        .payment-btn.pix.selected { background: #3498db; border-color: #3498db; }
+        .payment-btn.cartao.selected { background: #e74c3c; border-color: #e74c3c; }
+        .payment-btn.online.selected { background: #95a5a6; border-color: #95a5a6; }
+
+        .btn-registrar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            transition: transform 0.1s;
+        }
+
+        .btn-registrar:active {
+            transform: scale(0.98);
+        }
+
+        .nomes-area {
+            padding: 20px 30px;
+            background: #f8f9fa;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .nomes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .nome-item {
+            background: white;
+            padding: 8px 12px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .nome-item .numero {
+            font-weight: bold;
+            color: #667eea;
+            min-width: 30px;
+        }
+
+        .nome-item input {
+            flex: 1;
+            padding: 5px 8px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        .content {
+            display: flex;
+            gap: 20px;
+            padding: 30px;
+            flex-wrap: wrap;
+        }
+
+        .contagem-area {
+            flex: 2;
+            min-width: 350px;
+        }
+
+        .contagem-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        .card-moto {
+            background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 15px;
+            transition: all 0.3s;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .card-moto:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            border-color: #667eea;
+        }
+
+        .moto-header {
+            text-align: center;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .moto-numero {
+            font-size: 20px;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .moto-nome {
+            font-size: 18px;
+            font-weight: bold;
+            margin: 5px 0;
+        }
+
+        .moto-qtd {
+            font-size: 28px;
+            font-weight: bold;
+            color: #764ba2;
+        }
+
+        .detalhes-pagamento {
+            margin-top: 10px;
+        }
+
+        .detalhe-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 0;
+            font-size: 13px;
+            border-bottom: 1px dashed #ddd;
+        }
+
+        .detalhe-label {
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .detalhe-valor {
+            font-weight: bold;
+        }
+
+        .total-item {
+            margin-top: 10px;
+            padding-top: 8px;
+            border-top: 2px solid #667eea;
+            display: flex;
+            justify-content: space-between;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .badge {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 5px;
+        }
+
+        .badge-dinheiro { background: #27ae60; }
+        .badge-pix { background: #3498db; }
+        .badge-cartao { background: #e74c3c; }
+        .badge-online { background: #95a5a6; }
+
+        .total-area {
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .total-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .total-box h3 {
+            margin: 0 0 10px;
+        }
+
+        .total-valor {
+            font-size: 48px;
+            font-weight: bold;
+        }
+
+        .total-money {
+            font-size: 24px;
+            margin-top: 10px;
+        }
+
+        .resumo-pagamento {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+        }
+
+        .resumo-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .ultimos-pedidos {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 15px;
+            max-height: 350px;
+            overflow-y: auto;
+        }
+
+        .ultimos-pedidos h4 {
+            margin: 0 0 10px;
+            color: #667eea;
+        }
+
+        .pedido-item {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+            font-size: 12px;
+            background: white;
+            margin-bottom: 5px;
+            border-radius: 8px;
+        }
+
+        .pedido-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+
+        .pedido-numero {
+            font-weight: bold;
+            font-size: 14px;
+            color: #667eea;
+        }
+
+        .pedido-actions {
+            display: flex;
+            gap: 5px;
+        }
+
+        .edit-btn, .delete-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            padding: 2px 5px;
+            border-radius: 5px;
+            transition: all 0.2s;
+        }
+
+        .edit-btn:hover { background: #3498db; color: white; }
+        .delete-btn:hover { background: #e74c3c; color: white; }
+
+        .pedido-detalhes {
+            font-size: 11px;
+            color: #666;
+        }
+
+        .payment-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: bold;
+            margin-left: 5px;
+        }
+
+        .payment-dinheiro { background: #27ae60; color: white; }
+        .payment-pix { background: #3498db; color: white; }
+        .payment-cartao { background: #e74c3c; color: white; }
+        .payment-online { background: #95a5a6; color: white; }
+
+        /* Modal de Relatório */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            max-width: 700px;
+            width: 90%;
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .modal-header h3 {
+            margin: 0;
+            color: #667eea;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 28px;
+            cursor: pointer;
+            color: #999;
+        }
+
+        .close-modal:hover {
+            color: #333;
+        }
+
+        .relatorio-resumo {
+            background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .relatorio-lista {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .relatorio-item {
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+            margin-bottom: 8px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .relatorio-pedido {
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .relatorio-valor {
+            color: #27ae60;
+            font-weight: bold;
+        }
+
+        .btn-fechar {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 15px;
+            font-weight: bold;
+        }
+
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            .container { margin: 0; }
+            .content { padding: 15px; }
+            .contagem-grid { grid-template-columns: 1fr; }
+            .payment-buttons { margin-top: 10px; }
+            .payment-btn { padding: 8px; font-size: 12px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 Sistema de Entregas</h1>
+            <p>Clique nos cards para ver relatório detalhado</p>
+        </div>
+
+        <div class="turno-bar">
+            <button class="turno-btn manha" id="btnManha">🌅 MANHÃ</button>
+            <button class="turno-btn noite" id="btnNoite">🌙 NOITE</button>
+            <div class="turno-info" id="turnoInfo">Turno atual: MANHÃ</div>
+            <div class="atalho-info">⌨️ Enter para avançar | Ctrl+M trocar turno | Clique no card para relatório</div>
+        </div>
+
+        <div class="registro-area">
+            <div class="registro-box">
+                <div class="row">
+                    <div class="input-group">
+                        <label>📦 Nº do Pedido (3-6 dígitos)</label>
+                        <input type="text" id="pedidoInput" placeholder="Ex: 123456" autocomplete="off">
+                    </div>
+                    <div class="input-group">
+                        <label>🏍️ Motoqueiro (1-15)</label>
+                        <input type="number" id="motoInput" min="1" max="15" placeholder="1 a 15" autocomplete="off">
+                    </div>
+                    <div class="input-group">
+                        <label>💰 Valor do Pedido (R$)</label>
+                        <input type="text" id="valorInput" placeholder="Ex: 45.90" autocomplete="off">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="payment-buttons">
+                        <button class="payment-btn dinheiro" data-payment="dinheiro">💵 DINHEIRO</button>
+                        <button class="payment-btn pix" data-payment="pix">📱 PIX</button>
+                        <button class="payment-btn cartao" data-payment="cartao">💳 CARTÃO</button>
+                        <button class="payment-btn online" data-payment="online">🌐 PAGO ONLINE</button>
+                    </div>
+                </div>
+                <div class="row">
+                    <button class="btn-registrar" id="registrarBtn">✅ REGISTRAR ENTREGA (Enter)</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="nomes-area">
+            <strong>✏️ Nomes dos Motoqueiros (clique para editar)</strong>
+            <div class="nomes-grid" id="nomesGrid"></div>
+        </div>
+
+        <div class="content">
+            <div class="contagem-area">
+                <h3>📊 Entregas por Motoqueiro (Clique para detalhes)</h3>
+                <div id="contagemGrid" class="contagem-grid"></div>
+            </div>
+
+            <div class="total-area">
+                <div class="total-box">
+                    <h3>📦 Total de Pedidos</h3>
+                    <div class="total-valor" id="totalPedidos">0</div>
+                    <div id="turnoLabel">neste turno</div>
+                    <div class="total-money" id="totalMoney">R$ 0,00</div>
+                </div>
+
+                <div class="resumo-pagamento">
+                    <h4 style="margin:0 0 10px 0;">💰 Resumo por Pagamento</h4>
+                    <div id="resumoPagamento"></div>
+                </div>
+
+                <div class="ultimos-pedidos">
+                    <h4>🕒 Últimos pedidos registrados</h4>
+                    <div id="ultimosPedidos"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Relatório do Motoqueiro -->
+    <div id="relatorioModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitulo">📋 Relatório do Motoqueiro</h3>
+                <button class="close-modal" onclick="fecharRelatorio()">&times;</button>
+            </div>
+            <div id="relatorioConteudo"></div>
+            <button class="btn-fechar" onclick="fecharRelatorio()">FECHAR</button>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <script>
+        // Configuração do Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyAE6OgotOg-Y36IGAqUScMvo_LymmTNdK4",
+            authDomain: "food-delivery-fb89e.firebaseapp.com",
+            databaseURL: "https://food-delivery-fb89e.firebaseio.com",
+            projectId: "food-delivery-fb89e",
+            storageBucket: "food-delivery-fb89e.firebasestorage.app",
+            messagingSenderId: "1050430398596",
+            appId: "1:1050430398596:web:1701ff1d161183105e22d1"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        // Estado da aplicação
+        let turnoAtual = 'manha';
+        let contagem = {
+            manha: Array(15).fill(0),
+            noite: Array(15).fill(0)
+        };
+        let valoresPorTipo = {
+            manha: Array(15).fill().map(() => ({ dinheiro: 0, pix: 0, cartao: 0, online: 0 })),
+            noite: Array(15).fill().map(() => ({ dinheiro: 0, pix: 0, cartao: 0, online: 0 }))
+        };
+        let nomesMotoqueiros = Array(15).fill('').map((_, i) => `Moto ${i+1}`);
+        let ultimosPedidos = [];
+        let pagamentoSelecionado = 'online';
+        let editandoId = null;
+        let todosPedidos = [];
+
+        // Carregar dados do Firebase
+        function carregarDados() {
+            db.ref('contagem').on('value', (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    if (data.manha) contagem.manha = data.manha;
+                    if (data.noite) contagem.noite = data.noite;
+                }
+                atualizarInterface();
+            });
+
+            db.ref('valoresPorTipo').on('value', (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    if (data.manha) valoresPorTipo.manha = data.manha;
+                    if (data.noite) valoresPorTipo.noite = data.noite;
+                }
+                atualizarInterface();
+            });
+
+            db.ref('nomes').on('value', (snapshot) => {
+                const data = snapshot.val();
+                if (data && Array.isArray(data)) {
+                    nomesMotoqueiros = data;
+                }
+                renderizarNomes();
+                atualizarInterface();
+            });
+
+            // Carregar todos os pedidos para relatórios
+            db.ref('ultimosPedidos').orderByChild('timestamp').limitToLast(200).on('value', (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    todosPedidos = Object.entries(data).map(([id, pedido]) => ({ id, ...pedido }));
+                    ultimosPedidos = [...todosPedidos].reverse().slice(0, 30);
+                } else {
+                    todosPedidos = [];
+                    ultimosPedidos = [];
+                }
+                renderizarUltimosPedidos();
+                atualizarInterface();
+            });
+        }
+
+        function salvarContagens() {
+            db.ref('contagem').set({
+                manha: contagem.manha,
+                noite: contagem.noite
+            });
+        }
+
+        function salvarValoresPorTipo() {
+            db.ref('valoresPorTipo').set({
+                manha: valoresPorTipo.manha,
+                noite: valoresPorTipo.noite
+            });
+        }
+
+        function salvarNomes() {
+            db.ref('nomes').set(nomesMotoqueiros);
+        }
+
+        function formatarMoeda(valor) {
+            return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(valor);
+        }
+
+        function parseValor(valorStr) {
+            if (!valorStr) return 0;
+            let cleaned = valorStr.toString().replace(/[^\d,.-]/g, '').replace(',', '.');
+            let valor = parseFloat(cleaned);
+            return isNaN(valor) ? 0 : valor;
+        }
+
+        function registrarEntrega() {
+            const pedidoInput = document.getElementById('pedidoInput');
+            const motoInput = document.getElementById('motoInput');
+            const valorInput = document.getElementById('valorInput');
+            
+            let pedido = pedidoInput.value.trim();
+            const motoNumero = parseInt(motoInput.value);
+            const valor = parseValor(valorInput.value);
+            
+            if (!pedido) {
+                alert('⚠️ Digite o número do pedido!');
+                pedidoInput.focus();
+                return;
+            }
+            
+            if (pedido.length < 3 || pedido.length > 6 || !/^\d+$/.test(pedido)) {
+                alert('⚠️ Pedido inválido! Use 3 a 6 dígitos numéricos.');
+                pedidoInput.focus();
+                return;
+            }
+            
+            if (isNaN(motoNumero) || motoNumero < 1 || motoNumero > 15) {
+                alert('⚠️ Motoqueiro inválido! Digite um número de 1 a 15.');
+                motoInput.focus();
+                return;
+            }
+            
+            const index = motoNumero - 1;
+            contagem[turnoAtual][index]++;
+            valoresPorTipo[turnoAtual][index][pagamentoSelecionado] += valor;
+            
+            const pedidoData = {
+                pedido: pedido,
+                motoqueiro: motoNumero,
+                motoqueiroNome: nomesMotoqueiros[index],
+                turno: turnoAtual,
+                valor: valor,
+                pagamento: pagamentoSelecionado,
+                timestamp: Date.now(),
+                dataHora: new Date().toLocaleString('pt-BR')
+            };
+            
+            db.ref('ultimosPedidos').push(pedidoData);
+            salvarContagens();
+            salvarValoresPorTipo();
+            
+            pedidoInput.value = '';
+            motoInput.value = '';
+            valorInput.value = '';
+            pedidoInput.focus();
+            
+            // Reset selected payment to online
+            document.querySelectorAll('.payment-btn').forEach(btn => btn.classList.remove('selected'));
+            document.querySelector('.payment-btn.online').classList.add('selected');
+            pagamentoSelecionado = 'online';
+        }
+        
+        function excluirPedido(id) {
+            if (confirm('⚠️ Tem certeza que deseja EXCLUIR este pedido? Esta ação não pode ser desfeita!')) {
+                const pedido = todosPedidos.find(p => p.id === id);
+                if (pedido) {
+                    const index = pedido.motoqueiro - 1;
+                    contagem[pedido.turno][index]--;
+                    valoresPorTipo[pedido.turno][index][pedido.pagamento] -= (pedido.valor || 0);
+                    salvarContagens();
+                    salvarValoresPorTipo();
+                    db.ref(`ultimosPedidos/${id}`).remove();
+                }
+            }
+        }
+        
+        function abrirRelatorio(motoqueiroNumero) {
+            const index = motoqueiroNumero - 1;
+            const nome = nomesMotoqueiros[index];
+            const pedidosMotoqueiro = todosPedidos.filter(p => p.motoqueiro === motoqueiroNumero && p.turno === turnoAtual);
+            const qtdTotal = contagem[turnoAtual][index];
+            const valores = valoresPorTipo[turnoAtual][index];
+            
+            document.getElementById('modalTitulo').innerHTML = `📋 Relatório - ${nome} (${turnoAtual === 'manha' ? '🌅 MANHÃ' : '🌙 NOITE'})`;
+            
+            let html = `
+                <div class="relatorio-resumo">
+                    <h4>📊 Resumo do Motoqueiro</h4>
+                    <div><strong>Total de entregas:</strong> ${qtdTotal}</div>
+                    <div><strong>Valor total:</strong> ${formatarMoeda(valores.dinheiro + valores.pix + valores.cartao + valores.online)}</div>
+                </div>
+                
+                <div class="relatorio-resumo">
+                    <h4>💰 Detalhamento por Pagamento</h4>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                        <span>💵 DINHEIRO:</span>
+                        <strong>${formatarMoeda(valores.dinheiro)}</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                        <span>📱 PIX:</span>
+                        <strong>${formatarMoeda(valores.pix)}</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                        <span>💳 CARTÃO:</span>
+                        <strong>${formatarMoeda(valores.cartao)}</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between;">
+                        <span>🌐 ONLINE:</span>
+                        <strong>${formatarMoeda(valores.online)}</strong>
+                    </div>
+                </div>
+                
+                <h4>📦 Lista de Pedidos (${turnoAtual === 'manha' ? 'MANHÃ' : 'NOITE'})</h4>
+                <div class="relatorio-lista">
+            `;
+            
+            if (pedidosMotoqueiro.length === 0) {
+                html += `<div style="text-align: center; color: #999; padding: 20px;">Nenhum pedido registrado neste turno</div>`;
+            } else {
+                pedidosMotoqueiro.sort((a,b) => b.timestamp - a.timestamp).forEach(pedido => {
+                    const pagamentoLabel = {
+                        dinheiro: '💵 DINHEIRO',
+                        pix: '📱 PIX',
+                        cartao: '💳 CARTÃO',
+                        online: '🌐 ONLINE'
+                    }[pedido.pagamento];
+                    
+                    html += `
+                        <div class="relatorio-item">
+                            <div class="relatorio-pedido">📦 Pedido: ${pedido.pedido}</div>
+                            <div>💰 ${formatarMoeda(pedido.valor || 0)} - ${pagamentoLabel}</div>
+                            <div><small>🕐 ${pedido.dataHora}</small></div>
+                        </div>
+                    `;
+                });
+            }
+            
+            html += `</div>`;
+            document.getElementById('relatorioConteudo').innerHTML = html;
+            document.getElementById('relatorioModal').style.display = 'flex';
+        }
+        
+        function fecharRelatorio() {
+            document.getElementById('relatorioModal').style.display = 'none';
+        }
+        
+        function trocarTurno(turno) {
+            turnoAtual = turno;
+            const btnManha = document.getElementById('btnManha');
+            const btnNoite = document.getElementById('btnNoite');
+            const turnoInfo = document.getElementById('turnoInfo');
+            
+            if (turno === 'manha') {
+                btnManha.classList.add('active');
+                btnNoite.classList.remove('active');
+                turnoInfo.innerHTML = 'Turno atual: 🌅 MANHÃ';
+            } else {
+                btnNoite.classList.add('active');
+                btnManha.classList.remove('active');
+                turnoInfo.innerHTML = 'Turno atual: 🌙 NOITE';
+            }
+            
+            atualizarInterface();
+        }
+        
+        function atualizarInterface() {
+            renderizarContagem();
+            atualizarTotal();
+            renderizarResumoPagamento();
+        }
+        
+        function renderizarContagem() {
+            const grid = document.getElementById('contagemGrid');
+            const contagemAtual = contagem[turnoAtual];
+            const valoresAtual = valoresPorTipo[turnoAtual];
+            
+            grid.innerHTML = '';
+            for (let i = 0; i < 15; i++) {
+                const totalValor = valoresAtual[i].dinheiro + valoresAtual[i].pix + valoresAtual[i].cartao + valoresAtual[i].online;
+                
+                const card = document.createElement('div');
+                card.className = 'card-moto';
+                card.onclick = () => abrirRelatorio(i + 1);
+                card.innerHTML = `
+                    <div class="moto-header">
+                        <div class="moto-numero">#${i+1}</div>
+                        <div class="moto-nome">${nomesMotoqueiros[i]}</div>
+                        <div class="moto-qtd">${contagemAtual[i]} entrega${contagemAtual[i] !== 1 ? 's' : ''}</div>
+                    </div>
+                    <div class="detalhes-pagamento">
+                        <div class="detalhe-item">
+                            <span class="detalhe-label"><span class="badge badge-dinheiro"></span>💵 DINHEIRO</span>
+                            <span class="detalhe-valor">${formatarMoeda(valoresAtual[i].dinheiro)}</span>
+                        </div>
+                        <div class="detalhe-item">
+                            <span class="detalhe-label"><span class="badge badge-pix"></span>📱 PIX</span>
+                            <span class="detalhe-valor">${formatarMoeda(valoresAtual[i].pix)}</span>
+                        </div>
+                        <div class="detalhe-item">
+                            <span class="detalhe-label"><span class="badge badge-cartao"></span>💳 CARTÃO</span>
+                            <span class="detalhe-valor">${formatarMoeda(valoresAtual[i].cartao)}</span>
+                        </div>
+                        <div class="detalhe-item">
+                            <span class="detalhe-label"><span class="badge badge-online"></span>🌐 ONLINE</span>
+                            <span class="detalhe-valor">${formatarMoeda(valoresAtual[i].online)}</span>
+                        </div>
+                        <div class="total-item">
+                            <span>TOTAL</span>
+                            <span>${formatarMoeda(totalValor)}</span>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            }
+        }
+        
+        function renderizarResumoPagamento() {
+            const container = document.getElementById('resumoPagamento');
+            let totalDinheiro = 0, totalPix = 0, totalCartao = 0, totalOnline = 0;
+            
+            for (let i = 0; i < 15; i++) {
+                totalDinheiro += valoresPorTipo[turnoAtual][i].dinheiro;
+                totalPix += valoresPorTipo[turnoAtual][i].pix;
+                totalCartao += valoresPorTipo[turnoAtual][i].cartao;
+                totalOnline += valoresPorTipo[turnoAtual][i].online;
+            }
+            
+            container.innerHTML = `
+                <div class="resumo-item">
+                    <span>💵 DINHEIRO</span>
+                    <strong>${formatarMoeda(totalDinheiro)}</strong>
+                </div>
+                <div class="resumo-item">
+                    <span>📱 PIX</span>
+                    <strong>${formatarMoeda(totalPix)}</strong>
+                </div>
+                <div class="resumo-item">
+                    <span>💳 CARTÃO</span>
+                    <strong>${formatarMoeda(totalCartao)}</strong>
+                </div>
+                <div class="resumo-item">
+                    <span>🌐 ONLINE</span>
+                    <strong>${formatarMoeda(totalOnline)}</strong>
+                </div>
+                <div class="resumo-item" style="border-top: 2px solid #667eea; margin-top: 5px; padding-top: 10px;">
+                    <span><strong>TOTAL GERAL</strong></span>
+                    <strong>${formatarMoeda(totalDinheiro + totalPix + totalCartao + totalOnline)}</strong>
+                </div>
+            `;
+        }
+        
+        function renderizarNomes() {
+            const grid = document.getElementById('nomesGrid');
+            grid.innerHTML = '';
+            for (let i = 0; i < 15; i++) {
+                const item = document.createElement('div');
+                item.className = 'nome-item';
+                item.innerHTML = `
+                    <span class="numero">${i+1}.</span>
+                    <input type="text" value="${nomesMotoqueiros[i]}" maxlength="20" 
+                           onchange="atualizarNome(${i}, this.value)">
+                `;
+                grid.appendChild(item);
+            }
+        }
+        
+        window.atualizarNome = function(index, novoNome) {
+            if (novoNome.trim()) {
+                nomesMotoqueiros[index] = novoNome.trim();
+            } else {
+                nomesMotoqueiros[index] = `Moto ${index+1}`;
+            }
+            salvarNomes();
+            atualizarInterface();
+        };
+        
+        function atualizarTotal() {
+            const total = contagem[turnoAtual].reduce((sum, val) => sum + val, 0);
+            let totalMoney = 0;
+            for (let i = 0; i < 15; i++) {
+                totalMoney += valoresPorTipo[turnoAtual][i].dinheiro + valoresPorTipo[turnoAtual][i].pix + 
+                             valoresPorTipo[turnoAtual][i].cartao + valoresPorTipo[turnoAtual][i].online;
+            }
+            document.getElementById('totalPedidos').textContent = total;
+            document.getElementById('totalMoney').textContent = formatarMoeda(totalMoney);
+            const turnoLabel = document.getElementById('turnoLabel');
+            turnoLabel.innerHTML = turnoAtual === 'manha' ? 'neste turno (MANHÃ)' : 'neste turno (NOITE)';
+        }
+        
+        function renderizarUltimosPedidos() {
+            const container = document.getElementById('ultimosPedidos');
+            if (ultimosPedidos.length === 0) {
+                container.innerHTML = '<div style="color: #999; text-align: center;">Nenhum pedido registrado ainda</div>';
+                return;
+            }
+            
+            container.innerHTML = ultimosPedidos.slice(0, 15).map(pedido => {
+                const pagamentoClass = `payment-${pedido.pagamento || 'online'}`;
+                const pagamentoLabel = {
+                    dinheiro: '💵 DINHEIRO',
+                    pix: '📱 PIX',
+                    cartao: '💳 CARTÃO',
+                    online: '🌐 PAGO ONLINE'
+                }[pedido.pagamento || 'online'];
+                
+                return `
+                    <div class="pedido-item">
+                        <div class="pedido-header">
+                            <span class="pedido-numero">📦 ${pedido.pedido}</span>
+                            <div class="pedido-actions">
+                                <button class="edit-btn" onclick="abrirRelatorio(${pedido.motoqueiro})">📊</button>
+                                <button class="delete-btn" onclick="excluirPedido('${pedido.id}')">🗑️</button>
+                            </div>
+                        </div>
+                        <div class="pedido-detalhes">
+                            🏍️ ${pedido.motoqueiroNome} (${pedido.turno === 'manha' ? '🌅' : '🌙'})<br>
+                            💰 ${formatarMoeda(pedido.valor || 0)} 
+                            <span class="payment-badge ${pagamentoClass}">${pagamentoLabel}</span><br>
+                            <small>🕐 ${pedido.dataHora}</small>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        // Event Listeners
+        document.addEventListener('DOMContentLoaded', () => {
+            carregarDados();
+            
+            const pedidoInput = document.getElementById('pedidoInput');
+            const motoInput = document.getElementById('motoInput');
+            const valorInput = document.getElementById('valorInput');
+            const registrarBtn = document.getElementById('registrarBtn');
+            const btnManha = document.getElementById('btnManha');
+            const btnNoite = document.getElementById('btnNoite');
+            
+            // Payment buttons
+            document.querySelectorAll('.payment-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.payment-btn').forEach(b => b.classList.remove('selected'));
+                    btn.classList.add('selected');
+                    pagamentoSelecionado = btn.dataset.payment;
+                });
+            });
+            document.querySelector('.payment-btn.online').classList.add('selected');
+            
+            pedidoInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    motoInput.focus();
+                }
+            });
+            
+            motoInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    valorInput.focus();
+                }
+            });
+            
+            valorInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    registrarEntrega();
+                }
+            });
+            
+            registrarBtn.addEventListener('click', registrarEntrega);
+            btnManha.addEventListener('click', () => trocarTurno('manha'));
+            btnNoite.addEventListener('click', () => trocarTurno('noite'));
+            
+            document.addEventListener('keydown', (e) => {
+                if (e.ctrlKey && e.key === 'm') {
+                    e.preventDefault();
+                    trocarTurno(turnoAtual === 'manha' ? 'noite' : 'manha');
+                }
+                if (e.key === 'Escape') {
+                    fecharRelatorio();
+                }
+            });
+            
+            pedidoInput.focus();
+        });
+        
+        window.abrirRelatorio = abrirRelatorio;
+        window.excluirPedido = excluirPedido;
+        window.fecharRelatorio = fecharRelatorio;
+    </script>
+</body>
+</html>
