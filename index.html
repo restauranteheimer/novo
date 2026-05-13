@@ -686,6 +686,12 @@
             font-weight: 600;
             cursor: pointer;
         }
+
+        /* Estilo para campo de valor com máscara */
+        .money-input {
+            text-align: right;
+            font-weight: 500;
+        }
     </style>
 </head>
 <body>
@@ -731,12 +737,12 @@
                 <div class="balance-label">saldo disponível</div>
                 <div class="main-balance" id="mainBalance">R$ 0,00</div>
                 <div class="balance-stats">
-                    <div class="stat"><div class="stat-label">receitas do mês</div><div class="stat-value stat-income" id="monthIncome">R$ 0</div></div>
-                    <div class="stat"><div class="stat-label">despesas do mês</div><div class="stat-value stat-expense" id="monthExpense">R$ 0</div></div>
+                    <div class="stat"><div class="stat-label">receitas do mês</div><div class="stat-value stat-income" id="monthIncome">R$ 0,00</div></div>
+                    <div class="stat"><div class="stat-label">despesas do mês</div><div class="stat-value stat-expense" id="monthExpense">R$ 0,00</div></div>
                 </div>
                 <div class="balance-stats">
-                    <div class="stat"><div class="stat-label">receitas da semana</div><div class="stat-value stat-income" id="weekIncome">R$ 0</div></div>
-                    <div class="stat"><div class="stat-label">despesas da semana</div><div class="stat-value stat-expense" id="weekExpense">R$ 0</div></div>
+                    <div class="stat"><div class="stat-label">receitas da semana</div><div class="stat-value stat-income" id="weekIncome">R$ 0,00</div></div>
+                    <div class="stat"><div class="stat-label">despesas da semana</div><div class="stat-value stat-expense" id="weekExpense">R$ 0,00</div></div>
                 </div>
             </div>
 
@@ -759,9 +765,9 @@
 
         <div class="right-column">
             <div class="week-summary">
-                <div class="summary-item"><div class="summary-label">🔴 Despesas</div><div class="summary-value" id="totalExpense">R$ 0</div></div>
-                <div class="summary-item"><div class="summary-label">🟢 Receitas</div><div class="summary-value" id="totalIncome">R$ 0</div></div>
-                <div class="summary-item"><div class="summary-label">💰 Saldo</div><div class="summary-value" id="totalBalance">R$ 0</div></div>
+                <div class="summary-item"><div class="summary-label">🔴 Despesas</div><div class="summary-value" id="totalExpense">R$ 0,00</div></div>
+                <div class="summary-item"><div class="summary-label">🟢 Receitas</div><div class="summary-value" id="totalIncome">R$ 0,00</div></div>
+                <div class="summary-item"><div class="summary-label">💰 Saldo</div><div class="summary-value" id="totalBalance">R$ 0,00</div></div>
             </div>
 
             <button class="desktop-fab" id="desktopFabBtn">➕ Nova transação</button>
@@ -810,7 +816,7 @@
             <form id="financialForm">
                 <div class="form-group"><label>Tipo</label><select id="type"><option value="expense">🔴 Despesa</option><option value="income">🟢 Receita</option></select></div>
                 <div class="form-group"><label>Descrição</label><input type="text" id="description" list="descSuggestions" required placeholder="Ex: Almoço, Salário"><datalist id="descSuggestions"></datalist></div>
-                <div class="form-group"><label>Valor (R$)</label><input type="number" id="amount" step="0.01" required placeholder="0,00"></div>
+                <div class="form-group"><label>Valor (R$)</label><input type="text" id="amount" class="money-input" required placeholder="1.500,50"></div>
                 <div class="form-group"><label>Status</label><select id="status"><option value="pending">⏳ Pendente</option><option value="paid">✅ Pago/Recebido</option></select></div>
                 <div class="form-buttons"><button type="button" class="btn-cancel" id="cancelModalBtn">Cancelar</button><button type="submit" class="btn-save">Salvar</button></div>
             </form>
@@ -919,13 +925,72 @@
     <div class="modal-content">
         <div class="modal-header"><h3>Definir meta mensal</h3><button class="close-modal" id="closeMetaModalBtn">Fechar</button></div>
         <div style="padding:20px;">
-            <input type="number" id="metaAmountInput" placeholder="Valor da meta (R$)" style="width:100%; margin-bottom:16px;">
+            <input type="text" id="metaAmountInput" class="money-input" placeholder="1.500,00" style="width:100%; margin-bottom:16px;">
             <button id="saveMetaBtn" class="btn-save">Salvar meta</button>
         </div>
     </div>
 </div>
 
 <script>
+    // ==================== FUNÇÕES DE FORMATAÇÃO BRASILEIRA ====================
+    // Converte string no formato brasileiro (1.500,50) para número (1500.50)
+    function parseBrazilianMoney(value) {
+        if (!value) return 0;
+        // Remove tudo exceto dígitos, vírgula e ponto
+        let cleaned = value.toString().trim();
+        // Se já for número, retorna
+        if (typeof cleaned === 'number') return cleaned;
+        // Remove R$ se existir
+        cleaned = cleaned.replace(/R\$?\s*/g, '');
+        // Remove pontos de milhar (mantém apenas o último ponto como separador decimal? Não, vírgula é decimal)
+        // Estratégia: remove todos os pontos (separador de milhar) e troca vírgula por ponto
+        cleaned = cleaned.replace(/\./g, ''); // remove pontos de milhar
+        cleaned = cleaned.replace(/,/g, '.'); // vírgula vira ponto decimal
+        let number = parseFloat(cleaned);
+        return isNaN(number) ? 0 : number;
+    }
+    
+    // Formata número para moeda brasileira (R$ 1.500,50)
+    function formatBrazilianMoney(value) {
+        if (value === undefined || value === null) value = 0;
+        let num = typeof value === 'number' ? value : parseBrazilianMoney(value);
+        return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(num);
+    }
+    
+    // Formata apenas o número sem símbolo (1.500,50)
+    function formatBrazilianNumber(value) {
+        if (value === undefined || value === null) value = 0;
+        let num = typeof value === 'number' ? value : parseBrazilianMoney(value);
+        return new Intl.NumberFormat('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(num);
+    }
+    
+    // Aplica máscara de dinheiro no input (enquanto digita)
+    function setupMoneyMask(inputElement) {
+        if (!inputElement) return;
+        inputElement.addEventListener('input', function(e) {
+            let value = this.value;
+            // Remove tudo que não for dígito ou vírgula
+            let cleaned = value.replace(/[^\d,]/g, '');
+            // Separa parte inteira e decimal
+            let parts = cleaned.split(',');
+            if (parts.length > 2) parts = [parts[0], parts.slice(1).join('')];
+            let integerPart = parts[0].replace(/^0+/, '') || '0';
+            let decimalPart = parts[1] ? parts[1].substring(0, 2) : '';
+            if (decimalPart.length === 1) decimalPart += '0';
+            if (decimalPart === '') decimalPart = '00';
+            // Formata parte inteira com pontos a cada 3 dígitos
+            integerPart = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+            this.value = integerPart + ',' + decimalPart;
+        });
+        inputElement.addEventListener('blur', function() {
+            if (!this.value || this.value === '0,00') {
+                this.value = '0,00';
+            }
+        });
+        // Inicializa com 0,00 se vazio
+        if (!inputElement.value) inputElement.value = '0,00';
+    }
+    
     // ==================== CONFIGURAÇÃO FIREBASE ====================
     const firebaseConfig = {
         apiKey: "AIzaSyAE6OgotOg-Y36IGAqUScMvo_LymmTNdK4",
@@ -950,7 +1015,6 @@
     let map = null, currentMarker = null, selectedAddress = "";
     let lastSavedTransaction = null;
     let currentDayModalDate = null;
-    let shouldReopenDayModal = false; // Para controlar se deve reabrir o modal do dia após editar
 
     // ==================== FUNÇÕES AUXILIARES ====================
     function showLoading() { document.getElementById('loadingOverlay').style.display = 'flex'; }
@@ -1001,23 +1065,35 @@
             let freq = new Map();
             matches.forEach(m => freq.set(m.amount, (freq.get(m.amount)||0)+1));
             let most = [...freq.entries()].sort((a,b)=>b[1]-a[1])[0][0];
-            document.getElementById('amount').value = most;
+            document.getElementById('amount').value = formatBrazilianNumber(most);
         }
     }
 
     // ==================== META ====================
     function updateMetaUI() {
         let meta = userSettings.meta || 0;
-        document.getElementById('metaValueDisplay').innerHTML = `R$ ${meta.toFixed(2)}`;
+        document.getElementById('metaValueDisplay').innerHTML = formatBrazilianMoney(meta);
         if(meta === 0) { document.getElementById('progressBar').style.width = '0%'; document.getElementById('metaStatus').innerHTML = 'Defina uma meta'; return; }
         let gastos = getMonthStats().expense;
         let percent = Math.min(100, (gastos/meta)*100);
         document.getElementById('progressBar').style.width = `${percent}%`;
         document.getElementById('metaStatus').innerHTML = percent >= 100 ? '⚠️ Meta estourada' : `${percent.toFixed(0)}% da meta`;
     }
-    function editMeta() { document.getElementById('metaModal').style.display = 'flex'; document.getElementById('metaAmountInput').value = userSettings.meta; }
+    function editMeta() { 
+        document.getElementById('metaModal').style.display = 'flex'; 
+        document.getElementById('metaAmountInput').value = formatBrazilianNumber(userSettings.meta);
+    }
     function closeMetaModal() { document.getElementById('metaModal').style.display = 'none'; }
-    function saveMeta() { let v = parseFloat(document.getElementById('metaAmountInput').value); if(!isNaN(v) && v>=0) { userSettings.meta = v; if(currentUser) saveToCloud(); updateMetaUI(); closeMetaModal(); updatePredictionCard(); } }
+    function saveMeta() { 
+        let v = parseBrazilianMoney(document.getElementById('metaAmountInput').value); 
+        if(!isNaN(v) && v>=0) { 
+            userSettings.meta = v; 
+            if(currentUser) saveToCloud(); 
+            updateMetaUI(); 
+            closeMetaModal(); 
+            updatePredictionCard(); 
+        } 
+    }
 
     // ==================== DADOS FINANCEIROS ====================
     function getFinancialItemsForDate(d) { let key = formatDateKey(d); return items.filter(i => i.date === key && (i.type === 'income' || i.type === 'expense')); }
@@ -1025,14 +1101,25 @@
     function getDaySummary(d) { let inc=0, exp=0; getFinancialItemsForDate(d).forEach(i => { if(i.type === 'income') inc += i.amount; else exp += i.amount; }); return { balance: inc-exp, income: inc, expense: exp }; }
     function getWeekBalance(date) { let inc=0, exp=0, start=new Date(date); start.setDate(date.getDate()-date.getDay()); for(let i=0;i<7;i++){ let d=new Date(start); d.setDate(start.getDate()+i); getFinancialItemsForDate(d).forEach(i=>{ if(i.type==='income') inc+=i.amount; else exp+=i.amount; }); } return { balance: inc-exp, income: inc, expense: exp }; }
     function getMonthStats() { let inc=0, exp=0, today=new Date(); for(let d=1;d<=31;d++){ let date=new Date(today.getFullYear(),today.getMonth(),d); if(date.getMonth()!==today.getMonth()) break; getFinancialItemsForDate(date).forEach(i=>{ if(i.type==='income') inc+=i.amount; else exp+=i.amount; }); } return { income: inc, expense: exp, balance: inc-exp }; }
-    function updateBalances() { let week=getWeekBalance(new Date()), month=getMonthStats(); document.getElementById('mainBalance').innerHTML = `R$ ${month.balance.toFixed(2)}`; document.getElementById('monthIncome').innerHTML = `R$ ${month.income.toFixed(2)}`; document.getElementById('monthExpense').innerHTML = `R$ ${month.expense.toFixed(2)}`; document.getElementById('weekIncome').innerHTML = `R$ ${week.income.toFixed(2)}`; document.getElementById('weekExpense').innerHTML = `R$ ${week.expense.toFixed(2)}`; document.getElementById('totalExpense').innerHTML = `R$ ${week.expense.toFixed(2)}`; document.getElementById('totalIncome').innerHTML = `R$ ${week.income.toFixed(2)}`; document.getElementById('totalBalance').innerHTML = `R$ ${week.balance.toFixed(2)}`; updateMetaUI(); }
+    function updateBalances() { 
+        let week=getWeekBalance(new Date()), month=getMonthStats(); 
+        document.getElementById('mainBalance').innerHTML = formatBrazilianMoney(month.balance); 
+        document.getElementById('monthIncome').innerHTML = formatBrazilianMoney(month.income); 
+        document.getElementById('monthExpense').innerHTML = formatBrazilianMoney(month.expense); 
+        document.getElementById('weekIncome').innerHTML = formatBrazilianMoney(week.income); 
+        document.getElementById('weekExpense').innerHTML = formatBrazilianMoney(week.expense); 
+        document.getElementById('totalExpense').innerHTML = formatBrazilianMoney(week.expense); 
+        document.getElementById('totalIncome').innerHTML = formatBrazilianMoney(week.income); 
+        document.getElementById('totalBalance').innerHTML = formatBrazilianMoney(week.balance); 
+        updateMetaUI(); 
+    }
 
     // ==================== CALENDÁRIOS ====================
     function renderWeekCalendar() {
         let today = new Date(), start = new Date(today); start.setDate(today.getDate()-today.getDay());
         let weekDays = ['DOM','SEG','TER','QUA','QUI','SEX','SÁB'];
         let container = document.getElementById('weekDaysContainer'); container.innerHTML = '';
-        for(let i=0;i<7;i++){ let d = new Date(start); d.setDate(start.getDate()+i); let sum = getDaySummary(d); let isToday = d.toDateString() === today.toDateString(); let chip = document.createElement('div'); chip.className = `day-chip ${isToday ? 'today' : ''}`; chip.onclick = () => showDayModal(d); chip.innerHTML = `<div class="day-name">${weekDays[i]}</div><div class="day-number">${d.getDate()}</div><div class="day-amount ${sum.balance>=0?'amount-positive':'amount-negative'}">${sum.balance>=0?'+':'-'}R$ ${Math.abs(sum.balance).toFixed(2)}</div>`; container.appendChild(chip); }
+        for(let i=0;i<7;i++){ let d = new Date(start); d.setDate(start.getDate()+i); let sum = getDaySummary(d); let isToday = d.toDateString() === today.toDateString(); let chip = document.createElement('div'); chip.className = `day-chip ${isToday ? 'today' : ''}`; chip.onclick = () => showDayModal(d); chip.innerHTML = `<div class="day-name">${weekDays[i]}</div><div class="day-number">${d.getDate()}</div><div class="day-amount ${sum.balance>=0?'amount-positive':'amount-negative'}">${sum.balance>=0?'+':'-'} ${formatBrazilianNumber(Math.abs(sum.balance))}</div>`; container.appendChild(chip); }
         document.getElementById('currentMonthLabel').innerHTML = today.toLocaleDateString('pt-BR',{month:'short',year:'numeric'});
     }
     function renderMonthCalendar() {
@@ -1043,11 +1130,11 @@
         let grid = document.getElementById('monthGrid'); grid.innerHTML = '';
         ['D','S','T','Q','Q','S','S'].forEach(day => { let h = document.createElement('div'); h.className = 'weekday-header'; h.textContent = day; grid.appendChild(h); });
         for(let i=0;i<startDay;i++){ let e = document.createElement('div'); e.className = 'month-day'; e.style.background = 'transparent'; e.style.cursor = 'default'; grid.appendChild(e); }
-        for(let day=1;day<=totalDays;day++){ let d = new Date(year,month,day); let dayItems = getItemsForDate(d); let inc=0, exp=0, allPaid=true; dayItems.forEach(i=>{ if(i.type==='income') inc+=i.amount; if(i.type==='expense') exp+=i.amount; if(i.status !== 'paid') allPaid=false; }); let isToday = d.toDateString() === today.toDateString(); let indicatorClass = ''; if(inc>0 && exp>0) indicatorClass = 'has-both'; else if(inc>0) indicatorClass = 'has-income'; else if(exp>0) indicatorClass = 'has-expense'; let hasApp = dayItems.some(i=>i.type==='appointment'); let hasNote = dayItems.some(i=>i.type==='note'); if(hasApp) indicatorClass += ' has-appointment'; if(hasNote) indicatorClass += ' has-note'; let dayDiv = document.createElement('div'); dayDiv.className = `month-day ${isToday?'today':''} ${indicatorClass}`; let indicators = ''; if(inc>0) indicators += `<span class="indicator-up ${allPaid?'paid':''}">↑${inc.toFixed(0)}</span>`; if(exp>0) indicators += `<span class="indicator-down ${allPaid?'paid':''}">↓${exp.toFixed(0)}</span>`; if(hasApp) indicators += `📅`; if(hasNote) indicators += `📝`; dayDiv.innerHTML = `<div class="day-number">${day}</div>${indicators?`<div class="day-indicators">${indicators}</div>`:''}`; dayDiv.onclick = () => showDayModal(d); grid.appendChild(dayDiv); }
+        for(let day=1;day<=totalDays;day++){ let d = new Date(year,month,day); let dayItems = getItemsForDate(d); let inc=0, exp=0, allPaid=true; dayItems.forEach(i=>{ if(i.type==='income') inc+=i.amount; if(i.type==='expense') exp+=i.amount; if(i.status !== 'paid') allPaid=false; }); let isToday = d.toDateString() === today.toDateString(); let indicatorClass = ''; if(inc>0 && exp>0) indicatorClass = 'has-both'; else if(inc>0) indicatorClass = 'has-income'; else if(exp>0) indicatorClass = 'has-expense'; let hasApp = dayItems.some(i=>i.type==='appointment'); let hasNote = dayItems.some(i=>i.type==='note'); if(hasApp) indicatorClass += ' has-appointment'; if(hasNote) indicatorClass += ' has-note'; let dayDiv = document.createElement('div'); dayDiv.className = `month-day ${isToday?'today':''} ${indicatorClass}`; let indicators = ''; if(inc>0) indicators += `<span class="indicator-up ${allPaid?'paid':''}">↑${formatBrazilianNumber(inc)}</span>`; if(exp>0) indicators += `<span class="indicator-down ${allPaid?'paid':''}">↓${formatBrazilianNumber(exp)}</span>`; if(hasApp) indicators += `📅`; if(hasNote) indicators += `📝`; dayDiv.innerHTML = `<div class="day-number">${day}</div>${indicators?`<div class="day-indicators">${indicators}</div>`:''}`; dayDiv.onclick = () => showDayModal(d); grid.appendChild(dayDiv); }
     }
     function refreshAllUI() { renderWeekCalendar(); renderMonthCalendar(); updateBalances(); updateDescriptionDatalist(); updatePredictionCard(); }
 
-    // ==================== MODAL DO DIA COM EDIÇÃO CORRIGIDA ====================
+    // ==================== MODAL DO DIA ====================
     function showDayModal(date) {
         currentDayModalDate = date;
         document.getElementById('dayModalTitle').innerHTML = formatDateDisplay(date);
@@ -1082,7 +1169,7 @@
                 let detailSpan = document.createElement('div');
                 detailSpan.className = 'day-modal-detail';
                 let detailText = '';
-                if(item.amount) detailText += `💰 R$ ${item.amount.toFixed(2)} `;
+                if(item.amount) detailText += `💰 ${formatBrazilianMoney(item.amount)} `;
                 if(item.time) detailText += `🕒 ${item.time} `;
                 if(item.location) detailText += `📍 ${item.location}`;
                 if(item.content) detailText += `📝 ${item.content.substring(0, 50)}`;
@@ -1101,9 +1188,7 @@
                 editBtn.title = 'Editar item';
                 editBtn.onclick = (e) => {
                     e.stopPropagation();
-                    // FECHA O MODAL DO DIA PRIMEIRO
                     closeDayModal();
-                    // Depois abre a edição
                     editItemByGlobalIndex(globalIndex);
                 };
                 
@@ -1133,7 +1218,6 @@
         document.getElementById('dayModal').style.display = 'flex';
     }
     
-    // Função para editar um item pelo índice global
     function editItemByGlobalIndex(globalIndex) {
         let item = items[globalIndex];
         if(!item) return;
@@ -1146,7 +1230,7 @@
             openModalWithDate(editDate, 'financial');
             document.getElementById('type').value = item.type;
             document.getElementById('description').value = item.title;
-            document.getElementById('amount').value = item.amount;
+            document.getElementById('amount').value = formatBrazilianNumber(item.amount);
             document.getElementById('status').value = item.status || 'pending';
             document.getElementById('modalTitle').innerHTML = 'Editar transação';
         } else if(item.type === 'appointment') {
@@ -1169,7 +1253,7 @@
     function openNewTransactionFromModal() { 
         if(currentDayModalDate) {
             let dateToUse = currentDayModalDate;
-            closeDayModal(); // Fecha o modal do dia antes de abrir nova transação
+            closeDayModal();
             openNewTransaction(dateToUse);
         } else {
             openNewTransaction(new Date());
@@ -1222,13 +1306,13 @@
         let raw = phoneNumber.toString().replace(/\D/g, '');
         if (!raw.startsWith('55')) raw = '55' + raw;
         const tipo = transaction.type === 'expense' ? '🔴 DESPESA' : '🟢 RECEITA';
-        const msg = `💰 *${tipo}*\n📝 ${transaction.title}\n💵 R$ ${transaction.amount.toFixed(2)}\n📅 Data: ${transaction.date}\n⏳ Status: ${transaction.status === 'paid' ? 'Pago/Recebido' : 'Pendente'}`;
+        const msg = `💰 *${tipo}*\n📝 ${transaction.title}\n💵 ${formatBrazilianMoney(transaction.amount)}\n📅 Data: ${transaction.date}\n⏳ Status: ${transaction.status === 'paid' ? 'Pago/Recebido' : 'Pendente'}`;
         window.open(`https://wa.me/${raw}?text=${encodeURIComponent(msg)}`, '_blank');
     }
     function openWhatsAppModal(transaction) {
         lastSavedTransaction = transaction;
         const preview = document.getElementById('whatsappMessagePreview');
-        if(preview) preview.innerHTML = `<strong>📄 Transação:</strong> ${transaction.type === 'expense' ? '🔴 Despesa' : '🟢 Receita'}<br>${transaction.title}<br>R$ ${transaction.amount.toFixed(2)}<br>${transaction.date}`;
+        if(preview) preview.innerHTML = `<strong>📄 Transação:</strong> ${transaction.type === 'expense' ? '🔴 Despesa' : '🟢 Receita'}<br>${transaction.title}<br>${formatBrazilianMoney(transaction.amount)}<br>${transaction.date}`;
         document.getElementById('contactSelect').value = '';
         document.getElementById('dddInput').value = '81';
         document.getElementById('phoneNumberInput').value = '';
@@ -1302,11 +1386,13 @@
         e.preventDefault();
         let dateInput = document.getElementById('transactionDate');
         let selectedDate = parseLocalDate(dateInput.value);
+        let amountValue = parseBrazilianMoney(document.getElementById('amount').value);
+        
         let newTransaction = {
             id: editingItemId || Date.now(),
             type: document.getElementById('type').value,
             title: document.getElementById('description').value,
-            amount: parseFloat(document.getElementById('amount').value),
+            amount: amountValue,
             status: document.getElementById('status').value,
             date: formatDateKey(selectedDate)
         };
@@ -1328,9 +1414,8 @@
             items.push(newTransaction);
         }
         saveData();
-        closeModal(); // Fecha o modal de edição
+        closeModal();
         
-        // Reabre o modal do dia se estava em alguma data
         if(currentDayModalDate) {
             setTimeout(() => {
                 showDayModal(currentDayModalDate);
@@ -1348,6 +1433,7 @@
         if(presetType) document.getElementById('type').value = presetType;
         document.getElementById('modalTitle').innerHTML = 'Nova transação';
         document.getElementById('description').oninput = function() { suggestAmountByDescription(this.value); };
+        document.getElementById('amount').value = '0,00';
     }
     
     function openModalWithDate(date, tab) {
@@ -1367,11 +1453,11 @@
     function saveData() { refreshAllUI(); if(currentUser) saveToCloud(); }
 
     // ==================== RELATÓRIOS E INSIGHTS ====================
-    function openFullReport() { let week = getWeekBalance(new Date()), month = getMonthStats(); let total=0, rec=0, desp=0; items.filter(i=>i.type==='income'||i.type==='expense').forEach(i=>{ if(i.type==='income'){ total+=i.amount; rec++; } else { total-=i.amount; desp++; } }); let html = `<div><strong>📊 RESUMO COMPLETO</strong><br><div style="background:var(--primary-soft);padding:12px;border-radius:16px;margin-bottom:16px">💰 SALDO TOTAL: ${total>=0?'+':'-'} R$ ${Math.abs(total).toFixed(2)}</div><div>🟢 Receitas mês: R$ ${month.income.toFixed(2)} (${rec} transações)</div><div>🔴 Despesas mês: R$ ${month.expense.toFixed(2)} (${desp} transações)</div><div>📆 Semana: Saldo ${week.balance>=0?'+':'-'} R$ ${Math.abs(week.balance).toFixed(2)}</div></div>`; document.getElementById('reportModalContent').innerHTML = html; document.getElementById('reportModal').style.display = 'flex'; }
-    function generateWeeklyReport() { let week = getWeekBalance(new Date()); document.getElementById('reportModalContent').innerHTML = `<strong>📊 RELATÓRIO DA SEMANA</strong><br>Receitas: R$ ${week.income.toFixed(2)}<br>Despesas: R$ ${week.expense.toFixed(2)}<br>Saldo: ${week.balance>=0?'+':'-'} R$ ${Math.abs(week.balance).toFixed(2)}`; document.getElementById('reportModal').style.display = 'flex'; }
-    function generateMonthlyReport() { let month = getMonthStats(); document.getElementById('reportModalContent').innerHTML = `<strong>📅 RELATÓRIO DO MÊS</strong><br>Receitas: R$ ${month.income.toFixed(2)}<br>Despesas: R$ ${month.expense.toFixed(2)}<br>Saldo: ${month.balance>=0?'+':'-'} R$ ${Math.abs(month.balance).toFixed(2)}`; document.getElementById('reportModal').style.display = 'flex'; }
+    function openFullReport() { let week = getWeekBalance(new Date()), month = getMonthStats(); let total=0, rec=0, desp=0; items.filter(i=>i.type==='income'||i.type==='expense').forEach(i=>{ if(i.type==='income'){ total+=i.amount; rec++; } else { total-=i.amount; desp++; } }); let html = `<div><strong>📊 RESUMO COMPLETO</strong><br><div style="background:var(--primary-soft);padding:12px;border-radius:16px;margin-bottom:16px">💰 SALDO TOTAL: ${total>=0?'+':'-'} ${formatBrazilianMoney(Math.abs(total))}</div><div>🟢 Receitas mês: ${formatBrazilianMoney(month.income)} (${rec} transações)</div><div>🔴 Despesas mês: ${formatBrazilianMoney(month.expense)} (${desp} transações)</div><div>📆 Semana: Saldo ${week.balance>=0?'+':'-'} ${formatBrazilianMoney(Math.abs(week.balance))}</div></div>`; document.getElementById('reportModalContent').innerHTML = html; document.getElementById('reportModal').style.display = 'flex'; }
+    function generateWeeklyReport() { let week = getWeekBalance(new Date()); document.getElementById('reportModalContent').innerHTML = `<strong>📊 RELATÓRIO DA SEMANA</strong><br>Receitas: ${formatBrazilianMoney(week.income)}<br>Despesas: ${formatBrazilianMoney(week.expense)}<br>Saldo: ${week.balance>=0?'+':'-'} ${formatBrazilianMoney(Math.abs(week.balance))}`; document.getElementById('reportModal').style.display = 'flex'; }
+    function generateMonthlyReport() { let month = getMonthStats(); document.getElementById('reportModalContent').innerHTML = `<strong>📅 RELATÓRIO DO MÊS</strong><br>Receitas: ${formatBrazilianMoney(month.income)}<br>Despesas: ${formatBrazilianMoney(month.expense)}<br>Saldo: ${month.balance>=0?'+':'-'} ${formatBrazilianMoney(Math.abs(month.balance))}`; document.getElementById('reportModal').style.display = 'flex'; }
     function closeReportModal() { document.getElementById('reportModal').style.display = 'none'; }
-    function showInsightsModal() { let monthStats = getMonthStats(); let pending = items.filter(i=>(i.type==='income'||i.type==='expense')&&i.status==='pending').length; let html = `<div class="insight-item">💰 Saldo do mês: ${monthStats.balance>=0?'positivo':'negativo'} (R$ ${Math.abs(monthStats.balance).toFixed(2)})</div><div class="insight-item">${pending>0?`⏳ ${pending} transação(ões) pendente(s)`:'✅ Todas as transações estão em dia'}</div>`; document.getElementById('insightsModalContent').innerHTML = html; document.getElementById('insightsModal').style.display = 'flex'; }
+    function showInsightsModal() { let monthStats = getMonthStats(); let pending = items.filter(i=>(i.type==='income'||i.type==='expense')&&i.status==='pending').length; let html = `<div class="insight-item">💰 Saldo do mês: ${monthStats.balance>=0?'positivo':'negativo'} (${formatBrazilianMoney(Math.abs(monthStats.balance))})</div><div class="insight-item">${pending>0?`⏳ ${pending} transação(ões) pendente(s)`:'✅ Todas as transações estão em dia'}</div>`; document.getElementById('insightsModalContent').innerHTML = html; document.getElementById('insightsModal').style.display = 'flex'; }
     function closeInsightsModal() { document.getElementById('insightsModal').style.display = 'none'; }
     function prevMonth() { currentMonth.setMonth(currentMonth.getMonth()-1); renderMonthCalendar(); }
     function nextMonth() { currentMonth.setMonth(currentMonth.getMonth()+1); renderMonthCalendar(); }
@@ -1431,15 +1517,15 @@
                 dailyPredictions.push(predicted);
                 totalPredicted += predicted;
             }
-            return { prediction: totalPredicted, dailyBreakdown: dailyPredictions, baselineAvg: baseline, message: `Projeção para 7 dias: R$ ${totalPredicted.toFixed(2)}` };
+            return { prediction: totalPredicted, dailyBreakdown: dailyPredictions, baselineAvg: baseline, message: `Projeção para 7 dias: ${formatBrazilianMoney(totalPredicted)}` };
         }
         getAlert() {
             const pred = this.predictNext7Days();
             if (!pred.prediction) return null;
             const weeklyBudget = this.dailyBudget * 7;
             const percent = (pred.prediction / weeklyBudget) * 100;
-            if (percent >= 80) return { level: percent >= 100 ? 'critical' : 'warning', message: `⚠️ Previsão de gastos (R$ ${pred.prediction.toFixed(2)}) ocupa ${percent.toFixed(0)}% do orçamento semanal (R$ ${weeklyBudget.toFixed(2)}).`, suggestion: `Sugerimos reduzir despesas não essenciais.` };
-            return { level: 'ok', message: `✅ Dentro do esperado. Previsão: R$ ${pred.prediction.toFixed(2)}` };
+            if (percent >= 80) return { level: percent >= 100 ? 'critical' : 'warning', message: `⚠️ Previsão de gastos (${formatBrazilianMoney(pred.prediction)}) ocupa ${percent.toFixed(0)}% do orçamento semanal (${formatBrazilianMoney(weeklyBudget)}).`, suggestion: `Sugerimos reduzir despesas não essenciais.` };
+            return { level: 'ok', message: `✅ Dentro do esperado. Previsão: ${formatBrazilianMoney(pred.prediction)}` };
         }
         suggestDailyLimit() {
             const last30 = this.getExpensesLastDays(30);
@@ -1465,9 +1551,9 @@
             const today = new Date();
             for (let i = 0; i < 7; i++) {
                 const d = new Date(today); d.setDate(today.getDate() + i + 1);
-                html += `<div class="prediction-day-item"><strong>${d.toLocaleDateString('pt-BR', {weekday:'short'})}</strong><br>R$ ${predResult.dailyBreakdown[i].toFixed(2)}</div>`;
+                html += `<div class="prediction-day-item"><strong>${d.toLocaleDateString('pt-BR', {weekday:'short'})}</strong><br>${formatBrazilianMoney(predResult.dailyBreakdown[i])}</div>`;
             }
-            html += `</div><div style="margin-top:8px; font-size:0.7rem;">🎯 Orçamento semanal: R$ ${(predictor.dailyBudget * 7).toFixed(2)}</div>`;
+            html += `</div><div style="margin-top:8px; font-size:0.7rem;">🎯 Orçamento semanal: ${formatBrazilianMoney(predictor.dailyBudget * 7)}</div>`;
         }
         container.innerHTML = html;
         const applyBtn = document.getElementById('applyAiSuggestionBtn');
@@ -1475,7 +1561,7 @@
         if (applyBtn) {
             applyBtn.onclick = () => {
                 const newMeta = suggestedLimit * 30;
-                if (confirm(`Aplicar sugestão de economia: limite diário de R$ ${suggestedLimit.toFixed(2)} (meta mensal R$ ${newMeta.toFixed(2)})?`)) {
+                if (confirm(`Aplicar sugestão de economia: limite diário de ${formatBrazilianMoney(suggestedLimit)} (meta mensal ${formatBrazilianMoney(newMeta)})?`)) {
                     userSettings.meta = newMeta;
                     if (currentUser) saveToCloud();
                     updateMetaUI();
@@ -1567,6 +1653,10 @@
         else { currentUser = null; items = []; userSettings = { meta:0, contacts:[] }; document.getElementById('authSection').style.display = 'flex'; document.getElementById('userInfo').style.display = 'none'; document.body.classList.remove('logged-in'); document.getElementById('signupGuide').style.display = 'flex'; refreshAllUI(); }
     });
     refreshAllUI();
+    
+    // Configurar máscaras de dinheiro nos inputs
+    setupMoneyMask(document.getElementById('amount'));
+    setupMoneyMask(document.getElementById('metaAmountInput'));
 </script>
 </body>
 </html>
