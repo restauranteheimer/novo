@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
-    <title>DDinheiro em Dia - IA e Gestos</title>
+    <title>Dinheiro em Dia - IA e Gestos</title>
     <!-- Bibliotecas -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
@@ -594,7 +594,6 @@
             margin-left: 8px;
         }
 
-        /* Estilo para itens pagos/riscados */
         .day-modal-title {
             font-weight: 500;
         }
@@ -840,7 +839,7 @@
     </div>
 </div>
 
-<!-- Modal de Detalhe do Dia (COM BOTÃO EDITAR) -->
+<!-- Modal de Detalhe do Dia -->
 <div id="dayModal" class="modal">
     <div class="modal-content">
         <div class="modal-header"><h3 id="dayModalTitle">Detalhes do dia</h3><button class="close-modal" id="closeDayModalBtn">Fechar</button></div>
@@ -951,6 +950,7 @@
     let map = null, currentMarker = null, selectedAddress = "";
     let lastSavedTransaction = null;
     let currentDayModalDate = null;
+    let shouldReopenDayModal = false; // Para controlar se deve reabrir o modal do dia após editar
 
     // ==================== FUNÇÕES AUXILIARES ====================
     function showLoading() { document.getElementById('loadingOverlay').style.display = 'flex'; }
@@ -1047,7 +1047,7 @@
     }
     function refreshAllUI() { renderWeekCalendar(); renderMonthCalendar(); updateBalances(); updateDescriptionDatalist(); updatePredictionCard(); }
 
-    // ==================== MODAL DO DIA COM BOTÃO EDITAR ====================
+    // ==================== MODAL DO DIA COM EDIÇÃO CORRIGIDA ====================
     function showDayModal(date) {
         currentDayModalDate = date;
         document.getElementById('dayModalTitle').innerHTML = formatDateDisplay(date);
@@ -1063,19 +1063,16 @@
                 let div = document.createElement('div'); 
                 div.className = 'day-modal-item';
                 
-                // Checkbox
                 let checkbox = document.createElement('input');
                 checkbox.type = 'checkbox';
                 checkbox.className = 'day-item-checkbox';
                 checkbox.dataset.globalIndex = globalIndex;
                 checkbox.style.marginRight = '8px';
                 
-                // Ícone
                 let iconSpan = document.createElement('div');
                 iconSpan.className = 'day-modal-icon';
                 iconSpan.innerText = icon;
                 
-                // Informações
                 let infoDiv = document.createElement('div');
                 infoDiv.className = 'day-modal-info';
                 let titleSpan = document.createElement('div');
@@ -1095,7 +1092,6 @@
                 infoDiv.appendChild(titleSpan);
                 infoDiv.appendChild(detailSpan);
                 
-                // Botões de ação (EDITAR e EXCLUIR)
                 let actionsDiv = document.createElement('div');
                 actionsDiv.className = 'day-modal-actions';
                 
@@ -1105,6 +1101,9 @@
                 editBtn.title = 'Editar item';
                 editBtn.onclick = (e) => {
                     e.stopPropagation();
+                    // FECHA O MODAL DO DIA PRIMEIRO
+                    closeDayModal();
+                    // Depois abre a edição
                     editItemByGlobalIndex(globalIndex);
                 };
                 
@@ -1162,8 +1161,21 @@
         }
     }
     
-    function closeDayModal() { document.getElementById('dayModal').style.display = 'none'; currentDayModalDate = null; }
-    function openNewTransactionFromModal() { if(currentDayModalDate) openNewTransaction(currentDayModalDate); closeDayModal(); }
+    function closeDayModal() { 
+        document.getElementById('dayModal').style.display = 'none'; 
+        currentDayModalDate = null; 
+    }
+    
+    function openNewTransactionFromModal() { 
+        if(currentDayModalDate) {
+            let dateToUse = currentDayModalDate;
+            closeDayModal(); // Fecha o modal do dia antes de abrir nova transação
+            openNewTransaction(dateToUse);
+        } else {
+            openNewTransaction(new Date());
+        }
+    }
+    
     function deleteSelectedItems() {
         let checkboxes = document.querySelectorAll('#dayModalContent .day-item-checkbox:checked');
         if(checkboxes.length === 0) { alert('Nenhum item selecionado'); return; }
@@ -1174,6 +1186,7 @@
         saveData();
         if(currentDayModalDate) showDayModal(currentDayModalDate); else closeDayModal();
     }
+    
     function deleteAllData() {
         if(!confirm('⚠️ ATENÇÃO: isso apagará TODOS os dados (transações, compromissos, anotações). Digite "APAGAR" para confirmar.')) return;
         let confirmText = prompt('Digite APAGAR para confirmar a exclusão total:');
@@ -1301,7 +1314,6 @@
         if(editingItemId) { 
             let idx = items.findIndex(i => i.id === editingItemId); 
             if(idx !== -1) {
-                // Se a data mudou, precisamos remover o antigo e adicionar como novo
                 if(items[idx].date !== newTransaction.date) {
                     items.splice(idx, 1);
                     items.push(newTransaction);
@@ -1316,9 +1328,18 @@
             items.push(newTransaction);
         }
         saveData();
-        closeModal();
+        closeModal(); // Fecha o modal de edição
+        
+        // Reabre o modal do dia se estava em alguma data
+        if(currentDayModalDate) {
+            setTimeout(() => {
+                showDayModal(currentDayModalDate);
+            }, 100);
+        }
+        
         setTimeout(() => { if(confirm('Deseja enviar esta transação via WhatsApp?')) openWhatsAppModal(newTransaction); }, 100);
     }
+    
     function openNewTransaction(date, presetType = null) {
         editingItemId = null;
         let targetDate = date || new Date();
@@ -1328,6 +1349,7 @@
         document.getElementById('modalTitle').innerHTML = 'Nova transação';
         document.getElementById('description').oninput = function() { suggestAmountByDescription(this.value); };
     }
+    
     function openModalWithDate(date, tab) {
         document.getElementById('modalDateInfo').innerHTML = `<div class="date-selector"><span>📅 Data:</span><input type="date" id="transactionDate" value="${formatDateKey(date)}"></div>`;
         document.getElementById('modal').style.display = 'flex';
@@ -1336,7 +1358,12 @@
         document.querySelector(`.tab-btn[data-tab="${tab}"]`).classList.add('active');
         document.getElementById(`${tab}Tab`).classList.add('active');
     }
-    function closeModal() { document.getElementById('modal').style.display = 'none'; editingItemId = null; }
+    
+    function closeModal() { 
+        document.getElementById('modal').style.display = 'none'; 
+        editingItemId = null; 
+    }
+    
     function saveData() { refreshAllUI(); if(currentUser) saveToCloud(); }
 
     // ==================== RELATÓRIOS E INSIGHTS ====================
@@ -1502,8 +1529,8 @@
     document.getElementById('sendWhatsappBtn')?.addEventListener('click', sendFromModal);
     document.getElementById('closeWhatsappModalBtn')?.addEventListener('click', () => document.getElementById('whatsappModal').style.display = 'none');
     document.getElementById('financialForm')?.addEventListener('submit', handleFinancialSubmit);
-    document.getElementById('appointmentForm')?.addEventListener('submit', (e) => { e.preventDefault(); let date = parseLocalDate(document.getElementById('transactionDate').value); items.push({ id:Date.now(), type:'appointment', title:document.getElementById('appointmentTitle').value, time:document.getElementById('appointmentTime').value, location:document.getElementById('appointmentLocation').value, date:formatDateKey(date) }); saveData(); closeModal(); alert('Compromisso salvo'); });
-    document.getElementById('noteForm')?.addEventListener('submit', (e) => { e.preventDefault(); let date = parseLocalDate(document.getElementById('transactionDate').value); items.push({ id:Date.now(), type:'note', title:document.getElementById('noteTitle').value, content:document.getElementById('noteContent').value, date:formatDateKey(date) }); saveData(); closeModal(); alert('Anotação salva'); });
+    document.getElementById('appointmentForm')?.addEventListener('submit', (e) => { e.preventDefault(); let date = parseLocalDate(document.getElementById('transactionDate').value); items.push({ id:Date.now(), type:'appointment', title:document.getElementById('appointmentTitle').value, time:document.getElementById('appointmentTime').value, location:document.getElementById('appointmentLocation').value, date:formatDateKey(date) }); saveData(); closeModal(); alert('Compromisso salvo'); if(currentDayModalDate) setTimeout(() => showDayModal(currentDayModalDate), 100); });
+    document.getElementById('noteForm')?.addEventListener('submit', (e) => { e.preventDefault(); let date = parseLocalDate(document.getElementById('transactionDate').value); items.push({ id:Date.now(), type:'note', title:document.getElementById('noteTitle').value, content:document.getElementById('noteContent').value, date:formatDateKey(date) }); saveData(); closeModal(); alert('Anotação salva'); if(currentDayModalDate) setTimeout(() => showDayModal(currentDayModalDate), 100); });
     document.querySelectorAll('.tab-btn').forEach(btn => btn.addEventListener('click', function(){ document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active')); this.classList.add('active'); document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active')); document.getElementById(this.dataset.tab+'Tab').classList.add('active'); }));
     document.getElementById('closeModalBtn')?.addEventListener('click', closeModal);
     document.getElementById('cancelModalBtn')?.addEventListener('click', closeModal);
