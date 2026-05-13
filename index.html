@@ -19,7 +19,6 @@
             -webkit-tap-highlight-color: transparent;
         }
 
-        /* Tema claro (padrão) */
         :root {
             --primary: #8b5cf6;
             --primary-dark: #6d28d9;
@@ -34,7 +33,6 @@
             --danger: #ef4444;
         }
 
-        /* Tema escuro */
         body.dark-mode {
             --primary: #a78bfa;
             --primary-dark: #8b5cf6;
@@ -70,60 +68,22 @@
             padding: 0 0 80px 0;
         }
 
-        /* Layout adaptativo para telas muito pequenas (até 480px) */
         @media (max-width: 480px) {
-            .dashboard-grid {
-                padding-bottom: 70px;
-            }
-            .balance-card, .meta-card, .shortcuts, .week-scroll, .month-card, .week-summary, .contacts-card {
-                margin: 8px;
-                padding: 12px;
-                border-radius: 20px;
-            }
-            .main-balance {
-                font-size: 1.8rem;
-            }
-            .month-day {
-                font-size: 0.65rem;
-                min-height: 45px;
-                padding: 4px 2px;
-            }
-            .day-indicators {
-                font-size: 0.5rem;
-                gap: 2px;
-            }
-            .shortcut-item {
-                padding: 8px 4px;
-                font-size: 0.7rem;
-            }
-            .week-summary .summary-value {
-                font-size: 0.75rem;
-            }
-            .header {
-                padding: 12px 12px;
-            }
-            .logo h1 {
-                font-size: 1.2rem;
-            }
-            .contacts-card .contact-item {
-                flex-wrap: wrap;
-            }
-            .fab {
-                width: 50px;
-                height: 50px;
-                bottom: 15px;
-                right: 15px;
-                font-size: 22px;
-            }
+            .dashboard-grid { padding-bottom: 70px; }
+            .balance-card, .meta-card, .shortcuts, .week-scroll, .month-card, .week-summary, .contacts-card { margin: 8px; padding: 12px; border-radius: 20px; }
+            .main-balance { font-size: 1.8rem; }
+            .month-day { font-size: 0.65rem; min-height: 45px; padding: 4px 2px; }
+            .day-indicators { font-size: 0.5rem; gap: 2px; }
+            .shortcut-item { padding: 8px 4px; font-size: 0.7rem; }
+            .week-summary .summary-value { font-size: 0.75rem; }
+            .header { padding: 12px 12px; }
+            .logo h1 { font-size: 1.2rem; }
+            .contacts-card .contact-item { flex-wrap: wrap; }
+            .fab { width: 50px; height: 50px; bottom: 15px; right: 15px; font-size: 22px; }
         }
 
         @media (min-width: 901px) {
-            .dashboard-grid {
-                display: grid;
-                grid-template-columns: 1fr 380px;
-                gap: 20px;
-                padding: 20px;
-            }
+            .dashboard-grid { display: grid; grid-template-columns: 1fr 380px; gap: 20px; padding: 20px; }
             .fab { display: none; }
             .desktop-fab { display: block; }
         }
@@ -132,16 +92,13 @@
             .desktop-fab { display: none; }
         }
 
-        /* Header */
         .header {
             background: var(--primary);
             padding: 20px 20px 16px;
             color: white;
             transition: all 0.2s ease;
         }
-        body.logged-in .header {
-            padding: 10px 20px 8px;
-        }
+        body.logged-in .header { padding: 10px 20px 8px; }
         body.logged-in .logo h1 { font-size: 1.2rem; }
         body.logged-in .logo p { font-size: 0.6rem; }
 
@@ -155,7 +112,6 @@
             flex-wrap: wrap;
             margin-top: 8px;
         }
-        body.logged-in .header-actions { margin-top: 4px; }
 
         .insights-lamp {
             background: rgba(255,255,255,0.2);
@@ -171,7 +127,6 @@
             justify-content: center;
             transition: 0.2s;
         }
-        .insights-lamp:hover { background: rgba(255,255,255,0.3); transform: scale(1.05); }
 
         .auth-section {
             display: flex;
@@ -231,7 +186,6 @@
             margin-top: 8px;
         }
 
-        /* Cards */
         .balance-card, .meta-card, .shortcuts, .week-scroll, .month-card, .week-summary, .contacts-card, .prediction-card {
             background: var(--card-bg);
             margin: 16px;
@@ -239,6 +193,7 @@
             padding: 16px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.05);
         }
+
         @media (min-width: 900px) {
             .balance-card, .meta-card, .week-summary, .contacts-card, .prediction-card {
                 margin: 0 0 20px 0;
@@ -316,7 +271,6 @@
             transition: 0.1s;
         }
         .day-chip.today { background: var(--primary-dark); border-color: var(--primary-dark); color: white; }
-        .day-chip.today .day-name, .day-chip.today .day-number, .day-chip.today .day-amount { color: white !important; }
         .day-name { font-size: 0.65rem; font-weight: 500; color: var(--text-gray); }
         .day-number { font-size: 1rem; font-weight: 700; margin-top: 4px; color: var(--text-dark); }
         .day-amount { font-size: 0.6rem; font-weight: 600; margin-top: 6px; }
@@ -373,8 +327,6 @@
         }
         .month-day.has-income { border: 1px solid var(--success); background: rgba(16,185,129,0.1); }
         .month-day.has-expense { border: 1px solid var(--danger); background: rgba(239,68,68,0.1); }
-        .month-day.has-appointment { border-left: 3px solid #3b82f6; }
-        .month-day.has-note { border-right: 3px solid #f59e0b; }
         .day-indicators {
             font-size: 0.6rem;
             margin-top: 4px;
@@ -428,7 +380,6 @@
             box-shadow: 0 4px 12px rgba(0,0,0,0.2);
         }
 
-        /* Modais */
         .modal, .report-modal {
             display: none;
             position: fixed;
@@ -660,7 +611,23 @@
             border-bottom: 1px solid var(--border);
             flex-wrap: wrap;
         }
-        .day-modal-checkbox { margin-right: 8px; }
+        .day-modal-actions {
+            display: flex;
+            gap: 8px;
+            margin-left: auto;
+        }
+        .edit-item-btn, .delete-item-btn {
+            background: none;
+            border: none;
+            font-size: 1.1rem;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 8px;
+            transition: 0.1s;
+        }
+        .edit-item-btn:hover { background: var(--primary-soft); }
+        .delete-item-btn:hover { background: rgba(239,68,68,0.2); }
+
         .bulk-actions {
             padding: 12px 16px;
             display: flex;
@@ -672,7 +639,6 @@
         #map { height: 300px; width: 100%; border-radius: 16px; margin-bottom: 12px; }
         .address-search { display: flex; gap: 8px; margin-bottom: 12px; }
 
-        /* Estilos para previsão IA */
         .prediction-header {
             display: flex;
             justify-content: space-between;
@@ -801,7 +767,6 @@
 
             <button class="desktop-fab" id="desktopFabBtn">➕ Nova transação</button>
 
-            <!-- Card de Previsão IA -->
             <div class="prediction-card" id="predictionCard">
                 <div class="prediction-header">
                     <span>🧠 Previsão IA (Ciclos)</span>
@@ -875,7 +840,7 @@
     </div>
 </div>
 
-<!-- Modal de Detalhe do Dia -->
+<!-- Modal de Detalhe do Dia (COM BOTÃO EDITAR) -->
 <div id="dayModal" class="modal">
     <div class="modal-content">
         <div class="modal-header"><h3 id="dayModalTitle">Detalhes do dia</h3><button class="close-modal" id="closeDayModalBtn">Fechar</button></div>
@@ -905,7 +870,7 @@
     </div>
 </div>
 
-<!-- Modal WhatsApp corrigido -->
+<!-- Modal WhatsApp -->
 <div id="whatsappModal" class="modal" style="z-index: 9999;">
     <div class="modal-content" style="pointer-events: auto; max-width: 400px;">
         <div class="modal-header">
@@ -981,6 +946,7 @@
     let items = [];
     let currentMonth = new Date();
     let editingItemId = null;
+    let editingItemOriginalDate = null;
     let userSettings = { meta: 0, contacts: [] };
     let map = null, currentMarker = null, selectedAddress = "";
     let lastSavedTransaction = null;
@@ -1014,12 +980,12 @@
             document.getElementById('syncStatus').textContent = `✅ ${items.length} itens carregados`;
             document.getElementById('syncStatus').classList.add('synced');
             refreshAllUI();
-            updatePredictionCard(); // IA
+            updatePredictionCard();
         } catch(e) { console.error(e); }
         finally { hideLoading(); }
     }
 
-    // ==================== AUTOCOMPLETE DESCRIÇÃO ====================
+    // ==================== AUTOCOMPLETE ====================
     function getDescriptionSuggestions() {
         let freq = new Map();
         items.filter(i => i.type === 'income' || i.type === 'expense').forEach(t => freq.set(t.title, (freq.get(t.title)||0)+1));
@@ -1081,7 +1047,7 @@
     }
     function refreshAllUI() { renderWeekCalendar(); renderMonthCalendar(); updateBalances(); updateDescriptionDatalist(); updatePredictionCard(); }
 
-    // ==================== MODAL DO DIA (COM ESTILO RISCADO) ====================
+    // ==================== MODAL DO DIA COM BOTÃO EDITAR ====================
     function showDayModal(date) {
         currentDayModalDate = date;
         document.getElementById('dayModalTitle').innerHTML = formatDateDisplay(date);
@@ -1089,18 +1055,27 @@
         let dayItems = getItemsForDate(date);
         if(dayItems.length === 0) container.innerHTML = '<div style="padding:16px;text-align:center;">Nenhum item neste dia</div>';
         else {
-            dayItems.forEach(item => {
+            dayItems.forEach((item, idx) => {
                 let globalIndex = items.findIndex(i => i.id === item.id);
                 let icon = item.type==='expense'?'💸':(item.type==='income'?'💰':(item.type==='appointment'?'📅':'📝'));
                 let isPaid = (item.type === 'income' || item.type === 'expense') && item.status === 'paid';
-                let div = document.createElement('div'); div.className = 'day-modal-item';
-                // Adiciona checkbox para seleção
+                
+                let div = document.createElement('div'); 
+                div.className = 'day-modal-item';
+                
+                // Checkbox
                 let checkbox = document.createElement('input');
                 checkbox.type = 'checkbox';
                 checkbox.className = 'day-item-checkbox';
                 checkbox.dataset.globalIndex = globalIndex;
                 checkbox.style.marginRight = '8px';
-                // Informações do item
+                
+                // Ícone
+                let iconSpan = document.createElement('div');
+                iconSpan.className = 'day-modal-icon';
+                iconSpan.innerText = icon;
+                
+                // Informações
                 let infoDiv = document.createElement('div');
                 infoDiv.className = 'day-modal-info';
                 let titleSpan = document.createElement('div');
@@ -1109,20 +1084,84 @@
                 titleSpan.innerText = escapeHtml(item.title || (item.type==='appointment'?item.title:item.type));
                 let detailSpan = document.createElement('div');
                 detailSpan.className = 'day-modal-detail';
-                detailSpan.innerText = (item.amount ? `R$ ${item.amount.toFixed(2)} ` : '') + (item.time ? `🕒 ${item.time} ` : '') + (item.location ? `📍 ${item.location}` : '');
+                let detailText = '';
+                if(item.amount) detailText += `💰 R$ ${item.amount.toFixed(2)} `;
+                if(item.time) detailText += `🕒 ${item.time} `;
+                if(item.location) detailText += `📍 ${item.location}`;
+                if(item.content) detailText += `📝 ${item.content.substring(0, 50)}`;
+                if(item.status === 'paid') detailText += ` ✅ Pago/Recebido`;
+                else if(item.status === 'pending') detailText += ` ⏳ Pendente`;
+                detailSpan.innerText = detailText || '';
                 infoDiv.appendChild(titleSpan);
                 infoDiv.appendChild(detailSpan);
+                
+                // Botões de ação (EDITAR e EXCLUIR)
+                let actionsDiv = document.createElement('div');
+                actionsDiv.className = 'day-modal-actions';
+                
+                let editBtn = document.createElement('button');
+                editBtn.className = 'edit-item-btn';
+                editBtn.innerHTML = '✏️';
+                editBtn.title = 'Editar item';
+                editBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    editItemByGlobalIndex(globalIndex);
+                };
+                
+                let deleteBtn = document.createElement('button');
+                deleteBtn.className = 'delete-item-btn';
+                deleteBtn.innerHTML = '🗑️';
+                deleteBtn.title = 'Excluir item';
+                deleteBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    if(confirm('Excluir este item permanentemente?')) {
+                        items.splice(globalIndex, 1);
+                        saveData();
+                        if(currentDayModalDate) showDayModal(currentDayModalDate);
+                    }
+                };
+                
+                actionsDiv.appendChild(editBtn);
+                actionsDiv.appendChild(deleteBtn);
+                
                 div.appendChild(checkbox);
-                let iconSpan = document.createElement('div');
-                iconSpan.className = 'day-modal-icon';
-                iconSpan.innerText = icon;
                 div.appendChild(iconSpan);
                 div.appendChild(infoDiv);
+                div.appendChild(actionsDiv);
                 container.appendChild(div);
             });
         }
         document.getElementById('dayModal').style.display = 'flex';
     }
+    
+    // Função para editar um item pelo índice global
+    function editItemByGlobalIndex(globalIndex) {
+        let item = items[globalIndex];
+        if(!item) return;
+        
+        editingItemId = item.id;
+        editingItemOriginalDate = item.date;
+        let editDate = parseLocalDate(item.date);
+        
+        if(item.type === 'income' || item.type === 'expense') {
+            openModalWithDate(editDate, 'financial');
+            document.getElementById('type').value = item.type;
+            document.getElementById('description').value = item.title;
+            document.getElementById('amount').value = item.amount;
+            document.getElementById('status').value = item.status || 'pending';
+            document.getElementById('modalTitle').innerHTML = 'Editar transação';
+        } else if(item.type === 'appointment') {
+            openModalWithDate(editDate, 'appointment');
+            document.getElementById('appointmentTitle').value = item.title;
+            document.getElementById('appointmentTime').value = item.time || '';
+            document.getElementById('appointmentLocation').value = item.location || '';
+        } else if(item.type === 'note') {
+            openModalWithDate(editDate, 'note');
+            document.getElementById('noteTitle').value = item.title;
+            document.getElementById('noteContent').value = item.content || '';
+        }
+    }
+    
     function closeDayModal() { document.getElementById('dayModal').style.display = 'none'; currentDayModalDate = null; }
     function openNewTransactionFromModal() { if(currentDayModalDate) openNewTransaction(currentDayModalDate); closeDayModal(); }
     function deleteSelectedItems() {
@@ -1163,7 +1202,7 @@
     }
     function addContact() { let name = document.getElementById('contactName').value.trim(), phone = document.getElementById('contactPhone').value.trim(); if(!name || !phone) { alert('Preencha nome e número'); return; } if(!userSettings.contacts) userSettings.contacts = []; userSettings.contacts.push({name, phone}); if(currentUser) saveToCloud(); renderContacts(); document.getElementById('contactName').value = ''; document.getElementById('contactPhone').value = ''; }
 
-    // ==================== WHATSAPP CORRIGIDO ====================
+    // ==================== WHATSAPP ====================
     function sendWhatsAppMessageDirect(phoneNumber, transaction) {
         if (!transaction && lastSavedTransaction) transaction = lastSavedTransaction;
         if (!transaction) { alert("Nada para enviar."); return; }
@@ -1258,8 +1297,24 @@
             status: document.getElementById('status').value,
             date: formatDateKey(selectedDate)
         };
-        if(editingItemId) { let idx = items.findIndex(i => i.id === editingItemId); if(idx !== -1) items[idx] = newTransaction; else items.push(newTransaction); }
-        else items.push(newTransaction);
+        
+        if(editingItemId) { 
+            let idx = items.findIndex(i => i.id === editingItemId); 
+            if(idx !== -1) {
+                // Se a data mudou, precisamos remover o antigo e adicionar como novo
+                if(items[idx].date !== newTransaction.date) {
+                    items.splice(idx, 1);
+                    items.push(newTransaction);
+                } else {
+                    items[idx] = newTransaction;
+                }
+            } else {
+                items.push(newTransaction);
+            }
+            editingItemId = null;
+        } else {
+            items.push(newTransaction);
+        }
         saveData();
         closeModal();
         setTimeout(() => { if(confirm('Deseja enviar esta transação via WhatsApp?')) openWhatsAppModal(newTransaction); }, 100);
@@ -1281,11 +1336,8 @@
         document.querySelector(`.tab-btn[data-tab="${tab}"]`).classList.add('active');
         document.getElementById(`${tab}Tab`).classList.add('active');
     }
-    function editTransaction(index) { let item = items[index]; if(!item) return; editingItemId = item.id; let editDate = parseLocalDate(item.date); openModalWithDate(editDate, 'financial'); document.getElementById('type').value = item.type; document.getElementById('description').value = item.title; document.getElementById('amount').value = item.amount; document.getElementById('status').value = item.status || 'pending'; document.getElementById('modalTitle').innerHTML = 'Editar transação'; }
-    function repeatTransaction(index) { let original = items[index]; if(!original) return; editingItemId = null; let today = new Date(); openModalWithDate(today, 'financial'); document.getElementById('type').value = original.type; document.getElementById('description').value = original.title; document.getElementById('amount').value = original.amount; document.getElementById('status').value = original.status || 'pending'; document.getElementById('modalTitle').innerHTML = 'Repetir transação'; }
     function closeModal() { document.getElementById('modal').style.display = 'none'; editingItemId = null; }
     function saveData() { refreshAllUI(); if(currentUser) saveToCloud(); }
-    function deleteItem(index) { if(confirm('Excluir este item?')) { items.splice(index,1); saveData(); } }
 
     // ==================== RELATÓRIOS E INSIGHTS ====================
     function openFullReport() { let week = getWeekBalance(new Date()), month = getMonthStats(); let total=0, rec=0, desp=0; items.filter(i=>i.type==='income'||i.type==='expense').forEach(i=>{ if(i.type==='income'){ total+=i.amount; rec++; } else { total-=i.amount; desp++; } }); let html = `<div><strong>📊 RESUMO COMPLETO</strong><br><div style="background:var(--primary-soft);padding:12px;border-radius:16px;margin-bottom:16px">💰 SALDO TOTAL: ${total>=0?'+':'-'} R$ ${Math.abs(total).toFixed(2)}</div><div>🟢 Receitas mês: R$ ${month.income.toFixed(2)} (${rec} transações)</div><div>🔴 Despesas mês: R$ ${month.expense.toFixed(2)} (${desp} transações)</div><div>📆 Semana: Saldo ${week.balance>=0?'+':'-'} R$ ${Math.abs(week.balance).toFixed(2)}</div></div>`; document.getElementById('reportModalContent').innerHTML = html; document.getElementById('reportModal').style.display = 'flex'; }
@@ -1297,7 +1349,7 @@
     function prevMonth() { currentMonth.setMonth(currentMonth.getMonth()-1); renderMonthCalendar(); }
     function nextMonth() { currentMonth.setMonth(currentMonth.getMonth()+1); renderMonthCalendar(); }
 
-    // ==================== IA LOCAL - PREVISÃO DE CICLOS ====================
+    // ==================== IA LOCAL - PREVISÃO ====================
     class FinancialPredictor {
         constructor(transactions, metaMensal = 0) {
             this.transactions = transactions.filter(t => t.type === 'expense' && t.amount > 0);
@@ -1408,14 +1460,12 @@
     }
 
     // ==================== GESTOS E ATALHOS ====================
-    // Deslizar para excluir (simulado com toque longo + arrasto em dispositivos móveis)
     let touchStartX = null;
     document.addEventListener('touchstart', (e) => { touchStartX = e.touches[0].clientX; });
     document.addEventListener('touchend', (e) => {
         if (!touchStartX) return;
         const diff = e.changedTouches[0].clientX - touchStartX;
         if (Math.abs(diff) > 80) {
-            // Se o modal do dia estiver aberto, tenta excluir o primeiro item (simplificado)
             if (document.getElementById('dayModal').style.display === 'flex') {
                 const checkboxes = document.querySelectorAll('#dayModalContent .day-item-checkbox');
                 if (checkboxes.length > 0) {
@@ -1426,7 +1476,6 @@
         }
         touchStartX = null;
     });
-    // Atalhos de teclado: 'i' para receita, 'e' para despesa, 'r' para relatório
     document.addEventListener('keydown', (e) => {
         if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
         switch(e.key.toLowerCase()) {
