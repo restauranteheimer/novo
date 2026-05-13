@@ -3,7 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
-    <title>Dinheiro em Dia - IA e Gestos</title>
+    <meta name="theme-color" content="#8b5cf6">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Dinheiro em Dia">
+    <title>Dinheiro em Dia - IA Financeira</title>
     <!-- Bibliotecas -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
@@ -31,27 +35,39 @@
             --border: #e9ecef;
             --success: #10b981;
             --danger: #ef4444;
+            --warning: #f59e0b;
+            --info: #3b82f6;
+            --input-bg: #ffffff;
+            --input-text: #1e1e2f;
+            --input-border: #e9ecef;
+            --modal-bg: #ffffff;
         }
 
         body.dark-mode {
             --primary: #a78bfa;
-            --primary-dark: #8b5cf6;
+            --primary-dark: #c4b5fd;
             --primary-light: #2d1b4e;
-            --primary-soft: #1e1a2f;
+            --primary-soft: #2d2d3a;
             --background: #121212;
-            --card-bg: #1e1e1e;
+            --card-bg: #1e1e2e;
             --text-dark: #f0f0f0;
             --text-gray: #b0b0b0;
-            --border: #333333;
+            --border: #333344;
             --success: #34d399;
             --danger: #f87171;
+            --warning: #fbbf24;
+            --info: #60a5fa;
+            --input-bg: #2a2a3a;
+            --input-text: #f0f0f0;
+            --input-border: #444455;
+            --modal-bg: #1e1e2e;
         }
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             background: var(--primary);
             min-height: 100vh;
-            transition: background 0.3s, color 0.3s;
+            transition: all 0.3s ease;
         }
 
         .app-container {
@@ -60,7 +76,7 @@
             background: var(--background);
             min-height: 100vh;
             box-shadow: 0 0 40px rgba(0,0,0,0.1);
-            transition: background 0.3s;
+            transition: background 0.3s, color 0.3s;
         }
 
         .dashboard-grid {
@@ -80,6 +96,7 @@
             .logo h1 { font-size: 1.2rem; }
             .contacts-card .contact-item { flex-wrap: wrap; }
             .fab { width: 50px; height: 50px; bottom: 15px; right: 15px; font-size: 22px; }
+            .install-btn { font-size: 0.7rem; padding: 6px 10px; }
         }
 
         @media (min-width: 901px) {
@@ -113,6 +130,37 @@
             margin-top: 8px;
         }
 
+        .install-btn {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            padding: 8px 16px;
+            border-radius: 30px;
+            color: white;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: 500;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .install-btn:hover {
+            background: rgba(255,255,255,0.3);
+            transform: scale(1.02);
+        }
+
+        .dark-mode-toggle {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            padding: 8px 16px;
+            border-radius: 30px;
+            color: white;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: 0.2s;
+        }
+        .dark-mode-toggle:hover { background: rgba(255,255,255,0.3); }
+
         .insights-lamp {
             background: rgba(255,255,255,0.2);
             border: none;
@@ -127,6 +175,7 @@
             justify-content: center;
             transition: 0.2s;
         }
+        .insights-lamp:hover { background: rgba(255,255,255,0.3); transform: scale(1.05); }
 
         .auth-section {
             display: flex;
@@ -146,6 +195,7 @@
             min-width: 120px;
         }
         .auth-section input::placeholder { color: rgba(255,255,255,0.7); }
+        .auth-section input:focus { outline: none; background: rgba(255,255,255,0.3); }
         .auth-section button {
             background: white;
             color: var(--primary);
@@ -154,7 +204,9 @@
             border-radius: 30px;
             font-weight: 600;
             cursor: pointer;
+            transition: 0.2s;
         }
+        .auth-section button:hover { transform: scale(1.02); }
 
         .user-info {
             display: flex;
@@ -164,6 +216,7 @@
             padding: 6px 16px;
             border-radius: 40px;
             gap: 10px;
+            color: white;
         }
         .logout-btn {
             background: rgba(255,255,255,0.2);
@@ -172,7 +225,9 @@
             padding: 4px 12px;
             border-radius: 30px;
             cursor: pointer;
+            transition: 0.2s;
         }
+        .logout-btn:hover { background: rgba(255,255,255,0.3); }
 
         .signup-guide {
             background: rgba(255,255,255,0.15);
@@ -184,6 +239,7 @@
             gap: 8px;
             flex-wrap: wrap;
             margin-top: 8px;
+            color: white;
         }
 
         .balance-card, .meta-card, .shortcuts, .week-scroll, .month-card, .week-summary, .contacts-card, .prediction-card {
@@ -191,7 +247,8 @@
             margin: 16px;
             border-radius: 24px;
             padding: 16px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: all 0.3s;
         }
 
         @media (min-width: 900px) {
@@ -256,6 +313,7 @@
             padding: 8px 16px;
             font-weight: 600;
             font-size: 0.85rem;
+            color: var(--text-dark);
         }
 
         .week-scroll { overflow-x: auto; padding: 0 16px 16px; }
@@ -269,8 +327,10 @@
             cursor: pointer;
             border: 1px solid var(--border);
             transition: 0.1s;
+            color: var(--text-dark);
         }
         .day-chip.today { background: var(--primary-dark); border-color: var(--primary-dark); color: white; }
+        .day-chip.today .day-name, .day-chip.today .day-number, .day-chip.today .day-amount { color: white !important; }
         .day-name { font-size: 0.65rem; font-weight: 500; color: var(--text-gray); }
         .day-number { font-size: 1rem; font-weight: 700; margin-top: 4px; color: var(--text-dark); }
         .day-amount { font-size: 0.6rem; font-weight: 600; margin-top: 6px; }
@@ -292,6 +352,12 @@
             color: var(--primary);
             font-weight: 600;
             cursor: pointer;
+            transition: 0.2s;
+        }
+        .month-nav:hover { opacity: 0.8; }
+        .month-title {
+            color: var(--text-dark);
+            font-weight: 600;
         }
         .month-grid {
             display: grid;
@@ -319,6 +385,7 @@
             justify-content: center;
             font-size: 0.75rem;
             transition: 0.1s;
+            color: var(--text-dark);
         }
         .month-day.today {
             background: var(--primary-light);
@@ -328,14 +395,14 @@
         .month-day.has-income { border: 1px solid var(--success); background: rgba(16,185,129,0.1); }
         .month-day.has-expense { border: 1px solid var(--danger); background: rgba(239,68,68,0.1); }
         .day-indicators {
-            font-size: 0.6rem;
+            font-size: 0.9rem;
             margin-top: 4px;
             display: flex;
-            gap: 4px;
+            gap: 6px;
             justify-content: center;
         }
-        .indicator-up { color: var(--success); }
-        .indicator-down { color: var(--danger); }
+        .indicator-up { color: var(--success); font-size: 0.9rem; }
+        .indicator-down { color: var(--danger); font-size: 0.9rem; }
         .indicator-up.paid, .indicator-down.paid { text-decoration: line-through; opacity: 0.6; }
 
         .week-summary {
@@ -351,7 +418,7 @@
             border-radius: 20px;
         }
         .summary-label { font-size: 0.65rem; color: var(--text-gray); }
-        .summary-value { font-weight: 800; font-size: 0.9rem; }
+        .summary-value { font-weight: 800; font-size: 0.9rem; color: var(--text-dark); }
 
         .desktop-fab, .fab {
             background: var(--primary);
@@ -363,7 +430,9 @@
             cursor: pointer;
             width: calc(100% - 32px);
             margin: 0 16px;
+            transition: 0.2s;
         }
+        .desktop-fab:hover, .fab:hover { opacity: 0.9; transform: scale(0.98); }
         .fab {
             position: fixed;
             bottom: 20px;
@@ -394,7 +463,7 @@
             justify-content: center;
         }
         .modal-content, .report-modal-content {
-            background: var(--card-bg);
+            background: var(--modal-bg);
             width: 90%;
             max-width: 500px;
             border-radius: 28px;
@@ -416,6 +485,7 @@
             border-radius: 30px;
             cursor: pointer;
             color: var(--text-dark);
+            transition: 0.2s;
         }
         .modal-tabs {
             display: flex;
@@ -432,11 +502,13 @@
             color: var(--text-gray);
             border-radius: 40px;
             cursor: pointer;
+            transition: 0.2s;
         }
         .tab-btn.active {
             background: var(--primary-light);
             color: var(--primary);
         }
+
         .tab-content { display: none; padding: 20px; }
         .tab-content.active { display: block; }
 
@@ -451,11 +523,19 @@
         .form-group input, .form-group select, .form-group textarea {
             width: 100%;
             padding: 12px;
-            border: 1px solid var(--border);
+            border: 1px solid var(--input-border);
             border-radius: 14px;
-            background: var(--background);
-            color: var(--text-dark);
+            background: var(--input-bg);
+            color: var(--input-text);
             font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        .form-group input::placeholder, .form-group textarea::placeholder {
+            color: var(--text-gray);
         }
         .form-buttons {
             display: flex;
@@ -471,7 +551,9 @@
             border-radius: 40px;
             font-weight: 700;
             cursor: pointer;
+            transition: 0.2s;
         }
+        .btn-save:hover { opacity: 0.9; }
         .btn-cancel {
             flex: 1;
             background: var(--primary-soft);
@@ -481,7 +563,9 @@
             border-radius: 40px;
             font-weight: 600;
             cursor: pointer;
+            transition: 0.2s;
         }
+        .btn-cancel:hover { opacity: 0.8; }
         .small-btn {
             background: var(--primary);
             border: none;
@@ -490,7 +574,9 @@
             padding: 0 12px;
             cursor: pointer;
             white-space: nowrap;
+            transition: 0.2s;
         }
+        .small-btn:hover { opacity: 0.9; }
 
         .date-selector {
             background: var(--primary-soft);
@@ -560,8 +646,16 @@
             border: none;
             cursor: pointer;
             font-size: 1rem;
+            color: var(--text-gray);
+            transition: 0.2s;
         }
+        .edit-meta-btn:hover { color: var(--primary); }
         .meta-value { font-size: 1.5rem; font-weight: 800; color: var(--primary); }
+        .meta-description {
+            font-size: 0.7rem;
+            color: var(--text-gray);
+            margin-bottom: 8px;
+        }
         .progress-bar-container {
             background: var(--border);
             border-radius: 20px;
@@ -576,15 +670,28 @@
             border-radius: 20px;
             transition: width 0.3s;
         }
-        .meta-status { font-size: 0.7rem; color: var(--text-gray); }
+        .meta-status {
+            font-size: 0.7rem;
+            color: var(--text-gray);
+            margin-top: 8px;
+        }
+        .meta-status.good { color: var(--success); }
+        .meta-status.warning { color: var(--warning); }
+        .meta-status.danger { color: var(--danger); }
 
         .contacts-card { margin-top: 16px; }
+        .insights-header {
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: var(--text-dark);
+        }
         .contact-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
             padding: 8px;
             border-bottom: 1px solid var(--border);
+            color: var(--text-dark);
         }
         .contact-item button {
             background: none;
@@ -592,10 +699,13 @@
             cursor: pointer;
             font-size: 1rem;
             margin-left: 8px;
+            transition: 0.2s;
         }
+        .contact-item button:hover { opacity: 0.7; }
 
         .day-modal-title {
             font-weight: 500;
+            color: var(--text-dark);
         }
         .day-modal-title.paid {
             text-decoration: line-through;
@@ -643,6 +753,7 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 12px;
+            color: var(--text-dark);
         }
         .prediction-badge {
             background: var(--primary-light);
@@ -658,9 +769,10 @@
             margin-bottom: 12px;
             font-size: 0.8rem;
         }
-        .prediction-alert.critical { background: rgba(239,68,68,0.2); border-left: 4px solid var(--danger); }
-        .prediction-alert.warning { background: rgba(245,158,11,0.2); border-left: 4px solid #f59e0b; }
-        .prediction-alert.ok { background: rgba(16,185,129,0.2); border-left: 4px solid var(--success); }
+        .prediction-alert.critical { background: rgba(239,68,68,0.2); border-left: 4px solid var(--danger); color: var(--text-dark); }
+        .prediction-alert.warning { background: rgba(245,158,11,0.2); border-left: 4px solid var(--warning); color: var(--text-dark); }
+        .prediction-alert.ok { background: rgba(16,185,129,0.2); border-left: 4px solid var(--success); color: var(--text-dark); }
+        .prediction-alert.info { background: rgba(59,130,246,0.2); border-left: 4px solid var(--info); color: var(--text-dark); }
         .prediction-days {
             display: flex;
             gap: 8px;
@@ -674,6 +786,7 @@
             padding: 8px;
             text-align: center;
             font-size: 0.7rem;
+            color: var(--text-dark);
         }
         .suggestion-btn {
             width: 100%;
@@ -685,7 +798,33 @@
             color: var(--primary);
             font-weight: 600;
             cursor: pointer;
+            transition: 0.2s;
         }
+        .suggestion-btn:hover { opacity: 0.8; }
+        
+        .finance-analysis {
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid var(--border);
+        }
+        .analysis-title {
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: var(--primary);
+        }
+        .analysis-text {
+            font-size: 0.75rem;
+            line-height: 1.4;
+            color: var(--text-dark);
+        }
+        .investment-tip, .saving-tip {
+            padding: 8px;
+            border-radius: 12px;
+            margin-top: 8px;
+            font-size: 0.7rem;
+        }
+        .investment-tip { background: rgba(16,185,129,0.1); border-left: 3px solid var(--success); }
+        .saving-tip { background: rgba(239,68,68,0.1); border-left: 3px solid var(--danger); }
 
         .money-input {
             text-align: right;
@@ -699,6 +838,7 @@
     <div class="header">
         <div class="logo"><h1>💰 dinheiro em dia</h1><p>Planejamento financeiro + IA</p></div>
         <div class="header-actions">
+            <button id="installBtn" class="install-btn">📱 Instalar App</button>
             <button id="darkModeToggle" class="dark-mode-toggle">🌙 Modo escuro</button>
             <button id="insightsLamp" class="insights-lamp" title="Dicas e insights">💡</button>
             <div id="authSection" class="auth-section">
@@ -726,10 +866,14 @@
     <div class="dashboard-grid">
         <div class="left-column">
             <div class="meta-card">
-                <div class="meta-header"><span>🎯 Meta mensal</span><button class="edit-meta-btn" id="editMetaBtn">✏️</button></div>
+                <div class="meta-header">
+                    <span>🎯 Meta de Gastos Mensal</span>
+                    <button class="edit-meta-btn" id="editMetaBtn" title="Definir quanto você quer gastar por mês">✏️</button>
+                </div>
                 <div class="meta-value" id="metaValueDisplay">R$ 0,00</div>
+                <div class="meta-description">💰 Limite de gastos para este mês</div>
                 <div class="progress-bar-container"><div class="progress-bar" id="progressBar"></div></div>
-                <div class="meta-status" id="metaStatus">Defina uma meta</div>
+                <div class="meta-status" id="metaStatus"></div>
             </div>
 
             <div class="balance-card">
@@ -757,7 +901,7 @@
             <div class="week-scroll"><div class="week-days" id="weekDaysContainer"></div></div>
 
             <div class="month-card">
-                <div class="month-header"><button class="month-nav" id="prevMonthBtn">◀</button><span id="monthTitle"></span><button class="month-nav" id="nextMonthBtn">▶</button></div>
+                <div class="month-header"><button class="month-nav" id="prevMonthBtn">◀</button><span id="monthTitle" class="month-title"></span><button class="month-nav" id="nextMonthBtn">▶</button></div>
                 <div class="month-grid" id="monthGrid"></div>
             </div>
         </div>
@@ -771,9 +915,10 @@
 
             <button class="desktop-fab" id="desktopFabBtn">➕ Nova transação</button>
 
+            <!-- Card de Previsão e Análise IA Melhorada -->
             <div class="prediction-card" id="predictionCard">
                 <div class="prediction-header">
-                    <span>🧠 Previsão IA (Ciclos)</span>
+                    <span>🧠 IA Financeira</span>
                     <span class="prediction-badge" id="predictionBadge">Analisando...</span>
                 </div>
                 <div id="predictionContent">
@@ -922,9 +1067,13 @@
 <!-- Modal da Meta -->
 <div id="metaModal" class="modal">
     <div class="modal-content">
-        <div class="modal-header"><h3>Definir meta mensal</h3><button class="close-modal" id="closeMetaModalBtn">Fechar</button></div>
+        <div class="modal-header"><h3>🎯 Definir Meta de Gastos</h3><button class="close-modal" id="closeMetaModalBtn">Fechar</button></div>
         <div style="padding:20px;">
-            <input type="text" id="metaAmountInput" class="money-input" placeholder="0,00" style="width:100%; margin-bottom:16px;" value="">
+            <p style="margin-bottom: 16px; font-size: 0.8rem; color: var(--text-gray);">Defina quanto você planeja gastar neste mês. A IA vai te ajudar a acompanhar e controlar seus gastos!</p>
+            <div class="form-group">
+                <label>Valor da meta (R$)</label>
+                <input type="text" id="metaAmountInput" class="money-input" placeholder="1.500,00" style="width:100%;" value="">
+            </div>
             <button id="saveMetaBtn" class="btn-save">Salvar meta</button>
         </div>
     </div>
@@ -958,38 +1107,60 @@
         return new Intl.NumberFormat('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(num);
     }
     
-    // Máscara SIMPLES que só formata ao perder o foco (blur)
     function setupMoneyMask(inputElement) {
         if (!inputElement) return;
         
-        // Quando ganha foco, se estiver vazio ou 0,00, limpa para facilitar digitação
         inputElement.addEventListener('focus', function() {
             if (this.value === '0,00' || this.value === '' || this.value === 'R$ 0,00') {
                 this.value = '';
             }
         });
         
-        // Quando perde o foco, formata o valor
         inputElement.addEventListener('blur', function() {
             let value = this.value.trim();
             if (value === '') {
                 this.value = '0,00';
                 return;
             }
-            // Remove caracteres não numéricos exceto vírgula e ponto
             let cleaned = value.replace(/[^\d,.-]/g, '');
             let number = parseBrazilianMoney(cleaned);
             if (isNaN(number)) number = 0;
             this.value = formatBrazilianNumber(number);
         });
         
-        // Permite digitar livremente - sem formatação durante a digitação
         inputElement.addEventListener('input', function(e) {
-            // Não faz nada durante a digitação - deixa o usuário digitar à vontade
-            // Só garante que não tenha caracteres estranhos
             this.value = this.value.replace(/[^\d,]/g, '');
         });
     }
+    
+    // ==================== PWA - INSTALAÇÃO DO APP ====================
+    let deferredPrompt = null;
+    
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        const installBtn = document.getElementById('installBtn');
+        if (installBtn) {
+            installBtn.style.display = 'flex';
+            installBtn.addEventListener('click', () => {
+                if (deferredPrompt) {
+                    deferredPrompt.prompt();
+                    deferredPrompt.userChoice.then((choiceResult) => {
+                        if (choiceResult.outcome === 'accepted') {
+                            console.log('Usuário aceitou instalar o PWA');
+                        }
+                        deferredPrompt = null;
+                    });
+                }
+            });
+        }
+    });
+    
+    window.addEventListener('appinstalled', () => {
+        console.log('PWA foi instalado');
+        const installBtn = document.getElementById('installBtn');
+        if (installBtn) installBtn.style.display = 'none';
+    });
     
     // ==================== CONFIGURAÇÃO FIREBASE ====================
     const firebaseConfig = {
@@ -1044,7 +1215,7 @@
             document.getElementById('syncStatus').textContent = `✅ ${items.length} itens carregados`;
             document.getElementById('syncStatus').classList.add('synced');
             refreshAllUI();
-            updatePredictionCard();
+            updatePredictionAndAnalysis();
         } catch(e) { console.error(e); }
         finally { hideLoading(); }
     }
@@ -1069,16 +1240,42 @@
         }
     }
 
-    // ==================== META ====================
+    // ==================== META (MELHORADA) ====================
     function updateMetaUI() {
         let meta = userSettings.meta || 0;
         document.getElementById('metaValueDisplay').innerHTML = formatBrazilianMoney(meta);
-        if(meta === 0) { document.getElementById('progressBar').style.width = '0%'; document.getElementById('metaStatus').innerHTML = 'Defina uma meta'; return; }
+        
         let gastos = getMonthStats().expense;
+        let gastosFormatado = formatBrazilianMoney(gastos);
+        
+        if(meta === 0) { 
+            document.getElementById('progressBar').style.width = '0%'; 
+            document.getElementById('metaStatus').innerHTML = '⚠️ Nenhuma meta definida. Clique no lápis para definir seu limite de gastos!';
+            document.getElementById('metaStatus').className = 'meta-status warning';
+            return; 
+        }
+        
         let percent = Math.min(100, (gastos/meta)*100);
         document.getElementById('progressBar').style.width = `${percent}%`;
-        document.getElementById('metaStatus').innerHTML = percent >= 100 ? '⚠️ Meta estourada' : `${percent.toFixed(0)}% da meta`;
+        
+        let restante = meta - gastos;
+        let restanteFormatado = formatBrazilianMoney(Math.max(0, restante));
+        
+        if(percent >= 100) {
+            document.getElementById('metaStatus').innerHTML = `🔴 META ESTOURADA! Você gastou ${formatBrazilianMoney(gastos)} de ${formatBrazilianMoney(meta)} (${percent.toFixed(0)}%)`;
+            document.getElementById('metaStatus').className = 'meta-status danger';
+            document.getElementById('progressBar').style.backgroundColor = 'var(--danger)';
+        } else if(percent >= 70) {
+            document.getElementById('metaStatus').innerHTML = `⚠️ ATENÇÃO: Você já gastou ${formatBrazilianMoney(gastos)} de ${formatBrazilianMoney(meta)} (${percent.toFixed(0)}%). Restam ${restanteFormatado} para o mês.`;
+            document.getElementById('metaStatus').className = 'meta-status warning';
+            document.getElementById('progressBar').style.backgroundColor = 'var(--warning)';
+        } else {
+            document.getElementById('metaStatus').innerHTML = `✅ Dentro do orçamento: ${formatBrazilianMoney(gastos)} de ${formatBrazilianMoney(meta)} (${percent.toFixed(0)}%). Restam ${restanteFormatado}`;
+            document.getElementById('metaStatus').className = 'meta-status good';
+            document.getElementById('progressBar').style.backgroundColor = 'var(--success)';
+        }
     }
+    
     function editMeta() { 
         document.getElementById('metaModal').style.display = 'flex'; 
         document.getElementById('metaAmountInput').value = formatBrazilianNumber(userSettings.meta);
@@ -1091,7 +1288,7 @@
             if(currentUser) saveToCloud(); 
             updateMetaUI(); 
             closeMetaModal(); 
-            updatePredictionCard(); 
+            updatePredictionAndAnalysis(); 
         } 
     }
 
@@ -1130,9 +1327,9 @@
         let grid = document.getElementById('monthGrid'); grid.innerHTML = '';
         ['D','S','T','Q','Q','S','S'].forEach(day => { let h = document.createElement('div'); h.className = 'weekday-header'; h.textContent = day; grid.appendChild(h); });
         for(let i=0;i<startDay;i++){ let e = document.createElement('div'); e.className = 'month-day'; e.style.background = 'transparent'; e.style.cursor = 'default'; grid.appendChild(e); }
-        for(let day=1;day<=totalDays;day++){ let d = new Date(year,month,day); let dayItems = getItemsForDate(d); let inc=0, exp=0, allPaid=true; dayItems.forEach(i=>{ if(i.type==='income') inc+=i.amount; if(i.type==='expense') exp+=i.amount; if(i.status !== 'paid') allPaid=false; }); let isToday = d.toDateString() === today.toDateString(); let indicatorClass = ''; if(inc>0 && exp>0) indicatorClass = 'has-both'; else if(inc>0) indicatorClass = 'has-income'; else if(exp>0) indicatorClass = 'has-expense'; let hasApp = dayItems.some(i=>i.type==='appointment'); let hasNote = dayItems.some(i=>i.type==='note'); if(hasApp) indicatorClass += ' has-appointment'; if(hasNote) indicatorClass += ' has-note'; let dayDiv = document.createElement('div'); dayDiv.className = `month-day ${isToday?'today':''} ${indicatorClass}`; let indicators = ''; if(inc>0) indicators += `<span class="indicator-up ${allPaid?'paid':''}">↑${formatBrazilianNumber(inc)}</span>`; if(exp>0) indicators += `<span class="indicator-down ${allPaid?'paid':''}">↓${formatBrazilianNumber(exp)}</span>`; if(hasApp) indicators += `📅`; if(hasNote) indicators += `📝`; dayDiv.innerHTML = `<div class="day-number">${day}</div>${indicators?`<div class="day-indicators">${indicators}</div>`:''}`; dayDiv.onclick = () => showDayModal(d); grid.appendChild(dayDiv); }
+        for(let day=1;day<=totalDays;day++){ let d = new Date(year,month,day); let dayItems = getItemsForDate(d); let inc=0, exp=0, allPaid=true; dayItems.forEach(i=>{ if(i.type==='income') inc+=i.amount; if(i.type==='expense') exp+=i.amount; if(i.status !== 'paid') allPaid=false; }); let isToday = d.toDateString() === today.toDateString(); let indicatorClass = ''; if(inc>0 && exp>0) indicatorClass = 'has-both'; else if(inc>0) indicatorClass = 'has-income'; else if(exp>0) indicatorClass = 'has-expense'; let hasApp = dayItems.some(i=>i.type==='appointment'); let hasNote = dayItems.some(i=>i.type==='note'); if(hasApp) indicatorClass += ' has-appointment'; if(hasNote) indicatorClass += ' has-note'; let dayDiv = document.createElement('div'); dayDiv.className = `month-day ${isToday?'today':''} ${indicatorClass}`; let indicators = ''; if(inc>0) indicators += `<span class="indicator-up ${allPaid?'paid':''}" title="Receita">↑</span>`; if(exp>0) indicators += `<span class="indicator-down ${allPaid?'paid':''}" title="Despesa">↓</span>`; if(hasApp) indicators += `📅`; if(hasNote) indicators += `📝`; dayDiv.innerHTML = `<div class="day-number">${day}</div>${indicators?`<div class="day-indicators">${indicators}</div>`:''}`; dayDiv.onclick = () => showDayModal(d); grid.appendChild(dayDiv); }
     }
-    function refreshAllUI() { renderWeekCalendar(); renderMonthCalendar(); updateBalances(); updateDescriptionDatalist(); updatePredictionCard(); }
+    function refreshAllUI() { renderWeekCalendar(); renderMonthCalendar(); updateBalances(); updateDescriptionDatalist(); updatePredictionAndAnalysis(); }
 
     // ==================== MODAL DO DIA ====================
     function showDayModal(date) {
@@ -1462,13 +1659,15 @@
     function prevMonth() { currentMonth.setMonth(currentMonth.getMonth()-1); renderMonthCalendar(); }
     function nextMonth() { currentMonth.setMonth(currentMonth.getMonth()+1); renderMonthCalendar(); }
 
-    // ==================== IA LOCAL - PREVISÃO ====================
+    // ==================== IA COMPLETA - PREVISÃO + ANÁLISE FINANCEIRA ====================
     class FinancialPredictor {
         constructor(transactions, metaMensal = 0) {
             this.transactions = transactions.filter(t => t.type === 'expense' && t.amount > 0);
+            this.allTransactions = transactions;
             this.metaMensal = metaMensal;
             this.dailyBudget = metaMensal > 0 ? metaMensal / 30 : 100;
         }
+        
         getExpensesLastDays(days = 60) {
             const today = new Date();
             const cutoff = new Date(); cutoff.setDate(today.getDate() - days);
@@ -1477,6 +1676,7 @@
                 return tDate >= cutoff && tDate <= today;
             });
         }
+        
         getPatternByWeekday() {
             const weekdaySum = [0,0,0,0,0,0,0];
             const weekdayCount = [0,0,0,0,0,0,0];
@@ -1488,6 +1688,7 @@
             });
             return weekdaySum.map((sum, i) => weekdayCount[i] ? sum / weekdayCount[i] : 0);
         }
+        
         predictNext7Days() {
             const last30 = this.getExpensesLastDays(30);
             if (last30.length < 7) return { prediction: null, message: "Dados insuficientes (menos de 7 dias de despesas)" };
@@ -1519,6 +1720,7 @@
             }
             return { prediction: totalPredicted, dailyBreakdown: dailyPredictions, baselineAvg: baseline, message: `Projeção para 7 dias: ${formatBrazilianMoney(totalPredicted)}` };
         }
+        
         getAlert() {
             const pred = this.predictNext7Days();
             if (!pred.prediction) return null;
@@ -1527,45 +1729,148 @@
             if (percent >= 80) return { level: percent >= 100 ? 'critical' : 'warning', message: `⚠️ Previsão de gastos (${formatBrazilianMoney(pred.prediction)}) ocupa ${percent.toFixed(0)}% do orçamento semanal (${formatBrazilianMoney(weeklyBudget)}).`, suggestion: `Sugerimos reduzir despesas não essenciais.` };
             return { level: 'ok', message: `✅ Dentro do esperado. Previsão: ${formatBrazilianMoney(pred.prediction)}` };
         }
+        
         suggestDailyLimit() {
             const last30 = this.getExpensesLastDays(30);
             if (last30.length === 0) return this.dailyBudget;
             const avgDaily = last30.reduce((s,t) => s + t.amount, 0) / 30;
             return Math.max(10, avgDaily * 0.9);
         }
+        
+        // NOVA FUNÇÃO: Análise Financeira Completa
+        getFinancialAnalysis() {
+            const monthStats = getMonthStats();
+            const totalReceitas = monthStats.income;
+            const totalDespesas = monthStats.expense;
+            const saldo = monthStats.balance;
+            
+            // Análise de categorias de gastos (simplificada)
+            const despesasPorTitulo = {};
+            items.filter(i => i.type === 'expense' && new Date(i.date).getMonth() === new Date().getMonth())
+                .forEach(d => {
+                    const categoria = d.title;
+                    if (!despesasPorTitulo[categoria]) despesasPorTitulo[categoria] = 0;
+                    despesasPorTitulo[categoria] += d.amount;
+                });
+            
+            const maioresGastos = Object.entries(despesasPorTitulo)
+                .sort((a,b) => b[1] - a[1])
+                .slice(0, 3);
+            
+            let analysis = {};
+            
+            if (saldo > 0) {
+                // SUPERÁVIT - Dicas de investimento
+                analysis.type = 'surplus';
+                analysis.level = 'success';
+                analysis.title = '🎉 PARABÉNS! Você está no azul!';
+                analysis.message = `Seu saldo positivo é de ${formatBrazilianMoney(saldo)}. `;
+                analysis.tips = [
+                    `💰 Considere investir ${formatBrazilianMoney(saldo * 0.3)} em renda fixa (CDB, Tesouro Selic) para reserva de emergência.`,
+                    `📈 Invista ${formatBrazilianMoney(saldo * 0.4)} em aprendizado ou cursos para aumentar sua renda.`,
+                    `🏦 Separe ${formatBrazilianMoney(saldo * 0.2)} para objetivos de médio prazo (viagem, carro, imóvel).`,
+                    `🎯 Destine ${formatBrazilianMoney(saldo * 0.1)} para lazer ou doação - aproveite suas conquistas!`,
+                    `📊 Compare seus gastos com o mês anterior para manter o controle.`
+                ];
+                analysis.mainTip = `Com ${formatBrazilianMoney(saldo)} positivos, você pode começar a investir! Sugiro começar com CDB de liquidez diária.`;
+            } else if (saldo < 0) {
+                // DÉFICIT - Conselhos para cortar gastos
+                analysis.type = 'deficit';
+                analysis.level = 'danger';
+                analysis.title = '⚠️ ATENÇÃO! Você está no vermelho!';
+                analysis.message = `Seu saldo negativo é de ${formatBrazilianMoney(Math.abs(saldo))}. `;
+                analysis.tips = [
+                    `✂️ Revise seus maiores gastos: ${maioresGastos.map(g => `${g[0]} (${formatBrazilianMoney(g[1])})`).join(', ')}.`,
+                    `📝 Anote TODAS as despesas por 30 dias para identificar gastos desnecessários.`,
+                    `🍽️ Reduza refeições fora e delivery - cozinhar em casa economiza até 60%.`,
+                    `🔌 Corte assinaturas que você não usa (streaming, academia, apps).`,
+                    `🚗 Use transporte público ou carona solidária para economizar combustível.`,
+                    `💳 Negocie dívidas e evite parcelamentos com juros altos.`,
+                    `🛑 Evite compras por impulso - espere 48h antes de comprar algo não essencial.`
+                ];
+                analysis.mainTip = `Foque em cortar os maiores gastos: ${maioresGastos[0]?.[0] || 'revise suas despesas'} (${maioresGastos[0] ? formatBrazilianMoney(maioresGastos[0][1]) : 'R$ 0,00'}).`;
+            } else {
+                // EQUILIBRADO
+                analysis.type = 'balanced';
+                analysis.level = 'info';
+                analysis.title = '📊 Situação equilibrada';
+                analysis.message = `Suas receitas e despesas estão iguais em ${formatBrazilianMoney(totalReceitas)}. `;
+                analysis.tips = [
+                    `📈 Busque aumentar sua renda em 10% no próximo mês com trabalho extra ou freelas.`,
+                    `✂️ Tente reduzir despesas em ${formatBrazilianMoney(totalDespesas * 0.1)} cortando gastos supérfluos.`,
+                    `🏦 Comece a construir uma reserva de emergência de 3 meses de gastos.`,
+                    `📊 Acompanhe seus gastos semanalmente para manter o equilíbrio.`,
+                    `🎯 Defina metas financeiras de curto, médio e longo prazo.`
+                ];
+                analysis.mainTip = `Tente economizar ${formatBrazilianMoney(totalDespesas * 0.1)} neste mês para começar sua reserva.`;
+            }
+            
+            return analysis;
+        }
     }
-    async function updatePredictionCard() {
+    
+    async function updatePredictionAndAnalysis() {
         const container = document.getElementById('predictionContent');
         if (!container) return;
+        
         const meta = userSettings.meta || 0;
         const predictor = new FinancialPredictor(items, meta);
+        
+        // Previsão de gastos
         const alertData = predictor.getAlert();
         const predResult = predictor.predictNext7Days();
+        
+        // Análise financeira
+        const analysis = predictor.getFinancialAnalysis();
+        
         let html = '';
+        
+        // ANÁLISE FINANCEIRA (Destaque principal)
+        const analysisClass = analysis.level === 'success' ? 'ok' : (analysis.level === 'danger' ? 'critical' : (analysis.level === 'warning' ? 'warning' : 'info'));
+        html += `<div class="prediction-alert ${analysisClass}" style="margin-bottom: 16px;">`;
+        html += `<strong>${analysis.title}</strong><br>`;
+        html += `<span style="font-size: 0.75rem;">${analysis.message}</span><br>`;
+        html += `<div class="analysis-text" style="margin-top: 8px;">💡 <strong>Dica principal:</strong> ${analysis.mainTip}</div>`;
+        html += `<details style="margin-top: 8px;">`;
+        html += `<summary style="cursor: pointer; font-size: 0.7rem; color: var(--primary);">📋 Ver mais dicas</summary>`;
+        html += `<div style="margin-top: 8px; font-size: 0.7rem;">`;
+        analysis.tips.forEach(tip => { html += `<div style="margin-bottom: 4px;">• ${tip}</div>`; });
+        html += `</div></details>`;
+        html += `</div>`;
+        
+        // Previsão de gastos futuros
         if (!predResult.prediction) {
-            html = `<div style="text-align:center; color: var(--text-gray);">🔍 ${predResult.message || 'Insira mais despesas nos últimos 30 dias.'}</div>`;
+            html += `<div style="text-align:center; color: var(--text-gray); padding: 8px; font-size: 0.75rem;">🔍 ${predResult.message || 'Insira mais despesas nos últimos 30 dias para previsões.'}</div>`;
         } else {
             const alertClass = alertData.level === 'ok' ? 'ok' : (alertData.level === 'critical' ? 'critical' : 'warning');
-            html = `<div class="prediction-alert ${alertClass}">${alertData.message}<br><small>${alertData.suggestion || ''}</small></div>`;
-            html += `<div><strong>📈 Previsão diária (próximos 7 dias):</strong></div><div class="prediction-days">`;
+            html += `<div class="prediction-alert ${alertClass}" style="margin-top: 8px;">`;
+            html += `<strong>📈 Previsão de Gastos (7 dias)</strong><br>`;
+            html += `${alertData.message}<br>`;
+            if (alertData.suggestion) html += `<small>${alertData.suggestion}</small>`;
+            html += `</div>`;
+            
+            html += `<div class="prediction-days">`;
             const today = new Date();
             for (let i = 0; i < 7; i++) {
                 const d = new Date(today); d.setDate(today.getDate() + i + 1);
                 html += `<div class="prediction-day-item"><strong>${d.toLocaleDateString('pt-BR', {weekday:'short'})}</strong><br>${formatBrazilianMoney(predResult.dailyBreakdown[i])}</div>`;
             }
-            html += `</div><div style="margin-top:8px; font-size:0.7rem;">🎯 Orçamento semanal: ${formatBrazilianMoney(predictor.dailyBudget * 7)}</div>`;
+            html += `</div>`;
+            html += `<div style="margin-top:8px; font-size:0.65rem; text-align:center; color: var(--text-gray);">🎯 Orçamento semanal disponível: ${formatBrazilianMoney(predictor.dailyBudget * 7)}</div>`;
         }
+        
         container.innerHTML = html;
+        
         const applyBtn = document.getElementById('applyAiSuggestionBtn');
         const suggestedLimit = predictor.suggestDailyLimit();
         if (applyBtn) {
             applyBtn.onclick = () => {
                 const newMeta = suggestedLimit * 30;
-                if (confirm(`Aplicar sugestão de economia: limite diário de ${formatBrazilianMoney(suggestedLimit)} (meta mensal ${formatBrazilianMoney(newMeta)})?`)) {
+                if (confirm(`Com base na sua média de gastos, sugiro uma meta de ${formatBrazilianMoney(newMeta)} por mês (${formatBrazilianMoney(suggestedLimit)} por dia). Deseja aplicar?`)) {
                     userSettings.meta = newMeta;
                     if (currentUser) saveToCloud();
                     updateMetaUI();
-                    updatePredictionCard();
+                    updatePredictionAndAnalysis();
                     alert('Meta ajustada com base na IA!');
                 }
             };
@@ -1606,6 +1911,20 @@
     async function logout() { try{ await auth.signOut(); } catch(e){ alert(e.message); } }
 
     // ==================== EVENT LISTENERS ====================
+    document.getElementById('installBtn')?.addEventListener('click', () => {
+        if (deferredPrompt) {
+            deferredPrompt.prompt();
+            deferredPrompt.userChoice.then((choiceResult) => {
+                if (choiceResult.outcome === 'accepted') {
+                    console.log('Usuário aceitou instalar o PWA');
+                }
+                deferredPrompt = null;
+            });
+        } else {
+            alert('Seu navegador já suporta PWA. Use o menu do navegador para instalar o app!');
+        }
+    });
+    
     document.getElementById('openMapBtn')?.addEventListener('click', initMapWithGPS);
     document.getElementById('closeMapModalBtn')?.addEventListener('click', () => document.getElementById('mapModal').style.display = 'none');
     document.getElementById('searchAddressBtn')?.addEventListener('click', searchAddress);
@@ -1640,21 +1959,54 @@
     document.getElementById('loginBtn')?.addEventListener('click', login);
     document.getElementById('signupBtn')?.addEventListener('click', signup);
     document.getElementById('logoutBtn')?.addEventListener('click', logout);
+    
     const loginEmailField = document.getElementById('loginEmail'), loginPasswordField = document.getElementById('loginPassword');
     function handleLoginEnter(e) { if(e.key === 'Enter') login(); }
     loginEmailField?.addEventListener('keypress', handleLoginEnter);
     loginPasswordField?.addEventListener('keypress', handleLoginEnter);
+    
+    // Dark mode toggle melhorado
     const darkToggle = document.getElementById('darkModeToggle');
-    if(darkToggle) { if(localStorage.getItem('darkMode') === 'enabled') document.body.classList.add('dark-mode'); darkToggle.addEventListener('click', () => { document.body.classList.toggle('dark-mode'); localStorage.setItem('darkMode', document.body.classList.contains('dark-mode') ? 'enabled' : 'disabled'); }); }
+    if(darkToggle) {
+        if(localStorage.getItem('darkMode') === 'enabled') {
+            document.body.classList.add('dark-mode');
+            darkToggle.innerHTML = '☀️ Modo claro';
+        } else {
+            darkToggle.innerHTML = '🌙 Modo escuro';
+        }
+        darkToggle.addEventListener('click', () => {
+            document.body.classList.toggle('dark-mode');
+            const isDark = document.body.classList.contains('dark-mode');
+            localStorage.setItem('darkMode', isDark ? 'enabled' : 'disabled');
+            darkToggle.innerHTML = isDark ? '☀️ Modo claro' : '🌙 Modo escuro';
+        });
+    }
+    
     window.onclick = (e) => { if(e.target === document.getElementById('modal')) closeModal(); if(e.target === document.getElementById('reportModal')) closeReportModal(); if(e.target === document.getElementById('metaModal')) closeMetaModal(); if(e.target === document.getElementById('dayModal')) closeDayModal(); if(e.target === document.getElementById('insightsModal')) closeInsightsModal(); if(e.target === document.getElementById('mapModal')) document.getElementById('mapModal').style.display = 'none'; if(e.target === document.getElementById('whatsappModal')) document.getElementById('whatsappModal').style.display = 'none'; };
 
     auth.onAuthStateChanged(async (user) => {
-        if(user) { currentUser = user; document.getElementById('authSection').style.display = 'none'; document.getElementById('userInfo').style.display = 'flex'; document.getElementById('userEmail').textContent = user.email; await loadUserData(user.uid); document.body.classList.add('logged-in'); document.getElementById('signupGuide').style.display = 'none'; }
-        else { currentUser = null; items = []; userSettings = { meta:0, contacts:[] }; document.getElementById('authSection').style.display = 'flex'; document.getElementById('userInfo').style.display = 'none'; document.body.classList.remove('logged-in'); document.getElementById('signupGuide').style.display = 'flex'; refreshAllUI(); }
+        if(user) { 
+            currentUser = user; 
+            document.getElementById('authSection').style.display = 'none'; 
+            document.getElementById('userInfo').style.display = 'flex'; 
+            document.getElementById('userEmail').textContent = user.email; 
+            await loadUserData(user.uid); 
+            document.body.classList.add('logged-in'); 
+            document.getElementById('signupGuide').style.display = 'none'; 
+        } else { 
+            currentUser = null; 
+            items = []; 
+            userSettings = { meta:0, contacts:[] }; 
+            document.getElementById('authSection').style.display = 'flex'; 
+            document.getElementById('userInfo').style.display = 'none'; 
+            document.body.classList.remove('logged-in'); 
+            document.getElementById('signupGuide').style.display = 'flex'; 
+            refreshAllUI(); 
+        }
     });
     refreshAllUI();
     
-    // Configurar máscaras de dinheiro nos inputs (agora sem travar a digitação)
+    // Configurar máscaras de dinheiro nos inputs
     const amountInput = document.getElementById('amount');
     const metaInput = document.getElementById('metaAmountInput');
     if (amountInput) setupMoneyMask(amountInput);
