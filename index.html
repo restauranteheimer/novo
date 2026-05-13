@@ -35,7 +35,7 @@
             --border: #e9ecef;
             --success: #10b981;
             --danger: #ef4444;
-            --warning: #f59e0b;
+            --warning: #000000;
             --info: #3b82f6;
             --input-bg: #ffffff;
             --input-text: #1e1e2f;
@@ -1240,7 +1240,7 @@
         }
     }
 
-    // ==================== META (MELHORADA) ====================
+    // ==================== META ====================
     function updateMetaUI() {
         let meta = userSettings.meta || 0;
         document.getElementById('metaValueDisplay').innerHTML = formatBrazilianMoney(meta);
@@ -1264,15 +1264,12 @@
         if(percent >= 100) {
             document.getElementById('metaStatus').innerHTML = `🔴 META ESTOURADA! Você gastou ${formatBrazilianMoney(gastos)} de ${formatBrazilianMoney(meta)} (${percent.toFixed(0)}%)`;
             document.getElementById('metaStatus').className = 'meta-status danger';
-            document.getElementById('progressBar').style.backgroundColor = 'var(--danger)';
         } else if(percent >= 70) {
             document.getElementById('metaStatus').innerHTML = `⚠️ ATENÇÃO: Você já gastou ${formatBrazilianMoney(gastos)} de ${formatBrazilianMoney(meta)} (${percent.toFixed(0)}%). Restam ${restanteFormatado} para o mês.`;
             document.getElementById('metaStatus').className = 'meta-status warning';
-            document.getElementById('progressBar').style.backgroundColor = 'var(--warning)';
         } else {
             document.getElementById('metaStatus').innerHTML = `✅ Dentro do orçamento: ${formatBrazilianMoney(gastos)} de ${formatBrazilianMoney(meta)} (${percent.toFixed(0)}%). Restam ${restanteFormatado}`;
             document.getElementById('metaStatus').className = 'meta-status good';
-            document.getElementById('progressBar').style.backgroundColor = 'var(--success)';
         }
     }
     
@@ -1737,14 +1734,12 @@
             return Math.max(10, avgDaily * 0.9);
         }
         
-        // NOVA FUNÇÃO: Análise Financeira Completa
         getFinancialAnalysis() {
             const monthStats = getMonthStats();
             const totalReceitas = monthStats.income;
             const totalDespesas = monthStats.expense;
             const saldo = monthStats.balance;
             
-            // Análise de categorias de gastos (simplificada)
             const despesasPorTitulo = {};
             items.filter(i => i.type === 'expense' && new Date(i.date).getMonth() === new Date().getMonth())
                 .forEach(d => {
@@ -1760,7 +1755,6 @@
             let analysis = {};
             
             if (saldo > 0) {
-                // SUPERÁVIT - Dicas de investimento
                 analysis.type = 'surplus';
                 analysis.level = 'success';
                 analysis.title = '🎉 PARABÉNS! Você está no azul!';
@@ -1774,7 +1768,6 @@
                 ];
                 analysis.mainTip = `Com ${formatBrazilianMoney(saldo)} positivos, você pode começar a investir! Sugiro começar com CDB de liquidez diária.`;
             } else if (saldo < 0) {
-                // DÉFICIT - Conselhos para cortar gastos
                 analysis.type = 'deficit';
                 analysis.level = 'danger';
                 analysis.title = '⚠️ ATENÇÃO! Você está no vermelho!';
@@ -1790,7 +1783,6 @@
                 ];
                 analysis.mainTip = `Foque em cortar os maiores gastos: ${maioresGastos[0]?.[0] || 'revise suas despesas'} (${maioresGastos[0] ? formatBrazilianMoney(maioresGastos[0][1]) : 'R$ 0,00'}).`;
             } else {
-                // EQUILIBRADO
                 analysis.type = 'balanced';
                 analysis.level = 'info';
                 analysis.title = '📊 Situação equilibrada';
@@ -1816,16 +1808,12 @@
         const meta = userSettings.meta || 0;
         const predictor = new FinancialPredictor(items, meta);
         
-        // Previsão de gastos
         const alertData = predictor.getAlert();
         const predResult = predictor.predictNext7Days();
-        
-        // Análise financeira
         const analysis = predictor.getFinancialAnalysis();
         
         let html = '';
         
-        // ANÁLISE FINANCEIRA (Destaque principal)
         const analysisClass = analysis.level === 'success' ? 'ok' : (analysis.level === 'danger' ? 'critical' : (analysis.level === 'warning' ? 'warning' : 'info'));
         html += `<div class="prediction-alert ${analysisClass}" style="margin-bottom: 16px;">`;
         html += `<strong>${analysis.title}</strong><br>`;
@@ -1838,7 +1826,6 @@
         html += `</div></details>`;
         html += `</div>`;
         
-        // Previsão de gastos futuros
         if (!predResult.prediction) {
             html += `<div style="text-align:center; color: var(--text-gray); padding: 8px; font-size: 0.75rem;">🔍 ${predResult.message || 'Insira mais despesas nos últimos 30 dias para previsões.'}</div>`;
         } else {
@@ -1965,7 +1952,6 @@
     loginEmailField?.addEventListener('keypress', handleLoginEnter);
     loginPasswordField?.addEventListener('keypress', handleLoginEnter);
     
-    // Dark mode toggle melhorado
     const darkToggle = document.getElementById('darkModeToggle');
     if(darkToggle) {
         if(localStorage.getItem('darkMode') === 'enabled') {
@@ -2006,7 +1992,6 @@
     });
     refreshAllUI();
     
-    // Configurar máscaras de dinheiro nos inputs
     const amountInput = document.getElementById('amount');
     const metaInput = document.getElementById('metaAmountInput');
     if (amountInput) setupMoneyMask(amountInput);
