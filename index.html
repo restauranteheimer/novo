@@ -687,7 +687,6 @@
             cursor: pointer;
         }
 
-        /* Estilo para campo de valor com máscara */
         .money-input {
             text-align: right;
             font-weight: 500;
@@ -816,7 +815,7 @@
             <form id="financialForm">
                 <div class="form-group"><label>Tipo</label><select id="type"><option value="expense">🔴 Despesa</option><option value="income">🟢 Receita</option></select></div>
                 <div class="form-group"><label>Descrição</label><input type="text" id="description" list="descSuggestions" required placeholder="Ex: Almoço, Salário"><datalist id="descSuggestions"></datalist></div>
-                <div class="form-group"><label>Valor (R$)</label><input type="text" id="amount" class="money-input" required placeholder="1.500,50"></div>
+                <div class="form-group"><label>Valor (R$)</label><input type="text" id="amount" class="money-input" required placeholder="0,00" value=""></div>
                 <div class="form-group"><label>Status</label><select id="status"><option value="pending">⏳ Pendente</option><option value="paid">✅ Pago/Recebido</option></select></div>
                 <div class="form-buttons"><button type="button" class="btn-cancel" id="cancelModalBtn">Cancelar</button><button type="submit" class="btn-save">Salvar</button></div>
             </form>
@@ -925,7 +924,7 @@
     <div class="modal-content">
         <div class="modal-header"><h3>Definir meta mensal</h3><button class="close-modal" id="closeMetaModalBtn">Fechar</button></div>
         <div style="padding:20px;">
-            <input type="text" id="metaAmountInput" class="money-input" placeholder="1.500,00" style="width:100%; margin-bottom:16px;">
+            <input type="text" id="metaAmountInput" class="money-input" placeholder="0,00" style="width:100%; margin-bottom:16px;" value="">
             <button id="saveMetaBtn" class="btn-save">Salvar meta</button>
         </div>
     </div>
@@ -933,62 +932,63 @@
 
 <script>
     // ==================== FUNÇÕES DE FORMATAÇÃO BRASILEIRA ====================
-    // Converte string no formato brasileiro (1.500,50) para número (1500.50)
     function parseBrazilianMoney(value) {
         if (!value) return 0;
-        // Remove tudo exceto dígitos, vírgula e ponto
         let cleaned = value.toString().trim();
-        // Se já for número, retorna
         if (typeof cleaned === 'number') return cleaned;
-        // Remove R$ se existir
         cleaned = cleaned.replace(/R\$?\s*/g, '');
-        // Remove pontos de milhar (mantém apenas o último ponto como separador decimal? Não, vírgula é decimal)
-        // Estratégia: remove todos os pontos (separador de milhar) e troca vírgula por ponto
-        cleaned = cleaned.replace(/\./g, ''); // remove pontos de milhar
-        cleaned = cleaned.replace(/,/g, '.'); // vírgula vira ponto decimal
+        let isNegative = cleaned.startsWith('-');
+        if (isNegative) cleaned = cleaned.substring(1);
+        cleaned = cleaned.replace(/\./g, '');
+        cleaned = cleaned.replace(/,/g, '.');
         let number = parseFloat(cleaned);
-        return isNaN(number) ? 0 : number;
+        if (isNaN(number)) number = 0;
+        return isNegative ? -number : number;
     }
     
-    // Formata número para moeda brasileira (R$ 1.500,50)
     function formatBrazilianMoney(value) {
         if (value === undefined || value === null) value = 0;
         let num = typeof value === 'number' ? value : parseBrazilianMoney(value);
         return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(num);
     }
     
-    // Formata apenas o número sem símbolo (1.500,50)
     function formatBrazilianNumber(value) {
         if (value === undefined || value === null) value = 0;
         let num = typeof value === 'number' ? value : parseBrazilianMoney(value);
         return new Intl.NumberFormat('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(num);
     }
     
-    // Aplica máscara de dinheiro no input (enquanto digita)
+    // Máscara SIMPLES que só formata ao perder o foco (blur)
     function setupMoneyMask(inputElement) {
         if (!inputElement) return;
-        inputElement.addEventListener('input', function(e) {
-            let value = this.value;
-            // Remove tudo que não for dígito ou vírgula
-            let cleaned = value.replace(/[^\d,]/g, '');
-            // Separa parte inteira e decimal
-            let parts = cleaned.split(',');
-            if (parts.length > 2) parts = [parts[0], parts.slice(1).join('')];
-            let integerPart = parts[0].replace(/^0+/, '') || '0';
-            let decimalPart = parts[1] ? parts[1].substring(0, 2) : '';
-            if (decimalPart.length === 1) decimalPart += '0';
-            if (decimalPart === '') decimalPart = '00';
-            // Formata parte inteira com pontos a cada 3 dígitos
-            integerPart = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-            this.value = integerPart + ',' + decimalPart;
-        });
-        inputElement.addEventListener('blur', function() {
-            if (!this.value || this.value === '0,00') {
-                this.value = '0,00';
+        
+        // Quando ganha foco, se estiver vazio ou 0,00, limpa para facilitar digitação
+        inputElement.addEventListener('focus', function() {
+            if (this.value === '0,00' || this.value === '' || this.value === 'R$ 0,00') {
+                this.value = '';
             }
         });
-        // Inicializa com 0,00 se vazio
-        if (!inputElement.value) inputElement.value = '0,00';
+        
+        // Quando perde o foco, formata o valor
+        inputElement.addEventListener('blur', function() {
+            let value = this.value.trim();
+            if (value === '') {
+                this.value = '0,00';
+                return;
+            }
+            // Remove caracteres não numéricos exceto vírgula e ponto
+            let cleaned = value.replace(/[^\d,.-]/g, '');
+            let number = parseBrazilianMoney(cleaned);
+            if (isNaN(number)) number = 0;
+            this.value = formatBrazilianNumber(number);
+        });
+        
+        // Permite digitar livremente - sem formatação durante a digitação
+        inputElement.addEventListener('input', function(e) {
+            // Não faz nada durante a digitação - deixa o usuário digitar à vontade
+            // Só garante que não tenha caracteres estranhos
+            this.value = this.value.replace(/[^\d,]/g, '');
+        });
     }
     
     // ==================== CONFIGURAÇÃO FIREBASE ====================
@@ -1433,7 +1433,7 @@
         if(presetType) document.getElementById('type').value = presetType;
         document.getElementById('modalTitle').innerHTML = 'Nova transação';
         document.getElementById('description').oninput = function() { suggestAmountByDescription(this.value); };
-        document.getElementById('amount').value = '0,00';
+        document.getElementById('amount').value = '';
     }
     
     function openModalWithDate(date, tab) {
@@ -1654,9 +1654,11 @@
     });
     refreshAllUI();
     
-    // Configurar máscaras de dinheiro nos inputs
-    setupMoneyMask(document.getElementById('amount'));
-    setupMoneyMask(document.getElementById('metaAmountInput'));
+    // Configurar máscaras de dinheiro nos inputs (agora sem travar a digitação)
+    const amountInput = document.getElementById('amount');
+    const metaInput = document.getElementById('metaAmountInput');
+    if (amountInput) setupMoneyMask(amountInput);
+    if (metaInput) setupMoneyMask(metaInput);
 </script>
 </body>
 </html>
