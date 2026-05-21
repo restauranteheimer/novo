@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
   <title>Basket Cheese Burguer - Heimer</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -15,37 +15,40 @@
       background: #151515;
       touch-action: none;
       user-select: none;
+      -webkit-user-select: none;
+      -webkit-touch-callout: none;
     }
 
     #game {
       width: 100vw;
       height: 100vh;
       display: block;
-      background: linear-gradient(#242424, #111);
+      background: linear-gradient(#252525, #111);
+      touch-action: none;
     }
 
     .ui {
       position: fixed;
-      top: 12px;
-      left: 12px;
-      right: 12px;
+      top: max(10px, env(safe-area-inset-top));
+      left: 10px;
+      right: 10px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       color: white;
       z-index: 2;
       pointer-events: none;
-      gap: 8px;
+      gap: 6px;
     }
 
     .badge {
-      background: rgba(0,0,0,.55);
-      border: 1px solid rgba(255,255,255,.12);
-      padding: 10px 12px;
+      background: rgba(0,0,0,.58);
+      border: 1px solid rgba(255,255,255,.13);
+      padding: 9px 10px;
       border-radius: 14px;
-      font-weight: 800;
+      font-weight: 900;
       box-shadow: 0 8px 20px rgba(0,0,0,.25);
-      font-size: 14px;
+      font-size: clamp(11px, 3.2vw, 14px);
       white-space: nowrap;
     }
 
@@ -57,43 +60,40 @@
       justify-content: center;
       z-index: 4;
       background: rgba(0,0,0,.72);
-      padding: 22px;
+      padding: 18px;
     }
 
     .card {
-      max-width: 420px;
+      max-width: 430px;
       width: 100%;
       text-align: center;
       background: #fff7e8;
       border-radius: 26px;
-      padding: 26px 20px;
+      padding: 24px 18px;
       color: #221;
       box-shadow: 0 20px 50px rgba(0,0,0,.45);
       border: 4px solid #ffb000;
     }
 
-    .card h1 { font-size: 30px; margin-bottom: 10px; }
+    .card h1 { font-size: clamp(25px, 8vw, 32px); margin-bottom: 10px; }
     .card p { font-size: 16px; line-height: 1.4; margin: 8px 0; }
-    .prize { font-size: 76px; margin: 12px 0; }
+    .prize { font-size: 72px; margin: 10px 0; }
 
     button {
-      margin-top: 18px;
+      margin-top: 16px;
       border: none;
       background: #ff7a00;
       color: white;
-      padding: 14px 22px;
+      padding: 15px 22px;
       border-radius: 16px;
       font-size: 17px;
       font-weight: 900;
       cursor: pointer;
       box-shadow: 0 8px 0 #b65000;
+      min-width: 180px;
     }
 
-    button:active {
-      transform: translateY(4px);
-      box-shadow: 0 4px 0 #b65000;
-    }
-
+    button:active { transform: translateY(4px); box-shadow: 0 4px 0 #b65000; }
     .hidden { display: none; }
   </style>
 </head>
@@ -101,8 +101,8 @@
   <canvas id="game"></canvas>
 
   <div class="ui">
-    <div class="badge">🎮 Tentativas: <span id="playsLeft">3</span>/3</div>
-    <div class="badge">🏀 Pontos: <span id="score">0</span>/3</div>
+    <div class="badge">🎮 <span id="playsLeft">3</span>/3</div>
+    <div class="badge">🏀 <span id="score">0</span>/3</div>
     <div class="badge">⏱️ <span id="time">45</span>s</div>
   </div>
 
@@ -111,10 +111,10 @@
       <h1>🏀 Basket Heimer</h1>
       <p>Arraste a bola com o dedo, mire e solte para arremessar.</p>
       <p>Faça <b>3 cestas em 45 segundos</b> e ganhe um:</p>
-      <p style="font-size:14px;color:#6b3b00;"><b>Desafio:</b> mire bem, puxe a bola para trás e solte na força certa.</p>
+      <p style="font-size:14px;color:#6b3b00;"><b>Dica:</b> puxe a bola para baixo e para trás, depois solte.</p>
       <div class="prize">🍔</div>
       <p><b>CHEESE BURGUER!</b></p>
-      <button type="button" onclick="startGame()">COMEÇAR</button>
+      <button id="startBtn" type="button">COMEÇAR</button>
     </div>
   </div>
 
@@ -130,7 +130,7 @@
         <p>⏳ Válido até: <b><span id="expireDate">--/--/----</span></b></p>
         <p>📍 Resgate somente presencial no Heimer Restaurante.</p>
       </div>
-      <button type="button" onclick="startGame()">JOGAR DE NOVO</button>
+      <button id="playAgainWinBtn" type="button">JOGAR DE NOVO</button>
     </div>
   </div>
 
@@ -138,8 +138,19 @@
     <div class="card">
       <h1>😅 Não foi dessa vez</h1>
       <p>Você precisa fazer 3 cestas antes do tempo acabar.</p>
+      <p>Você ainda pode tentar de novo se tiver tentativas hoje.</p>
       <div class="prize">🏀</div>
-      <button type="button" onclick="startGame()">TENTAR NOVAMENTE</button>
+      <button id="playAgainLoseBtn" type="button">TENTAR NOVAMENTE</button>
+    </div>
+  </div>
+
+  <div id="limitScreen" class="centerBox hidden">
+    <div class="card">
+      <h1>⚠️ Limite do dia</h1>
+      <p>Você já usou suas <b>3 tentativas de hoje</b>.</p>
+      <p>Volte amanhã para jogar novamente.</p>
+      <div class="prize">🍔</div>
+      <button id="closeLimitBtn" type="button">OK</button>
     </div>
   </div>
 
@@ -154,16 +165,22 @@ const playsLeftEl = document.getElementById('playsLeft');
 const startScreen = document.getElementById('startScreen');
 const winScreen = document.getElementById('winScreen');
 const loseScreen = document.getElementById('loseScreen');
+const limitScreen = document.getElementById('limitScreen');
 const winDateEl = document.getElementById('winDate');
 const expireDateEl = document.getElementById('expireDate');
-const PLAY_STORAGE_KEY = 'heimer_basket_daily_plays';
+const startBtn = document.getElementById('startBtn');
+const playAgainWinBtn = document.getElementById('playAgainWinBtn');
+const playAgainLoseBtn = document.getElementById('playAgainLoseBtn');
+const closeLimitBtn = document.getElementById('closeLimitBtn');
 
 const WIN_SCORE = 3;
 const GAME_TIME = 45;
 const MAX_PLAYS_PER_DAY = 3;
+const PLAY_STORAGE_KEY = 'heimer_basket_daily_plays_v2';
 
 let W = 0;
 let H = 0;
+let DPR = 1;
 let hoop = null;
 let ball = null;
 let score = 0;
@@ -174,67 +191,77 @@ let dragging = false;
 let dragStart = null;
 let dragNow = null;
 let scoredThisShot = false;
+let shotStartTime = 0;
+
+function todayKey() {
+  const now = new Date();
+  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+}
+
+function getPlayData() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(PLAY_STORAGE_KEY) || '{}');
+    if (saved.date === todayKey() && Number.isFinite(saved.plays)) return saved;
+  } catch (_) {}
+  return { date: todayKey(), plays: 0 };
+}
+
+function savePlayData(data) {
+  try { localStorage.setItem(PLAY_STORAGE_KEY, JSON.stringify(data)); } catch (_) {}
+}
+
+function playsLeft() {
+  const data = getPlayData();
+  return Math.max(0, MAX_PLAYS_PER_DAY - data.plays);
+}
+
+function updatePlaysUI() {
+  playsLeftEl.textContent = String(playsLeft());
+}
+
+function spendOnePlay() {
+  const data = getPlayData();
+  if (data.plays >= MAX_PLAYS_PER_DAY) return false;
+  data.plays += 1;
+  savePlayData(data);
+  updatePlaysUI();
+  return true;
+}
+
+function setCanvasSize() {
+  DPR = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
+  W = Math.floor(window.innerWidth || 360);
+  H = Math.floor(window.innerHeight || 640);
+  canvas.width = Math.floor(W * DPR);
+  canvas.height = Math.floor(H * DPR);
+  canvas.style.width = `${W}px`;
+  canvas.style.height = `${H}px`;
+  ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+}
 
 function createHoop() {
-  const safeW = W || window.innerWidth || 360;
-  const safeH = H || window.innerHeight || 640;
-
+  const safeW = W || 360;
+  const safeH = H || 640;
   return {
-    // Cesta fixa, menor e mais distante para aumentar o desafio.
     x: safeW * 0.68,
-    y: safeH * 0.23,
-    w: Math.min(135, safeW * 0.30),
+    y: safeH * 0.24,
+    w: Math.min(150, safeW * 0.34),
     h: 16
   };
 }
 
 function createBall() {
-  const safeW = W || window.innerWidth || 360;
-  const safeH = H || window.innerHeight || 640;
-
+  const safeW = W || 360;
+  const safeH = H || 640;
   return {
-    x: safeW * 0.22,
-    y: safeH * 0.78,
-    r: Math.min(26, safeW * 0.065),
+    x: safeW * 0.20,
+    y: safeH * 0.76,
+    r: Math.min(26, Math.max(19, safeW * 0.06)),
     vx: 0,
     vy: 0,
     moving: false
   };
 }
-
-function ensureGameObjects() {
-  if (!canvas || !ctx) return false;
-
-  if (!W || !H) {
-    W = canvas.width = window.innerWidth || 360;
-    H = canvas.height = window.innerHeight || 640;
-  }
-
-  if (!hoop) hoop = createHoop();
-  if (!ball) ball = createBall();
-
-  return Boolean(hoop && ball);
-}
-
-function resize() {
-  W = canvas.width = window.innerWidth || 360;
-  H = canvas.height = window.innerHeight || 640;
-
-  // No mobile, a barra do navegador pode mudar a altura da tela.
-  // Por isso a cesta não é recalculada durante a partida.
-  if (!hoop) hoop = createHoop();
-  if (!ball) ball = createBall();
-}
-
-window.addEventListener('resize', resize);
-window.addEventListener('orientationchange', () => {
-  setTimeout(() => {
-    W = canvas.width = window.innerWidth || 360;
-    H = canvas.height = window.innerHeight || 640;
-    hoop = createHoop();
-    resetBall();
-  }, 250);
-});
 
 function resetBall() {
   ball = createBall();
@@ -242,81 +269,61 @@ function resetBall() {
   dragStart = null;
   dragNow = null;
   scoredThisShot = false;
+  shotStartTime = 0;
 }
 
-function getTodayKey() {
-  const now = new Date();
-  return `${now.getFullYear()}-${now.getMonth()+1}-${now.getDate()}`;
+function resize() {
+  const oldW = W;
+  const oldH = H;
+  setCanvasSize();
+
+  // A cesta fica estável durante a partida. Só reposiciona em rotação real ou nova partida.
+  if (!hoop || Math.abs(W - oldW) > 80 || Math.abs(H - oldH) > 160) hoop = createHoop();
+  if (!ball) resetBall();
 }
 
-function getPlayData() {
-  const saved = JSON.parse(localStorage.getItem(PLAY_STORAGE_KEY) || '{}');
-  const today = getTodayKey();
-
-  if (saved.date !== today) {
-    return { date: today, plays: 0 };
-  }
-
-  return saved;
-}
-
-function savePlayData(data) {
-  localStorage.setItem(PLAY_STORAGE_KEY, JSON.stringify(data));
-}
-
-function updatePlaysUI() {
-  const data = getPlayData();
-  playsLeftEl.textContent = String(MAX_PLAYS_PER_DAY - data.plays);
+function showOnly(screen) {
+  startScreen.classList.add('hidden');
+  winScreen.classList.add('hidden');
+  loseScreen.classList.add('hidden');
+  limitScreen.classList.add('hidden');
+  if (screen) screen.classList.remove('hidden');
 }
 
 function startGame() {
-  const playData = getPlayData();
-
-  if (playData.plays >= MAX_PLAYS_PER_DAY) {
-    alert('⚠️ Você já usou suas 3 tentativas de hoje. Volte amanhã!');
+  if (!spendOnePlay()) {
+    showOnly(limitScreen);
     return;
   }
-
-  playData.plays += 1;
-  savePlayData(playData);
-  updatePlaysUI();
 
   resize();
   hoop = createHoop();
   resetBall();
-
-  startScreen.classList.add('hidden');
-  winScreen.classList.add('hidden');
-  loseScreen.classList.add('hidden');
 
   score = 0;
   timeLeft = GAME_TIME;
   playing = true;
   scoreEl.textContent = String(score);
   timeEl.textContent = String(timeLeft);
+  showOnly(null);
 
   clearInterval(timer);
   timer = setInterval(() => {
     if (!playing) return;
-
     timeLeft -= 1;
     timeEl.textContent = String(timeLeft);
-
     if (timeLeft <= 0) endGame(false);
   }, 1000);
 }
 
 function formatDate(date) {
   return date.toLocaleDateString('pt-BR', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit'
+    day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit'
   });
 }
 
 function endGame(won) {
+  if (!playing) return;
   playing = false;
   dragging = false;
   clearInterval(timer);
@@ -326,14 +333,15 @@ function endGame(won) {
     const expires = new Date(now.getTime() + 24 * 60 * 60 * 1000);
     winDateEl.textContent = formatDate(now);
     expireDateEl.textContent = formatDate(expires);
-    winScreen.classList.remove('hidden');
+    showOnly(winScreen);
   } else {
-    loseScreen.classList.remove('hidden');
+    showOnly(loseScreen);
   }
 }
 
 function pointerPos(e) {
-  return { x: e.clientX, y: e.clientY };
+  const rect = canvas.getBoundingClientRect();
+  return { x: e.clientX - rect.left, y: e.clientY - rect.top };
 }
 
 function dist(a, b) {
@@ -341,39 +349,60 @@ function dist(a, b) {
   return Math.hypot(a.x - b.x, a.y - b.y);
 }
 
-canvas.addEventListener('pointerdown', e => {
-  if (!playing || !ensureGameObjects() || ball.moving) return;
+function clamp(value, min, max) {
+  return Math.max(min, Math.min(max, value));
+}
+
+function beginDrag(e) {
+  if (!playing || !ball || ball.moving) return;
+  e.preventDefault();
 
   const p = pointerPos(e);
-  if (dist(p, ball) <= ball.r * 2.4) {
+  const touchRadius = Math.max(ball.r * 2.8, 64); // dedo não precisa tocar exatamente na bola
+  if (dist(p, ball) <= touchRadius) {
     dragging = true;
     dragStart = { x: ball.x, y: ball.y };
     dragNow = p;
-    canvas.setPointerCapture?.(e.pointerId);
+    try { canvas.setPointerCapture(e.pointerId); } catch (_) {}
   }
-});
+}
 
-canvas.addEventListener('pointermove', e => {
+function moveDrag(e) {
   if (!dragging) return;
+  e.preventDefault();
   dragNow = pointerPos(e);
-});
+}
 
-canvas.addEventListener('pointerup', shoot);
-canvas.addEventListener('pointercancel', shoot);
-
-function shoot() {
+function shoot(e) {
+  if (e) e.preventDefault();
   if (!dragging || !dragStart || !dragNow || !ball) return;
 
   dragging = false;
-  const dx = dragStart.x - dragNow.x;
-  const dy = dragStart.y - dragNow.y;
 
-  // Força média: exige mirar melhor.
-  ball.vx = dx * 0.075;
-  ball.vy = dy * 0.075;
+  let dx = dragStart.x - dragNow.x;
+  let dy = dragStart.y - dragNow.y;
+  const pull = Math.hypot(dx, dy);
+
+  // Ignora toque sem arrastar para evitar disparo acidental.
+  if (pull < 18) return;
+
+  const maxPull = Math.min(230, W * 0.58);
+  const power = clamp(pull, 18, maxPull) / pull;
+  dx *= power;
+  dy *= power;
+
+  // Sensibilidade ajustada para mobile: nem rápido demais, nem fraco demais.
+  ball.vx = dx * 0.071;
+  ball.vy = dy * 0.071;
   ball.moving = true;
   scoredThisShot = false;
+  shotStartTime = performance.now();
 }
+
+canvas.addEventListener('pointerdown', beginDrag, { passive: false });
+canvas.addEventListener('pointermove', moveDrag, { passive: false });
+canvas.addEventListener('pointerup', shoot, { passive: false });
+canvas.addEventListener('pointercancel', shoot, { passive: false });
 
 function isBasketMade() {
   if (!ball || !hoop) return false;
@@ -382,21 +411,21 @@ function isBasketMade() {
   const rimRight = hoop.x + hoop.w / 2;
   const rimY = hoop.y;
 
-  // Área de acerto menor para o jogo ficar mais desafiador.
   return (
     !scoredThisShot &&
     ball.vy > 0 &&
     ball.x > rimLeft &&
     ball.x < rimRight &&
-    ball.y > rimY - 10 &&
-    ball.y < rimY + 24
+    ball.y > rimY - 12 &&
+    ball.y < rimY + 28
   );
 }
 
 function update() {
-  if (!playing || !ensureGameObjects() || !ball.moving) return;
+  if (!playing || !ball || !ball.moving) return;
 
-  ball.vy += 0.13;
+  ball.vy += 0.125;
+  ball.vx *= 0.998;
   ball.x += ball.vx;
   ball.y += ball.vy;
 
@@ -406,21 +435,22 @@ function update() {
     scoreEl.textContent = String(score);
 
     if (score >= WIN_SCORE) {
-      setTimeout(() => endGame(true), 500);
+      setTimeout(() => endGame(true), 450);
     } else {
-      setTimeout(resetBall, 900);
+      setTimeout(resetBall, 650);
     }
+    return;
   }
 
-  if (ball && (ball.x < -80 || ball.x > W + 80 || ball.y > H + 100 || ball.y < -140)) {
+  const tooLong = shotStartTime && performance.now() - shotStartTime > 5500;
+  if (ball.x < -90 || ball.x > W + 90 || ball.y > H + 110 || ball.y < -160 || tooLong) {
     resetBall();
   }
 }
 
 function drawCourt() {
-  if (!ensureGameObjects()) return;
-
   ctx.clearRect(0, 0, W, H);
+
   ctx.fillStyle = '#191919';
   ctx.fillRect(0, 0, W, H);
 
@@ -433,28 +463,31 @@ function drawCourt() {
   ctx.lineTo(W, H * 0.82);
   ctx.stroke();
 
-  ctx.fillStyle = '#f5f5f5';
-  ctx.fillRect(hoop.x + hoop.w * 0.28, hoop.y - 92, 18, 110);
+  if (!hoop) return;
 
+  // Suporte e tabela
+  ctx.fillStyle = '#eaeaea';
+  ctx.fillRect(hoop.x + hoop.w * 0.30, hoop.y - 92, 18, 112);
   ctx.fillStyle = '#ffffff';
-  ctx.fillRect(hoop.x - hoop.w * 0.48, hoop.y - 92, hoop.w * 0.95, 64);
-
+  ctx.fillRect(hoop.x - hoop.w * 0.50, hoop.y - 92, hoop.w, 64);
   ctx.strokeStyle = '#ff7a00';
   ctx.lineWidth = 5;
-  ctx.strokeRect(hoop.x - hoop.w * 0.24, hoop.y - 76, hoop.w * 0.48, 32);
+  ctx.strokeRect(hoop.x - hoop.w * 0.25, hoop.y - 76, hoop.w * 0.50, 32);
 
+  // Aro
   ctx.strokeStyle = '#ff7300';
   ctx.lineWidth = 7;
   ctx.beginPath();
   ctx.ellipse(hoop.x, hoop.y, hoop.w / 2, hoop.h, 0, 0, Math.PI * 2);
   ctx.stroke();
 
+  // Rede
   ctx.strokeStyle = 'rgba(255,255,255,.72)';
   ctx.lineWidth = 2;
   for (let i = -3; i <= 3; i += 1) {
     ctx.beginPath();
     ctx.moveTo(hoop.x + i * hoop.w / 7, hoop.y + 10);
-    ctx.lineTo(hoop.x + i * hoop.w / 12, hoop.y + 68);
+    ctx.lineTo(hoop.x + i * hoop.w / 12, hoop.y + 66);
     ctx.stroke();
   }
 
@@ -489,7 +522,7 @@ function drawBall() {
 function drawAim() {
   if (!dragging || !dragNow || !ball) return;
 
-  ctx.strokeStyle = 'rgba(255,255,255,.8)';
+  ctx.strokeStyle = 'rgba(255,255,255,.82)';
   ctx.lineWidth = 4;
   ctx.setLineDash([10, 8]);
   ctx.beginPath();
@@ -498,33 +531,47 @@ function drawAim() {
   ctx.stroke();
   ctx.setLineDash([]);
 
-  ctx.fillStyle = 'rgba(255,255,255,.9)';
+  const pull = Math.min(100, Math.round(dist({ x: ball.x, y: ball.y }, dragNow) / 2));
+  ctx.fillStyle = 'rgba(255,255,255,.95)';
   ctx.font = 'bold 15px Arial';
   ctx.textAlign = 'center';
-  ctx.fillText('Solte para arremessar', W / 2, H - 42);
+  ctx.fillText(`Força: ${pull}%`, W / 2, H - 48);
+}
+
+function drawHelp() {
+  if (playing && ball && !ball.moving && !dragging) {
+    ctx.fillStyle = 'rgba(255,255,255,.85)';
+    ctx.font = 'bold 14px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText('Toque na bola, arraste para trás e solte', W / 2, H - 34);
+  }
 }
 
 function loop() {
   update();
   drawCourt();
   drawAim();
+  drawHelp();
   drawBall();
   requestAnimationFrame(loop);
 }
 
 function runTests() {
-  console.group('Testes do Basket Heimer');
-
+  console.group('Testes do Basket Heimer Mobile');
   resize();
-  ensureGameObjects();
+  hoop = createHoop();
+  resetBall();
 
   console.assert(canvas instanceof HTMLCanvasElement, 'Canvas deve existir.');
   console.assert(ctx, 'Contexto 2D deve existir.');
   console.assert(hoop && Number.isFinite(hoop.x) && Number.isFinite(hoop.y), 'Cesta deve ser inicializada.');
   console.assert(ball && Number.isFinite(ball.x) && Number.isFinite(ball.y), 'Bola deve ser inicializada.');
+  console.assert(WIN_SCORE === 3, 'Vitória deve exigir 3 cestas.');
+  console.assert(GAME_TIME === 45, 'Tempo deve ser 45 segundos.');
+  console.assert(MAX_PLAYS_PER_DAY === 3, 'Máximo deve ser 3 tentativas por dia.');
+  console.assert(playsLeft() >= 0 && playsLeft() <= 3, 'Tentativas restantes devem ficar entre 0 e 3.');
 
   const savedBall = { ...ball };
-  const savedHoop = { ...hoop };
   const savedScored = scoredThisShot;
 
   ball.x = hoop.x;
@@ -533,24 +580,33 @@ function runTests() {
   scoredThisShot = false;
   console.assert(isBasketMade() === true, 'Bola dentro da área do aro deve contar cesta.');
 
-  console.assert(WIN_SCORE === 3, 'Vitória deve exigir 3 cestas no modo mais difícil.');
-  console.assert(GAME_TIME === 45, 'Tempo deve ser 45 segundos no modo mais difícil.');
-  console.assert(MAX_PLAYS_PER_DAY === 3, 'Máximo deve ser 3 tentativas por dia.');
-
   ball.x = hoop.x + hoop.w;
   ball.y = hoop.y;
   ball.vy = 1;
   scoredThisShot = false;
   console.assert(isBasketMade() === false, 'Bola fora do aro não deve contar cesta.');
 
-  hoop = savedHoop;
   ball = savedBall;
   scoredThisShot = savedScored;
-
   console.groupEnd();
 }
 
+startBtn.addEventListener('click', startGame);
+playAgainWinBtn.addEventListener('click', startGame);
+playAgainLoseBtn.addEventListener('click', startGame);
+closeLimitBtn.addEventListener('click', () => showOnly(startScreen));
+window.addEventListener('resize', resize);
+window.addEventListener('orientationchange', () => setTimeout(() => {
+  resize();
+  hoop = createHoop();
+  resetBall();
+}, 250));
+
+document.addEventListener('gesturestart', e => e.preventDefault());
+
 resize();
+hoop = createHoop();
+resetBall();
 updatePlaysUI();
 runTests();
 loop();
